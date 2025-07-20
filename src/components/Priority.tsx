@@ -20,10 +20,11 @@ export const Priority = (props: any) => {
   }
 
   return (
-    <div style={{
-      color: tagColor,
-      textTransform: 'capitalize'
-    }}
+    <div
+      style={{
+        color: tagColor,
+        textTransform: 'capitalize',
+      }}
     >
       {props.priorityData ? props.priorityData : '---'}
     </div>

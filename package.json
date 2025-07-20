@@ -29,7 +29,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "eslint ./src --ext ..js,.jsx,.tsx,.ts",
+    "lint:fix": "eslint ./src --ext .js,.jsx,.tsx,.ts --fix"
   },
   "eslintConfig": {
     "extends": [
@@ -51,7 +53,17 @@
   },
   "devDependencies": {
     "@mui/types": "^7.2.4",
-    "@types/react": "^18.2.14"
+    "@types/react": "^18.2.14",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-n": "^17.21.0",
+    "eslint-plugin-prettier": "^5.5.3",
+    "eslint-plugin-promise": "^7.2.1",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "prettier": "^3.6.2"
   },
   "overrides": {
     "typescript": "^5.1.6"
