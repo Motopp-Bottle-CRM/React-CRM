@@ -27,4 +27,4 @@ export const UsersUrl = 'users'
 export const UserUrl = 'user'
 // PROFILE
 export const ProfileUrl = 'profile'
-// 
+//
