@@ -18,5 +18,11 @@ export function fetchData(url: any, method: any, data = '', header: any) {
     method,
     headers: header,
     body: data,
-  }).then((response) => response.json())
+  }).then(async (response) => {
+    const json = await response.json();
+    if (!response.ok) {
+      throw json; // will be caught in .catch()
+    }
+    return json;
+  });
 }

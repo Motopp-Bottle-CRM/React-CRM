@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react'
 import { Box, TextField, Typography, Button } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import '../../styles/style.css'
+import { fetchData } from '../../components/FetchData'
+import { SetPasswordUrl } from '../../services/ApiUrls'
 export default function SetPassword() {
   const navigate = useNavigate()
   const [token, setToken] = useState('')
@@ -14,6 +16,45 @@ export default function SetPassword() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    if (password !== confirmPassword) {
+      setError('Passwords do not match')
+      return
+    }
+    submitForm()
+  }
+
+  const submitForm = () => {
+    const header = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    }
+
+    fetchData(
+      `${SetPasswordUrl}`,
+      'POST',
+      JSON.stringify({
+        email,
+        password,
+        confirmPassword,
+      }),
+      header
+    )
+      .then((res: any) => {
+        setSuccess('Password set successfully!')
+        navigate('/login') // Redirect to login after successful password set
+      })
+      .catch((err: any) => {
+        if (err.email) {
+          setError(err.email) // user not found
+        } else if (err.non_field_errors) {
+          setError(err.non_field_errors[0]) // other general errors
+        } else if (err.password) {
+          setError(err.password[0]) // password validation errors
+        }
+         else {
+          setError('An unexpected error occurred.')
+        }
+      })
   }
 
   return (
@@ -63,6 +104,7 @@ export default function SetPassword() {
           <TextField
             label="Email Address"
             variant="outlined"
+            required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             sx={{
@@ -76,6 +118,7 @@ export default function SetPassword() {
           <TextField
             label="Password"
             type="password"
+            required
             variant="outlined"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -91,6 +134,7 @@ export default function SetPassword() {
             label="Confirm Password"
             type="password"
             variant="outlined"
+            required
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             sx={{
@@ -101,6 +145,11 @@ export default function SetPassword() {
               width: '80%',
             }}
           ></TextField>
+          {error && (
+            <Typography color="error" variant="body2" mb={2}>
+              {error}
+            </Typography>
+          )}
           <Button
             type="submit"
             variant="contained"
@@ -170,8 +219,6 @@ export default function SetPassword() {
               backgroundColor: '#1E73BE',
               zIndex: '1',
               borderRadius: '98% 0 0 0%',
-
-
             }}
           >
             <Box textAlign="center" color="white">
