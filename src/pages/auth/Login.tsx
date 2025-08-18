@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Grid, Stack, Typography, Box, TextField, Button } from '@mui/material'
 import { useGoogleLogin } from '@react-oauth/google'
-import { useNavigate } from 'react-router-dom'
+import { Form, useNavigate } from 'react-router-dom'
 import imgGoogle from '../../assets/images/auth/google.svg'
 import imgLogo from '../../assets/images/auth/img_logo.png'
 import imgLogin from '../../assets/images/auth/img_login.png'
 import { GoogleButton } from '../../styles/CssStyled'
 import { fetchData } from '../../components/FetchData'
-import { AuthUrl } from '../../services/ApiUrls'
+import { LoginUrl, AuthUrl } from '../../services/ApiUrls'
 import '../../styles/style.css'
 
 declare global {
@@ -27,6 +27,39 @@ export default function Login() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    submitForm()
+  }
+  const submitForm = () => {
+    const header = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    }
+
+    fetchData(
+      `${LoginUrl}/`,
+      'POST',
+      JSON.stringify({
+        email,
+        password,
+      }),
+      header
+    )
+      .then((res: any) => {
+        localStorage.setItem('Token', `Bearer ${res.access}`)
+        setToken(true)
+        navigate('/app') // Redirect to app after successful login
+      })
+      .catch((err: any) => {
+        if (err.email) {
+          setError(err.email) // user not found
+        } else if (err.non_field_errors) {
+          setError(err.non_field_errors[0]) // other general errors
+        } else if (err.password) {
+          setError(err.password[0]) // password validation errors
+        } else {
+          setError('An unexpected error occurred.')
+        }
+      })
   }
 
   useEffect(() => {
@@ -120,6 +153,7 @@ export default function Login() {
                 <TextField
                   label="Email Address"
                   variant="outlined"
+                  required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   sx={{
@@ -133,6 +167,7 @@ export default function Login() {
                 <TextField
                   label="Password"
                   type="password"
+                  required
                   variant="outlined"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -161,6 +196,11 @@ export default function Login() {
                 >
                   Sign In
                 </Button>
+                {error && (
+                  <Typography color="error.main" mt={2} textAlign="center">
+                    {error}
+                  </Typography>
+                )}
               </Box>
 
               {/* right blue section*/}
@@ -221,8 +261,6 @@ export default function Login() {
               <img src={imgGoogle} alt="google" width={15} />
               Login with Google
             </GoogleButton>
-            {error && <Box color="error.main">{error}</Box>}
-            {success && <Box color="success.main">{success}</Box>}
           </Stack>
         </Grid>
       </Grid>
