@@ -1,10 +1,10 @@
 // authurl
-export const SERVER = process.env.REACT_APP_API_BASE_URL
+export const SERVER = process.env.REACT_APP_API_URL
 export const LoginUrl = 'auth/login'
 export const RegisterUrl = 'auth/register'
 export const ForgotPasswordUrl = 'auth/forgot-password'
 
-export const AuthUrl = 'auth/google'
+export const AuthUrl = 'auth/google/'
 // org
 export const OrgUrl = 'org'
 // export const OrgUrl = 'auth/create-org'

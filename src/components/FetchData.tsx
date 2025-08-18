@@ -18,5 +18,15 @@ export function fetchData(url: any, method: any, data = '', header: any) {
     method,
     headers: header,
     body: data
-  }).then((response) => response.json())
+  }).then((response) => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    const contentType = response.headers.get("content-type")
+    if (contentType && contentType.indexOf("application/json") !== -1) {
+      return response.json()
+    } else {
+      throw new Error("Response is not JSON")
+    }
+  })
 }

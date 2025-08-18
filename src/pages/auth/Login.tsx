@@ -37,7 +37,7 @@ export default function Login() {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             }
-            fetchData(`${AuthUrl}/`, 'POST', JSON.stringify(apiToken), head)
+            fetchData(AuthUrl, 'POST', JSON.stringify(apiToken), head)
                 .then((res: any) => {
                     localStorage.setItem('Token', `Bearer ${res.access_token}`)
                     setToken(true)
