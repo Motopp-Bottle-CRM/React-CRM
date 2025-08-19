@@ -21,7 +21,7 @@ import {
   FormHelperText,
 } from '@mui/material'
 import { UserUrl } from '../../services/ApiUrls'
-import { fetchData } from '../../components/FetchData'
+import { fetchData, Header } from '../../components/FetchData'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import { FaArrowDown, FaTimes, FaUpload } from 'react-icons/fa'
 import { AntSwitch, RequiredTextField } from '../../styles/CssStyled'
@@ -72,6 +72,7 @@ export function EditUser() {
   const [userErrors, setUserErrors] = useState<FormErrors>({})
   const [roleSelectOpen, setRoleSelectOpen] = useState(false)
   const [countrySelectOpen, setCountrySelectOpen] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState<FormData>({
     email: '',
     role: 'ADMIN',
@@ -100,6 +101,41 @@ export function EditUser() {
       setReset(false)
     }
   }, [reset])
+
+  useEffect(() => {
+    async function load() {
+      try {
+        setLoading(true)
+        setError(false)
+
+        fetchData(`${UserUrl}/${state?.id}/`, 'GET', null as any, Header).then(
+          (res: any) => {
+            if (!res.error) {
+              setLoading(false)
+              const data = res?.data?.profile_obj
+              setFormData({
+                email: data?.user_details?.email || '',
+                role: data?.role || '',
+                phone: data?.phone || '',
+                alternate_phone: data?.alternate_phone || '',
+                address_line: data?.address?.address_line || '',
+                street: data?.address?.street || '',
+                city: data?.address?.city || '',
+                state: data?.address?.state || '',
+                pincode: data?.address?.pincode || '',
+                country: data?.address?.country || '',
+              })
+            }
+          }
+        )
+      } catch (error) {
+        console.error('Error fetching user data:', error)
+        setError(true)
+      }
+    }
+
+    load()
+  }, [state?.id])
 
   const handleChange = (e: any) => {
     const { name, value, files, type, checked } = e.target
@@ -208,7 +244,19 @@ export function EditUser() {
           setUserErrors(res?.errors?.user_errors || res?.user_errors[0])
         }
       })
-      .catch(() => {})
+      .catch(() => {
+        setError(true)
+        if (!formData.phone)
+          setProfileErrors({
+            ...errors,
+            phone: ['adding phone number is required'],
+          })
+        else if (!formData.alternate_phone)
+          setProfileErrors({
+            ...errors,
+            alternate_phone: ['adding alternate phone number is required'],
+          })
+      })
   }
   const resetForm = () => {
     setFormData({
@@ -655,7 +703,7 @@ export function EditUser() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                         </div>
@@ -705,7 +753,7 @@ export function EditUser() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                             <div className='fieldSubContainer'>
@@ -726,7 +774,7 @@ export function EditUser() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                         </div>
@@ -749,7 +797,7 @@ export function EditUser() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                             <div className='fieldSubContainer'>
@@ -770,7 +818,7 @@ export function EditUser() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                         </div>
@@ -793,7 +841,7 @@ export function EditUser() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                             <div className='fieldSubContainer'>
@@ -814,7 +862,7 @@ export function EditUser() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                         </div>
@@ -849,7 +897,7 @@ export function EditUser() {
                                                     name='description'
                                                     minRows={8}
                                                     // defaultValue={state.editData && state.editData.description ? state.editData.description : ''}
-                                                    // onChange={onChange} 
+                                                    // onChange={onChange}
                                                     style={{ width: '70%', padding: '5px' }}
                                                     placeholder='Add Description'
                                                 />
