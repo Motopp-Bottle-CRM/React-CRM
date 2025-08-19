@@ -17,7 +17,6 @@ export function fetchData(url: any, method: any, data = '', header: any) {
   return fetch(`${SERVER}${url}`, {
     method,
     headers: header,
-<<<<<<< HEAD
     body: data
   }).then((response) => {
     if (!response.ok) {
@@ -30,14 +29,4 @@ export function fetchData(url: any, method: any, data = '', header: any) {
       throw new Error("Response is not JSON")
     }
   })
-=======
-    body: data,
-  }).then(async (response) => {
-    const json = await response.json();
-    if (!response.ok) {
-      throw json; // will be caught in .catch()
-    }
-    return json;
-  });
->>>>>>> origin/somayeh_sprint1_setup
 }
