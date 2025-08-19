@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom'
 import {
   TextField,
   AccordionDetails,
@@ -13,46 +13,46 @@ import {
   FormControl,
   Select,
   FormHelperText,
-  Button
+  Button,
 } from '@mui/material'
-import { useQuill } from 'react-quilljs';
-import 'quill/dist/quill.snow.css';
-import { ContactUrl } from '../../services/ApiUrls';
-import { CustomAppBar } from '../../components/CustomAppBar';
-import { fetchData, Header } from '../../components/FetchData';
-import { AntSwitch, RequiredTextField } from '../../styles/CssStyled';
-import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown';
-import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp';
-import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import { useQuill } from 'react-quilljs'
+import 'quill/dist/quill.snow.css'
+import { ContactUrl } from '../../services/ApiUrls'
+import { CustomAppBar } from '../../components/CustomAppBar'
+import { fetchData, Header } from '../../components/FetchData'
+import { AntSwitch, RequiredTextField } from '../../styles/CssStyled'
+import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
+import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
+import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
 import '../../styles/style.css'
 
 // interface FormErrors {
 //   [key: string]: string;
 // }
 type FormErrors = {
-  salutation?: string[];
-  first_name?: string[];
-  last_name?: string[];
-  organization?: string[];
-  title?: string[];
-  primary_email?: string[];
-  secondary_email?: string[];
-  mobile_number?: string[];
-  secondary_number?: string[];
-  department?: string[];
-  country?: string[];
-  language?: string[];
-  do_not_call?: string[];
-  address_line?: string[];
-  street?: string[];
-  city?: string[];
-  state?: string[];
-  postcode?: string[];
-  description?: string[];
-  linked_in_url?: string[];
-  facebook_url?: string[];
-  twitter_username?: string[];
-};
+  salutation?: string[]
+  first_name?: string[]
+  last_name?: string[]
+  organization?: string[]
+  title?: string[]
+  primary_email?: string[]
+  secondary_email?: string[]
+  mobile_number?: string[]
+  secondary_number?: string[]
+  department?: string[]
+  country?: string[]
+  language?: string[]
+  do_not_call?: string[]
+  address_line?: string[]
+  street?: string[]
+  city?: string[]
+  state?: string[]
+  postcode?: string[]
+  description?: string[]
+  linked_in_url?: string[]
+  facebook_url?: string[]
+  twitter_username?: string[]
+}
 
 // interface FormData {
 //   salutation: string;
@@ -61,8 +61,8 @@ type FormErrors = {
 function AddContacts() {
   const navigate = useNavigate()
   const { state } = useLocation()
-  const { quill, quillRef } = useQuill();
-  const initialContentRef = useRef(null);
+  const { quill, quillRef } = useQuill()
+  const initialContentRef = useRef(null)
   // const currentPage = new URLSearchParams(location.search).get('page')
 
   // useEffect(() => {
@@ -94,9 +94,9 @@ function AddContacts() {
     description: '',
     linked_in_url: '',
     facebook_url: '',
-    twitter_username: ''
+    twitter_username: '',
   })
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [errors, setErrors] = useState<FormErrors>({})
   const [countrySelectOpen, setCountrySelectOpen] = useState(false)
 
   const [validationErrors, setValidationErrors] = useState({
@@ -104,15 +104,15 @@ function AddContacts() {
     last_name: '',
     primary_email: '',
     mobile_number: '',
-    secondary_number: ''
-  });
+    secondary_number: '',
+  })
 
   useEffect(() => {
     if (quill) {
       // Save the initial state (HTML content) of the Quill editor
-      initialContentRef.current = quillRef.current.firstChild.innerHTML;
+      initialContentRef.current = quillRef.current.firstChild.innerHTML
     }
-  }, [quill]);
+  }, [quill])
 
   // useEffect(() => {
   //   if (quill) {
@@ -130,57 +130,55 @@ function AddContacts() {
 
   // const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
   const handleChange = (e: any) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, type, checked } = e.target
     // if (name === 'file') {
     //   setFormData({ ...formData, file: files[0] });
     // }
     if (type === 'checkbox') {
-      setFormData({ ...formData, [name]: checked });
-    }
-    else {
-      setFormData({ ...formData, [name]: value });
+      setFormData({ ...formData, [name]: checked })
+    } else {
+      setFormData({ ...formData, [name]: value })
     }
     // setValidationErrors(({ ...validationErrors, [name]: '' }));
     // setErrors({});
     // const newValue = type === 'checkbox' ? checked : value;
     // setFormData({ ...formData, [name]: newValue });
-  };
-
+  }
 
   const resetQuillToInitialState = () => {
     // Reset the Quill editor to its initial state
     setFormData({ ...formData, description: '' })
     if (quill && initialContentRef.current !== null) {
-      quill.clipboard.dangerouslyPasteHTML(initialContentRef.current);
+      quill.clipboard.dangerouslyPasteHTML(initialContentRef.current)
     }
-  };
+  }
 
   const handleSubmit = (e: any) => {
-    e.preventDefault();
+    e.preventDefault()
     // if (quill) {
     //   if (quillRef.current.firstChild.innerHTML !== "" && quillRef.current.firstChild.innerHTML === formData.description) {
     //     submitForm();
     //   } else
     //     onDescriptionChange(quillRef.current.firstChild.innerHTML)
     // } else {
-    submitForm();
+    submitForm()
     // }
-  };
+  }
 
   const isValidEmail = (email: any) => {
-    return /^\S+@\S+\.\S+$/.test(email);
-  };
+    return /^\S+@\S+\.\S+$/.test(email)
+  }
 
   const isValidPhoneNumber = (phoneNumber: any) => {
-    return /^\+91\d{10}$/.test(phoneNumber);
-  };
+    return /^\+91\d{10}$/.test(phoneNumber)
+  }
 
   const submitForm = () => {
     const Header = {
       Accept: 'application/json',
       'Content-Type': 'application/json',
       Authorization: localStorage.getItem('Token'),
-      org: localStorage.getItem('org')
+      org: localStorage.getItem('org'),
     }
     // console.log(formData.description, 'des')
     const data = {
@@ -204,7 +202,7 @@ function AddContacts() {
       description: formData.description,
       linked_in_url: formData.linked_in_url,
       facebook_url: formData.facebook_url,
-      twitter_username: formData.twitter_username
+      twitter_username: formData.twitter_username,
     }
     fetchData(`${ContactUrl}/`, 'POST', JSON.stringify(data), Header)
       .then((res: any) => {
@@ -219,9 +217,8 @@ function AddContacts() {
           setErrors(res?.errors?.contact_errors)
         }
       })
-      .catch(() => {
-      })
-  };
+      .catch(() => {})
+  }
 
   const resetForm = () => {
     setFormData({
@@ -247,9 +244,9 @@ function AddContacts() {
       description: '',
       linked_in_url: '',
       facebook_url: '',
-      twitter_username: ''
-    });
-    setErrors({});
+      twitter_username: '',
+    })
+    setErrors({})
   }
   const backbtnHandle = () => {
     navigate('/app/contacts')
@@ -265,186 +262,226 @@ function AddContacts() {
   // console.log(errors, 'err')
   return (
     <Box sx={{ mt: '60px' }}>
-      <CustomAppBar backbtnHandle={backbtnHandle} module={module} backBtn={backBtn} crntPage={crntPage} onCancel={onCancel} onSubmit={handleSubmit} />
-      <Box sx={{ mt: "120px" }}>
+      <CustomAppBar
+        backbtnHandle={backbtnHandle}
+        module={module}
+        backBtn={backBtn}
+        crntPage={crntPage}
+        onCancel={onCancel}
+        onSubmit={handleSubmit}
+      />
+      <Box sx={{ mt: '120px' }}>
         <form onSubmit={handleSubmit}>
           {/* contact details */}
           <div style={{ padding: '10px' }}>
-            <div className='leadContainer'>
-              <Accordion style={{ width: '98%' }}
-                defaultExpanded
-              >
-                <AccordionSummary expandIcon={<FiChevronDown style={{ fontSize: '25px' }} />}>
-                  <Typography className='accordion-header'>Contact Information</Typography>
+            <div className="leadContainer">
+              <Accordion style={{ width: '98%' }} defaultExpanded>
+                <AccordionSummary
+                  expandIcon={<FiChevronDown style={{ fontSize: '25px' }} />}
+                >
+                  <Typography className="accordion-header">
+                    Contact Information
+                  </Typography>
                 </AccordionSummary>
-                <Divider className='divider' />
+                <Divider className="divider" />
                 <AccordionDetails>
                   <Box
                     sx={{ width: '98%', color: '#1A3353', mb: 1 }}
-                    component='form'
-                    autoComplete='off'
+                    component="form"
+                    autoComplete="off"
                   >
-                    <div className='fieldContainer'>
-                      <div className='fieldSubContainer'>
-                        <div className='fieldTitle'>Salutation</div>
+                    <div className="fieldContainer">
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Salutation</div>
                         <TextField
-                          name='salutation'
+                          name="salutation"
                           className="custom-textfield"
                           value={formData.salutation}
                           onChange={handleChange}
                           style={{ width: '70%' }}
-                          size='small'
+                          size="small"
                           error={!!errors?.salutation?.[0]}
-                          helperText={errors?.salutation?.[0] ? errors?.salutation[0] : ''}
+                          helperText={
+                            errors?.salutation?.[0] ? errors?.salutation[0] : ''
+                          }
                         />
                       </div>
-                      <div className='fieldSubContainer'>
-                        <div className='fieldTitle'>First Name</div>
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">First Name</div>
                         <RequiredTextField
-                          name='first_name'
+                          name="first_name"
                           value={formData.first_name}
                           onChange={handleChange}
                           style={{ width: '70%' }}
-                          size='small'
+                          size="small"
                           required
                           error={!!errors?.first_name?.[0]}
-                          helperText={errors?.first_name?.[0] ? errors?.first_name[0] : ''}
+                          helperText={
+                            errors?.first_name?.[0] ? errors?.first_name[0] : ''
+                          }
                         />
                       </div>
                     </div>
-                    <div className='fieldContainer2'>
-                      <div className='fieldSubContainer'>
-                        <div className='fieldTitle'>Last Name</div>
+                    <div className="fieldContainer2">
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Last Name</div>
                         <RequiredTextField
-                          name='last_name'
+                          name="last_name"
                           value={formData.last_name}
                           onChange={handleChange}
                           style={{ width: '70%' }}
-                          size='small'
+                          size="small"
                           required
                           error={!!errors?.last_name?.[0]}
-                          helperText={errors?.last_name?.[0] ? errors?.last_name[0] : ''}
+                          helperText={
+                            errors?.last_name?.[0] ? errors?.last_name[0] : ''
+                          }
                         />
                       </div>
-                      <div className='fieldSubContainer'>
-                        <div className='fieldTitle'>Organization</div>
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Organization</div>
                         <RequiredTextField
-                          name='organization'
+                          name="organization"
                           value={formData.organization}
                           onChange={handleChange}
                           style={{ width: '70%' }}
-                          size='small'
+                          size="small"
                           required
                           error={!!errors?.organization?.[0]}
-                          helperText={errors?.organization?.[0] ? errors?.organization[0] : ''}
+                          helperText={
+                            errors?.organization?.[0]
+                              ? errors?.organization[0]
+                              : ''
+                          }
                         />
                       </div>
                     </div>
-                    <div className='fieldContainer2'>
-                      <div className='fieldSubContainer'>
-                        <div className='fieldTitle'>Primary Email</div>
+                    <div className="fieldContainer2">
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Primary Email</div>
                         <RequiredTextField
-                          name='primary_email'
+                          name="primary_email"
                           value={formData.primary_email}
                           onChange={handleChange}
                           required
                           style={{ width: '70%' }}
-                          size='small'
+                          size="small"
                           error={!!errors?.primary_email?.[0]}
-                          helperText={errors?.primary_email?.[0] ? errors?.primary_email[0] : ''}
+                          helperText={
+                            errors?.primary_email?.[0]
+                              ? errors?.primary_email[0]
+                              : ''
+                          }
                         />
                       </div>
-                      <div className='fieldSubContainer'>
-                        <div className='fieldTitle'>Secondary Email</div>
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Secondary Email</div>
                         <TextField
-                          name='secondary_email'
+                          name="secondary_email"
                           value={formData.secondary_email}
                           onChange={handleChange}
                           style={{ width: '70%' }}
-                          size='small'
+                          size="small"
                           error={!!errors?.secondary_email?.[0]}
-                          helperText={errors?.secondary_email?.[0] ? errors?.secondary_email[0] : ''}
+                          helperText={
+                            errors?.secondary_email?.[0]
+                              ? errors?.secondary_email[0]
+                              : ''
+                          }
                         />
                       </div>
-
                     </div>
-                    <div className='fieldContainer2'>
-                      <div className='fieldSubContainer'>
-                        <div className='fieldTitle'>Department</div>
+                    <div className="fieldContainer2">
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Department</div>
                         <RequiredTextField
-                          name='department'
-                          id='outlined-error-helper-text'
+                          name="department"
+                          id="outlined-error-helper-text"
                           value={formData.department}
                           onChange={handleChange}
                           required
                           style={{ width: '70%' }}
-                          size='small'
+                          size="small"
                           error={!!errors?.department?.[0]}
-                          helperText={errors?.department?.[0] ? errors?.department[0] : ''}
+                          helperText={
+                            errors?.department?.[0] ? errors?.department[0] : ''
+                          }
                         />
                       </div>
-                      <div className='fieldSubContainer'>
-                        <div className='fieldTitle'>Title</div>
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Title</div>
                         <TextField
-                          name='title'
+                          name="title"
                           value={formData.title}
                           onChange={handleChange}
                           required
                           style={{ width: '70%' }}
-                          size='small'
+                          size="small"
                           error={!!errors?.title?.[0]}
-                          helperText={errors?.title?.[0] ? errors?.title[0] : ''}
+                          helperText={
+                            errors?.title?.[0] ? errors?.title[0] : ''
+                          }
                         />
                       </div>
                     </div>
-                    <div className='fieldContainer2'>
-                      <div className='fieldSubContainer'>
-                        <div className='fieldTitle'>Mobile Number</div>
+                    <div className="fieldContainer2">
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Mobile Number</div>
                         <Tooltip title="Number must starts with +91">
                           <RequiredTextField
-                            name='mobile_number'
+                            name="mobile_number"
                             value={formData.mobile_number}
                             onChange={handleChange}
                             required
                             style={{ width: '70%' }}
-                            size='small'
+                            size="small"
                             error={!!errors?.mobile_number?.[0]}
-                            helperText={errors?.mobile_number?.[0] ? errors?.mobile_number[0] : ''}
+                            helperText={
+                              errors?.mobile_number?.[0]
+                                ? errors?.mobile_number[0]
+                                : ''
+                            }
                           />
                         </Tooltip>
                       </div>
-                      <div className='fieldSubContainer'>
-                        <div className='fieldTitle'>Secondary Number</div>
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Secondary Number</div>
                         <Tooltip title="Number must starts with +91">
                           <RequiredTextField
                             required
-                            name='secondary_number'
+                            name="secondary_number"
                             value={formData.secondary_number}
                             onChange={handleChange}
                             style={{ width: '70%' }}
-                            size='small'
+                            size="small"
                             error={!!errors?.secondary_number?.[0]}
-                            helperText={errors?.secondary_number?.[0] ? errors?.secondary_number[0] : ''}
+                            helperText={
+                              errors?.secondary_number?.[0]
+                                ? errors?.secondary_number[0]
+                                : ''
+                            }
                           />
                         </Tooltip>
                       </div>
                     </div>
-                    <div className='fieldContainer2'>
-                      <div className='fieldSubContainer'>
-                        <div className='fieldTitle'>Language</div>
+                    <div className="fieldContainer2">
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Language</div>
                         <RequiredTextField
                           required
-                          name='language'
+                          name="language"
                           value={formData.language}
                           onChange={handleChange}
                           style={{ width: '70%' }}
-                          size='small'
+                          size="small"
                           error={!!errors?.language?.[0]}
-                          helperText={errors?.language?.[0] ? errors?.language[0] : ''}
+                          helperText={
+                            errors?.language?.[0] ? errors?.language[0] : ''
+                          }
                         />
                       </div>
-                      <div className='fieldSubContainer'>
-                        <div className='fieldTitle'>Do Not Call</div>
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Do Not Call</div>
                         {/* <FormControlLabel
                           control={<AntSwitch
                             name='do_not_call'
@@ -454,10 +491,15 @@ function AddContacts() {
                           />}
                         /> */}
                         <AntSwitch
-                          name='do_not_call'
+                          name="do_not_call"
                           checked={formData.do_not_call}
                           // onChange={handleChange}
-                          onChange={(e: any) => { setFormData((prevData) => ({ ...prevData, do_not_call: e.target.checked })) }}
+                          onChange={(e: any) => {
+                            setFormData((prevData) => ({
+                              ...prevData,
+                              do_not_call: e.target.checked,
+                            }))
+                          }}
                           sx={{ mt: '1%' }}
                         />
                       </div>
@@ -467,121 +509,151 @@ function AddContacts() {
               </Accordion>
             </div>
             {/* address details */}
-            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '20px' }}>
-              <Accordion style={{ width: '98%' }}
-                defaultExpanded
-              >
-                <AccordionSummary expandIcon={<FiChevronDown style={{ fontSize: '25px' }} />}>
-                  <Typography className='accordion-header'>Address</Typography>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                marginTop: '20px',
+              }}
+            >
+              <Accordion style={{ width: '98%' }} defaultExpanded>
+                <AccordionSummary
+                  expandIcon={<FiChevronDown style={{ fontSize: '25px' }} />}
+                >
+                  <Typography className="accordion-header">Address</Typography>
                 </AccordionSummary>
-                <Divider className='divider' />
+                <Divider className="divider" />
                 <AccordionDetails>
                   <Box
                     sx={{ width: '98%', color: '#1A3353', mb: 1 }}
-                    component='form'
+                    component="form"
                   >
-                    <div className='fieldContainer'>
-                      <div className='fieldSubContainer'>
-                        <div className='fieldTitle'>Billing Address</div>
+                    <div className="fieldContainer">
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Billing Address</div>
                         <RequiredTextField
                           required
-                          name='address_line'
+                          name="address_line"
                           value={formData.address_line}
                           onChange={handleChange}
                           style={{ width: '70%' }}
-                          size='small'
+                          size="small"
                           error={!!errors?.address_line?.[0]}
-                          helperText={errors?.address_line?.[0] ? errors?.address_line[0] : ''}
+                          helperText={
+                            errors?.address_line?.[0]
+                              ? errors?.address_line[0]
+                              : ''
+                          }
                         />
                       </div>
-                      <div className='fieldSubContainer'>
-                        <div className='fieldTitle'>Street</div>
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Street</div>
                         <TextField
-                          name='street'
+                          name="street"
                           value={formData.street}
                           onChange={handleChange}
                           style={{ width: '70%' }}
-                          size='small'
+                          size="small"
                           required
                           error={!!errors?.street?.[0]}
-                          helperText={errors?.street?.[0] ? errors?.street[0] : ''}
+                          helperText={
+                            errors?.street?.[0] ? errors?.street[0] : ''
+                          }
                         />
                       </div>
                     </div>
-                    <div className='fieldContainer2'>
-                      <div className='fieldSubContainer'>
-                        <div className='fieldTitle'>City</div>
+                    <div className="fieldContainer2">
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">City</div>
                         <TextField
-                          name='city'
+                          name="city"
                           value={formData.city}
                           onChange={handleChange}
                           style={{ width: '70%' }}
-                          size='small'
+                          size="small"
                           required
                           error={!!errors?.city?.[0]}
                           helperText={errors?.city?.[0] ? errors?.city[0] : ''}
                         />
                       </div>
-                      <div className='fieldSubContainer'>
-                        <div className='fieldTitle'>State</div>
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">State</div>
                         <TextField
-                          name='state'
+                          name="state"
                           value={formData.state}
                           onChange={handleChange}
                           style={{ width: '70%' }}
-                          size='small'
+                          size="small"
                           required
                           error={!!errors?.state?.[0]}
-                          helperText={errors?.state?.[0] ? errors?.state[0] : ''}
+                          helperText={
+                            errors?.state?.[0] ? errors?.state[0] : ''
+                          }
                         />
                       </div>
                     </div>
-                    <div className='fieldContainer2'>
-                      <div className='fieldSubContainer'>
-                        <div className='fieldTitle'>Postcode</div>
+                    <div className="fieldContainer2">
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Postcode</div>
                         <TextField
-                          name='postcode'
+                          name="postcode"
                           value={formData.postcode}
                           onChange={handleChange}
                           style={{ width: '70%' }}
-                          size='small'
+                          size="small"
                           required
                           error={!!errors?.postcode?.[0]}
-                          helperText={errors?.postcode?.[0] ? errors?.postcode[0] : ''}
+                          helperText={
+                            errors?.postcode?.[0] ? errors?.postcode[0] : ''
+                          }
                         />
                       </div>
-                      <div className='fieldSubContainer'>
-                        <div className='fieldTitle'>Country</div>
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Country</div>
                         <FormControl sx={{ width: '70%' }}>
                           <Select
-                            name='country'
+                            name="country"
                             value={formData.country}
                             open={countrySelectOpen}
-                            onClick={() => setCountrySelectOpen(!countrySelectOpen)}
+                            onClick={() =>
+                              setCountrySelectOpen(!countrySelectOpen)
+                            }
                             IconComponent={() => (
-                              <div onClick={() => setCountrySelectOpen(!countrySelectOpen)} className="select-icon-background">
-                                {countrySelectOpen ? <FiChevronUp className='select-icon' /> : <FiChevronDown className='select-icon' />}
+                              <div
+                                onClick={() =>
+                                  setCountrySelectOpen(!countrySelectOpen)
+                                }
+                                className="select-icon-background"
+                              >
+                                {countrySelectOpen ? (
+                                  <FiChevronUp className="select-icon" />
+                                ) : (
+                                  <FiChevronDown className="select-icon" />
+                                )}
                               </div>
                             )}
                             MenuProps={{
                               PaperProps: {
                                 style: {
-                                  height: '200px'
-                                }
-                              }
+                                  height: '200px',
+                                },
+                              },
                             }}
                             className={'select'}
                             onChange={handleChange}
                             error={!!errors?.country?.[0]}
                           >
-                            {state?.countries?.length && state?.countries.map((option: any) => (
-                              <MenuItem key={option[0]} value={option[0]}>
-                                {option[1]}
-                              </MenuItem>
-                            ))}
-
+                            {state?.countries?.length &&
+                              state?.countries.map((option: any) => (
+                                <MenuItem key={option[0]} value={option[0]}>
+                                  {option[1]}
+                                </MenuItem>
+                              ))}
                           </Select>
-                          <FormHelperText>{errors?.country?.[0] ? errors?.country[0] : ''}</FormHelperText>
+                          <FormHelperText>
+                            {errors?.country?.[0] ? errors?.country[0] : ''}
+                          </FormHelperText>
                         </FormControl>
                         {/* <TextField
                           name='country'
@@ -605,23 +677,25 @@ function AddContacts() {
               </Accordion>
             </div>
             {/* Description details  */}
-            <div className='leadContainer'>
-              <Accordion
-                defaultExpanded
-                style={{ width: '98%' }}>
-                <AccordionSummary expandIcon={<FiChevronDown style={{ fontSize: '25px' }} />}>
-                  <Typography className='accordion-header'>Description</Typography>
+            <div className="leadContainer">
+              <Accordion defaultExpanded style={{ width: '98%' }}>
+                <AccordionSummary
+                  expandIcon={<FiChevronDown style={{ fontSize: '25px' }} />}
+                >
+                  <Typography className="accordion-header">
+                    Description
+                  </Typography>
                 </AccordionSummary>
-                <Divider className='divider' />
+                <Divider className="divider" />
                 <AccordionDetails>
                   <Box
                     sx={{ width: '100%', color: '#1A3353', mb: 1 }}
-                    component='form'
+                    component="form"
                     noValidate
-                    autoComplete='off'
+                    autoComplete="off"
                   >
-                    <div className='DescriptionDetail'>
-                      <div className='descriptionTitle'>Description</div>
+                    <div className="DescriptionDetail">
+                      <div className="descriptionTitle">Description</div>
                       {/* <TextareaAutosize
                           aria-label='minimum height'
                           name='description'
@@ -637,23 +711,55 @@ function AddContacts() {
                         <div ref={quillRef} />
                       </div>
                     </div>
-                    <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', mt: 1.5 }}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mt: 1.5,
+                      }}
+                    >
                       <Button
-                        className='header-button'
+                        className="header-button"
                         onClick={resetQuillToInitialState}
-                        size='small'
-                        variant='contained'
-                        startIcon={<FaTimesCircle style={{ fill: 'white', width: '16px', marginLeft: '2px' }} />}
-                        sx={{ backgroundColor: '#2b5075', ':hover': { backgroundColor: '#1e3750' } }}
+                        size="small"
+                        variant="contained"
+                        startIcon={
+                          <FaTimesCircle
+                            style={{
+                              fill: 'white',
+                              width: '16px',
+                              marginLeft: '2px',
+                            }}
+                          />
+                        }
+                        sx={{
+                          backgroundColor: '#2b5075',
+                          ':hover': { backgroundColor: '#1e3750' },
+                        }}
                       >
                         Cancel
                       </Button>
                       <Button
-                        className='header-button'
-                        onClick={() => setFormData({ ...formData, description: quillRef.current.firstChild.innerHTML })}
-                        variant='contained'
-                        size='small'
-                        startIcon={<FaCheckCircle style={{ fill: 'white', width: '16px', marginLeft: '2px' }} />}
+                        className="header-button"
+                        onClick={() =>
+                          setFormData({
+                            ...formData,
+                            description: quillRef.current.firstChild.innerHTML,
+                          })
+                        }
+                        variant="contained"
+                        size="small"
+                        startIcon={
+                          <FaCheckCircle
+                            style={{
+                              fill: 'white',
+                              width: '16px',
+                              marginLeft: '2px',
+                            }}
+                          />
+                        }
                         sx={{ ml: 1 }}
                       >
                         Save
@@ -664,62 +770,133 @@ function AddContacts() {
               </Accordion>
             </div>
             {/* Socials */}
-            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '20px' }}>
-              <Accordion
-                defaultExpanded
-                style={{ width: '98%' }}>
-                <AccordionSummary expandIcon={<FiChevronDown style={{ fontSize: '25px' }} />}>
-                  <Typography className='accordion-header'>Socials</Typography>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                marginTop: '20px',
+              }}
+            >
+              <Accordion defaultExpanded style={{ width: '98%' }}>
+                <AccordionSummary
+                  expandIcon={<FiChevronDown style={{ fontSize: '25px' }} />}
+                >
+                  <Typography className="accordion-header">Socials</Typography>
                 </AccordionSummary>
-                <Divider className='divider' />
+                <Divider className="divider" />
                 <AccordionDetails>
                   <Box
                     sx={{ width: '100%', color: '#1A3353', mb: 1 }}
-                    component='form'
+                    component="form"
                     noValidate
-                    autoComplete='off'
+                    autoComplete="off"
                   >
-                    <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }}>
-                      <div style={{ width: '40%', display: 'flex', flexDirection: 'row' }}>
-                        <div style={{ marginRight: '10px', fontSize: '13px', width: '22%', textAlign: 'right', fontWeight: 'bold' }}>Linkedin Url</div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'space-around',
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: '40%',
+                          display: 'flex',
+                          flexDirection: 'row',
+                        }}
+                      >
+                        <div
+                          style={{
+                            marginRight: '10px',
+                            fontSize: '13px',
+                            width: '22%',
+                            textAlign: 'right',
+                            fontWeight: 'bold',
+                          }}
+                        >
+                          Linkedin Url
+                        </div>
                         <TextField
-                          name='linked_in_url'
+                          name="linked_in_url"
                           value={formData.linked_in_url}
                           onChange={handleChange}
                           style={{ width: '70%' }}
-                          size='small'
+                          size="small"
                           error={!!errors?.linked_in_url?.[0]}
-                          helperText={errors?.linked_in_url?.[0] ? errors?.linked_in_url[0] : ''}
+                          helperText={
+                            errors?.linked_in_url?.[0]
+                              ? errors?.linked_in_url[0]
+                              : ''
+                          }
                         />
                       </div>
-                      <div style={{ width: '40%', display: 'flex', flexDirection: 'row' }}>
-                        <div style={{ marginRight: '10px', fontSize: '13px', width: '22%', textAlign: 'right', fontWeight: 'bold' }}>Facebook Url</div>
+                      <div
+                        style={{
+                          width: '40%',
+                          display: 'flex',
+                          flexDirection: 'row',
+                        }}
+                      >
+                        <div
+                          style={{
+                            marginRight: '10px',
+                            fontSize: '13px',
+                            width: '22%',
+                            textAlign: 'right',
+                            fontWeight: 'bold',
+                          }}
+                        >
+                          Facebook Url
+                        </div>
                         <TextField
-                          name='facebook_url'
+                          name="facebook_url"
                           value={formData.facebook_url}
                           onChange={handleChange}
                           style={{ width: '70%' }}
-                          size='small'
+                          size="small"
                           error={!!errors?.facebook_url?.[0]}
-                          helperText={errors?.facebook_url?.[0] ? errors?.facebook_url[0] : ''}
+                          helperText={
+                            errors?.facebook_url?.[0]
+                              ? errors?.facebook_url[0]
+                              : ''
+                          }
                         />
                       </div>
                     </div>
                     <div style={{ marginTop: '20px' }}>
-                      <div style={{
-                        width: '40%', display: 'flex', flexDirection: 'row'
-                        , marginLeft: '5%'
-                      }}>
-                        <div style={{ marginRight: '10px', fontSize: '13px', width: '22%', textAlign: 'right', fontWeight: 'bold' }}>Twitter Username</div>
+                      <div
+                        style={{
+                          width: '40%',
+                          display: 'flex',
+                          flexDirection: 'row',
+                          marginLeft: '5%',
+                        }}
+                      >
+                        <div
+                          style={{
+                            marginRight: '10px',
+                            fontSize: '13px',
+                            width: '22%',
+                            textAlign: 'right',
+                            fontWeight: 'bold',
+                          }}
+                        >
+                          Twitter Username
+                        </div>
                         <RequiredTextField
                           required
-                          name='twitter_username'
+                          name="twitter_username"
                           value={formData.twitter_username}
                           onChange={handleChange}
                           style={{ width: '70%' }}
-                          size='small'
+                          size="small"
                           error={!!errors?.twitter_username?.[0]}
-                          helperText={errors?.twitter_username?.[0] ? errors?.twitter_username[0] : ''}
+                          helperText={
+                            errors?.twitter_username?.[0]
+                              ? errors?.twitter_username[0]
+                              : ''
+                          }
                         />
                       </div>
                     </div>
@@ -730,7 +907,6 @@ function AddContacts() {
           </div>
         </form>
       </Box>
-
     </Box>
   )
 }

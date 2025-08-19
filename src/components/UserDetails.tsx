@@ -1,11 +1,8 @@
 // 'use client'
 import React, { useEffect, useState } from 'react'
-import {
-  Avatar,
-  Typography
-} from '@mui/material'
+import { Avatar, Typography } from '@mui/material'
 
-export const UserDetails = (props:any) => {
+export const UserDetails = (props: any) => {
   const [user, setUser] = useState([])
 
   useEffect(() => {

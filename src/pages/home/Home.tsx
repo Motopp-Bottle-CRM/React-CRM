@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Box } from '@mui/material'
@@ -45,14 +44,14 @@ export const Home = (props: any) => {
   // }, [navigate]);
   return (
     <Box sx={{}}>
-      {org ?
+      {org ? (
         <Sidebar
           // handleDrawerClose={() => handleDrawerClose}
           open={open}
-        /> :
+        />
+      ) : (
         <Organization />
-      }
+      )}
     </Box>
-
   )
 }

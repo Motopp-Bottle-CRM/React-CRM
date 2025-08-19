@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Chip } from '@mui/material'
 
 export const Label = (props: any) => {
-  const { tags } = props;
+  const { tags } = props
   const [tagsColor, setTagsColor] = useState('#665d1e')
 
   useEffect(() => {
@@ -61,22 +61,20 @@ export const Label = (props: any) => {
     }
   }
 
-  return (
-    (tags
-      ? <Chip
-        label={tags}
-        key={tags}
-        sx={{
-          backgroundColor: tagsColor,
-          borderRadius: '4px',
-          fontSize: '16px',
-          height: '25px',
-          color: 'white',
-          marginLeft: '5px',
-          fontWeight: '500',
-          pb: '2px'
-        }}
-      />
-      : null)
-  )
+  return tags ? (
+    <Chip
+      label={tags}
+      key={tags}
+      sx={{
+        backgroundColor: tagsColor,
+        borderRadius: '4px',
+        fontSize: '16px',
+        height: '25px',
+        color: 'white',
+        marginLeft: '5px',
+        fontWeight: '500',
+        pb: '2px',
+      }}
+    />
+  ) : null
 }
