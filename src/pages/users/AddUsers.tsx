@@ -159,7 +159,7 @@ export function AddUsers() {
             is_organization_admin: formData.is_organization_admin
         }
 
-        fetchData(`${UsersUrl}/`, 'POST', JSON.stringify(data), Header)
+        fetchData(UsersUrl, 'POST', JSON.stringify(data), Header)
             .then((res: any) => {
                 console.log('Form data:', res);
                 if (!res.error) {

@@ -144,7 +144,7 @@ export default function Users() {
         try {
             const activeOffset = (activeCurrentPage - 1) * activeRecordsPerPage;
             const inactiveOffset = (inactiveCurrentPage - 1) * inactiveRecordsPerPage;
-            await fetchData(`${UsersUrl}/?offset=${tab === "active" ? activeOffset : inactiveOffset}&limit=${tab === "active" ? activeRecordsPerPage : inactiveRecordsPerPage}`, 'GET', null as any, Header)
+            await fetchData(`${UsersUrl}?offset=${tab === "active" ? activeOffset : inactiveOffset}&limit=${tab === "active" ? activeRecordsPerPage : inactiveRecordsPerPage}`, 'GET', null as any, Header)
                 // fetchData(`${UsersUrl}/`, 'GET', null as any, Header)
                 .then((res: any) => {
                     if (!res.error) {
@@ -428,7 +428,7 @@ export default function Users() {
     return (
         <Box sx={{ mt: '60px' }}>
             <CustomToolbar>
-                <Tabs defaultValue={tab} onChange={handleChangeTab} sx={{ mt: '26px' }}>
+                <Tabs value={tab} onChange={handleChangeTab} sx={{ mt: '26px' }}>
                     <CustomTab value="active" label="Active"
                         sx={{
                             backgroundColor: tab === 'active' ? '#F0F7FF' : '#284871',

@@ -102,7 +102,7 @@ export default function OrganizationModal(props: any) {
                 <Box sx={{ width: '400px' }}>
                     {localStorage.getItem('org') ?
                         <Stack sx={{ display: "flex", flexDirection: "row-reverse", m: '12px 10px -20px 0px' }}>
-                            <IconButton size="small"><FaTimes onClick={onHandleClose} /></IconButton>
+                            <IconButton size="small" onClick={onHandleClose}><FaTimes /></IconButton>
                         </Stack> : ''}
                     <Stack sx={{ display: 'flex', textAlign: 'center', mt: 1.5 }}>
                         <Typography sx={{ fontSize: '22px', fontWeight: 500, mb: 1.5 }}>
@@ -121,7 +121,7 @@ export default function OrganizationModal(props: any) {
                                 sx={{ width: '100%' }}>
                                 {organization?.length > 0 &&
                                     organization.map((item, i) => (
-                                        <ListItem >
+                                        <ListItem key={item?.org?.id || i}>
                                             <StyledListItemButton
                                                 selected={item?.org?.id === localStorage?.getItem('org')}
                                                 onClick={() => selectedOrganization(item?.org?.id)}>
