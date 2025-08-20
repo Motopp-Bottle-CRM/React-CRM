@@ -180,7 +180,7 @@ export default function Users() {
       const activeOffset = (activeCurrentPage - 1) * activeRecordsPerPage
       const inactiveOffset = (inactiveCurrentPage - 1) * inactiveRecordsPerPage
       await fetchData(
-        `${UsersUrl}/?offset=${tab === 'active' ? activeOffset : inactiveOffset}&limit=${tab === 'active' ? activeRecordsPerPage : inactiveRecordsPerPage}`,
+        `${UsersUrl}?offset=${tab === 'active' ? activeOffset : inactiveOffset}&limit=${tab === 'active' ? activeRecordsPerPage : inactiveRecordsPerPage}`,
         'GET',
         null as any,
         Header
@@ -478,7 +478,7 @@ export default function Users() {
   return (
     <Box sx={{ mt: '60px' }}>
       <CustomToolbar>
-        <Tabs defaultValue={tab} onChange={handleChangeTab} sx={{ mt: '26px' }}>
+        <Tabs value={tab} onChange={handleChangeTab} sx={{ mt: '26px' }}>
           <CustomTab
             value="active"
             label="Active"
@@ -744,10 +744,9 @@ export default function Users() {
                       })
                     ) : (
                       <TableRow>
-                        {' '}
                         <TableCell colSpan={8} sx={{ border: 0 }}>
                           <Spinner />
-                        </TableCell>{' '}
+                        </TableCell>
                       </TableRow>
                     )}
                   </TableBody>
@@ -852,10 +851,9 @@ export default function Users() {
                       })
                     ) : (
                       <TableRow>
-                        {' '}
                         <TableCell colSpan={8} sx={{ border: 0 }}>
                           <Spinner />
-                        </TableCell>{' '}
+                        </TableCell>
                       </TableRow>
                     )}
                   </TableBody>

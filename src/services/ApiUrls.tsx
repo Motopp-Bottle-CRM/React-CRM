@@ -24,7 +24,7 @@ export const AccountsUrl = 'accounts'
 // CASES
 export const CasesUrl = 'cases'
 // USERS
-export const UsersUrl = 'users/'
+export const UsersUrl = 'users'
 export const UserUrl = 'user'
 // PROFILE
 export const ProfileUrl = 'profile'
