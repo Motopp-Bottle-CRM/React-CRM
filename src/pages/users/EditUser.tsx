@@ -160,6 +160,16 @@ export function EditUser() {
   }
   const handleSubmit = (e: any) => {
     e.preventDefault()
+    if (formData.phone) {
+      if (formData.phone === formData.alternate_phone) {
+        setProfileErrors({
+          ...profileErrors,
+          alternate_phone: ['Alternate phone cannot be the same as phone'],
+        })
+        return
+      }
+    }
+
     submitForm()
   }
 
@@ -231,31 +241,16 @@ export function EditUser() {
 
     fetchData(`${UserUrl}/${state?.id}/`, 'PUT', JSON.stringify(data), Header)
       .then((res: any) => {
-        // console.log('editsubmit:', res);
-        if (!res.error) {
-          resetForm()
-          navigate('/app/users')
-        }
-        if (res.error) {
-          setError(true)
-          setProfileErrors(
-            res?.errors?.profile_errors || res?.profile_errors[0]
-          )
-          setUserErrors(res?.errors?.user_errors || res?.user_errors[0])
-        }
+        resetForm()
+        navigate('/app/users')
       })
-      .catch(() => {
+      .catch(async (err: any) => {
         setError(true)
-        if (!formData.phone)
-          setProfileErrors({
-            ...errors,
-            phone: ['adding phone number is required'],
-          })
-        else if (!formData.alternate_phone)
-          setProfileErrors({
-            ...errors,
-            alternate_phone: ['adding alternate phone number is required'],
-          })
+        const profileErr = err?.profile_errors?.[0] || {}
+        const userErr = err?.user_errors?.[0] || {}
+
+        setProfileErrors(profileErr)
+        setUserErrors(userErr)
       })
   }
   const resetForm = () => {
