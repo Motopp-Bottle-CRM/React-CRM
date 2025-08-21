@@ -8,6 +8,7 @@ import {
 } from 'react-router-dom'
 import Login from './pages/auth/Login'
 import { Home } from './pages/home/Home'
+import SetPassword from './pages/auth/SetPassword'
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="*" element={<Home />} />
           <Route path="/app" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/set-password" element={<SetPassword />} />
           {/* <Route path="/" element={<Navigate to="/contacts" replace />} /> */}
           {/* <Route
             path='/'
