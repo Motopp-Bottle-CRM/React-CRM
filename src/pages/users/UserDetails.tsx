@@ -76,7 +76,7 @@ export default function UserDetails() {
       Authorization: localStorage.getItem('Token'),
       org: localStorage.getItem('org'),
     }
-    fetchData(`${UserUrl}/${id}/`, 'GET', null as any, Header).then((res) => {
+    fetchData(`${UserUrl}${id}/`, 'GET', null as any, Header).then((res) => {
       console.log(res, 'res')
       if (!res.error) {
         setUserDetails(res?.data?.profile_obj)

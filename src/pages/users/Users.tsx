@@ -321,7 +321,7 @@ export default function Users() {
       Authorization: localStorage.getItem('Token'),
       org: localStorage.getItem('org'),
     }
-    fetchData(`${UsersUrl}/${id}/`, 'delete', null as any, Header)
+    fetchData(`${UsersUrl}${id}/`, 'delete', null as any, Header)
       .then((data) => {
         if (!data.error) {
           getUsers()
@@ -357,7 +357,7 @@ export default function Users() {
       Authorization: localStorage.getItem('Token'),
       org: localStorage.getItem('org'),
     }
-    fetchData(`${UserUrl}/${id}/`, 'GET', null as any, Header).then((res) => {
+    fetchData(`${UserUrl}${id}/`, 'GET', null as any, Header).then((res) => {
       console.log(res, 'res')
       if (!res.error) {
         const data = res?.data?.profile_obj
@@ -379,6 +379,7 @@ export default function Users() {
               has_marketing_access: data?.has_marketing_access,
               is_organization_admin: data?.is_organization_admin,
             },
+            countries: res?.data?.countries,
             id: id,
             edit: true,
           },
@@ -416,7 +417,7 @@ export default function Users() {
       Authorization: localStorage.getItem('Token'),
       org: localStorage.getItem('org'),
     }
-    fetchData(`${UserUrl}/${selectedId}/`, 'DELETE', null as any, Header)
+    fetchData(`${UserUrl}${selectedId}/`, 'DELETE', null as any, Header)
       .then((res: any) => {
         console.log('delete:', res)
         if (!res.error) {
@@ -713,9 +714,8 @@ export default function Users() {
                                                             {item.user_type ? item.user_type : '---'}
                                                         </TableCell> */}
                             <TableCell className="tableCell">
-                              <IconButton>
+                              <IconButton onClick={() => EditItem(item.id)}>
                                 <FaEdit
-                                  onClick={() => EditItem(item.id)}
                                   style={{
                                     fill: '#1A3353',
                                     cursor: 'pointer',
@@ -727,9 +727,8 @@ export default function Users() {
                                                                     style={{ fill: '#1A3353', cursor: 'pointer' }}
                                                                 /> */}
                               </IconButton>
-                              <IconButton>
+                              <IconButton onClick={() => deleteRow(item?.id)}>
                                 <FaTrashAlt
-                                  onClick={() => deleteRow(item?.id)}
                                   style={{
                                     fill: '#1A3353',
                                     cursor: 'pointer',
@@ -820,9 +819,8 @@ export default function Users() {
                                                             {item.user_type ? item.user_type : '---'}
                                                         </TableCell> */}
                             <TableCell className="tableCell">
-                              <IconButton>
+                              <IconButton onClick={() => EditItem(item.id)}>
                                 <FaEdit
-                                  onClick={() => EditItem(item.id)}
                                   style={{
                                     fill: '#1A3353',
                                     cursor: 'pointer',
@@ -834,9 +832,8 @@ export default function Users() {
                                                                     style={{ fill: '#1A3353', cursor: 'pointer' }}
                                                                 /> */}
                               </IconButton>
-                              <IconButton>
+                              <IconButton onClick={() => deleteRow(item?.id)}>
                                 <FaTrashAlt
-                                  onClick={() => deleteRow(item?.id)}
                                   style={{
                                     fill: '#1A3353',
                                     cursor: 'pointer',

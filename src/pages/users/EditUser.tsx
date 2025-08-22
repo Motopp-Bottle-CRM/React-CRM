@@ -89,12 +89,36 @@ export function EditUser() {
     // is_organization_admin: false
   })
   useEffect(() => {
-    setFormData(state?.value)
+    if (state?.value) {
+      setFormData({
+        email: state.value.email || '',
+        role: state.value.role || 'ADMIN',
+        phone: state.value.phone || '',
+        alternate_phone: state.value.alternate_phone || '',
+        address_line: state.value.address_line || '',
+        street: state.value.street || '',
+        city: state.value.city || '',
+        state: state.value.state || '',
+        pincode: state.value.pincode || '',
+        country: state.value.country || '',
+      })
+    }
   }, [state?.id])
 
   useEffect(() => {
-    if (reset) {
-      setFormData(state?.value)
+    if (reset && state?.value) {
+      setFormData({
+        email: state.value.email || '',
+        role: state.value.role || 'ADMIN',
+        phone: state.value.phone || '',
+        alternate_phone: state.value.alternate_phone || '',
+        address_line: state.value.address_line || '',
+        street: state.value.street || '',
+        city: state.value.city || '',
+        state: state.value.state || '',
+        pincode: state.value.pincode || '',
+        country: state.value.country || '',
+      })
     }
     return () => {
       setReset(false)
@@ -193,7 +217,7 @@ export function EditUser() {
       // is_organization_admin: formData.is_organization_admin
     }
 
-    fetchData(`${UserUrl}/${state?.id}/`, 'PUT', JSON.stringify(data), Header)
+    fetchData(`${UserUrl}${state?.id}/`, 'PUT', JSON.stringify(data), Header)
       .then((res: any) => {
         // console.log('editsubmit:', res);
         if (!res.error) {
@@ -594,8 +618,8 @@ export function EditUser() {
                             onChange={handleChange}
                             error={!!profileErrors?.country?.[0]}
                           >
-                            {state?.countries?.length &&
-                              state?.countries.map((option: any) => (
+                            {state?.countries?.length > 0 &&
+                              state.countries.map((option: any) => (
                                 <MenuItem key={option[0]} value={option[0]}>
                                   {option[1]}
                                 </MenuItem>

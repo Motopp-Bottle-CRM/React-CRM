@@ -14,19 +14,40 @@ export const Header1 = {
 }
 
 export function fetchData(url: any, method: any, data = '', header: any) {
-  return fetch(`${SERVER}${url}`, {
+  const headers: Record<string, string | null> = {
+    ...header,
+  }
+  const token = localStorage.getItem('Token')
+  const org = localStorage.getItem('org')
+  if (token && !headers['Authorization']) {
+    headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`
+  }
+  if (org && !headers['org']) headers['org'] = org
+
+  const fetchOptions: RequestInit = {
     method,
-    headers: header,
-    body: data
-  }).then((response) => {
+    headers: headers as HeadersInit,
+  }
+  const upperMethod = String(method || '').toUpperCase()
+  if (data !== '' && upperMethod !== 'GET' && upperMethod !== 'HEAD') {
+    ;(fetchOptions as any).body = data
+  }
+
+  return fetch(`${SERVER}${url}`, fetchOptions).then(async (response) => {
+    const contentType = response.headers.get("content-type")
+    let responseData
+    
+    if (contentType && contentType.indexOf("application/json") !== -1) {
+      responseData = await response.json()
+    } else {
+      responseData = await response.text()
+    }
+    
     if (!response.ok) {
+      console.error(`HTTP ${response.status} error:`, responseData)
       throw new Error(`HTTP error! status: ${response.status}`)
     }
-    const contentType = response.headers.get("content-type")
-    if (contentType && contentType.indexOf("application/json") !== -1) {
-      return response.json()
-    } else {
-      throw new Error("Response is not JSON")
-    }
+    
+    return responseData
   })
 }

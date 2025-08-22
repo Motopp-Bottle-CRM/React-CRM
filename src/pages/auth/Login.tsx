@@ -36,7 +36,7 @@ export default function Login() {
     }
 
     fetchData(
-      `${LoginUrl}/`,
+      `${LoginUrl}`,
       'POST',
       JSON.stringify({
         email,
@@ -95,12 +95,10 @@ export default function Login() {
       alignItems="center"
       sx={{ height: '100vh', width: '100%', position: 'fixed' }}
     >
-      <Grid container xs={12} md={6}>
+      <Grid container>
         <Grid
+          container
           spacing={5}
-          item
-          xs={12}
-          md={12}
           sx={{
             display: 'flex',
             justifyContent: 'center',
@@ -266,8 +264,6 @@ export default function Login() {
       </Grid>
       <Grid
         container
-        xs={12}
-        md={6}
         direction="column"
         justifyContent="center"
         alignItems="center"

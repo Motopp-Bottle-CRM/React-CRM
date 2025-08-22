@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent, useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import {
   TextField,
@@ -24,7 +24,7 @@ import {
 // import isEmail from 'validator/lib/isEmail'
 
 import '../../styles/style.css'
-import { UsersUrl } from '../../services/ApiUrls'
+import { UsersUrl, UsernameCheckUrl, SetPasswordUrl } from '../../services/ApiUrls'
 import { fetchData, Header } from '../../components/FetchData'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import {
@@ -43,6 +43,7 @@ import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
 
 type FormErrors = {
+  username?: string[]
   email?: string[]
   role?: string[]
   phone?: string[]
@@ -57,8 +58,10 @@ type FormErrors = {
   has_sales_access?: string[]
   has_marketing_access?: string[]
   is_organization_admin?: string[]
+  temporary_password?: string[]
 }
 interface FormData {
+  username: string
   email: string
   role: string
   phone: string
@@ -73,6 +76,8 @@ interface FormData {
   has_sales_access: boolean
   has_marketing_access: boolean
   is_organization_admin: boolean
+  inviteMode: 'invite' | 'tempPassword'
+  temporaryPassword: string
 }
 export function AddUsers() {
   const { state } = useLocation()
@@ -83,6 +88,32 @@ export function AddUsers() {
   const [error, setError] = useState(false)
   const [msg, setMsg] = useState('')
   const [responceError, setResponceError] = useState(false)
+  const [countries, setCountries] = useState<any[]>([])
+
+  useEffect(() => {
+    // Fetch countries data when component loads
+    fetchCountries()
+  }, [])
+
+  const fetchCountries = async () => {
+    const Header = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: localStorage.getItem('Token'),
+      org: localStorage.getItem('org'),
+    }
+    
+    try {
+      // Use the same API call that provides countries in UserDetails
+      // We can call any user detail endpoint to get countries, or create a dedicated countries endpoint
+      const res = await fetchData(`${UsersUrl}`, 'GET', null as any, Header)
+      if (res && res.countries) {
+        setCountries(res.countries)
+      }
+    } catch (error) {
+      console.error('Failed to fetch countries:', error)
+    }
+  }
 
   const handleChange = (e: any) => {
     const { name, value, files, type, checked } = e.target
@@ -94,10 +125,15 @@ export function AddUsers() {
     } else {
       setFormData({ ...formData, [name]: value })
     }
-    // setValidationErrors(({ ...validationErrors, [name]: '' }));
-    // setErrors({});
-    // const newValue = type === 'checkbox' ? checked : value;
-    // setFormData({ ...formData, [name]: newValue });
+    
+    // Clear errors for this field when user starts typing
+    if (profileErrors[name as keyof FormErrors]) {
+      setProfileErrors({ ...profileErrors, [name]: undefined })
+    }
+    if (userErrors[name as keyof FormErrors]) {
+      setUserErrors({ ...userErrors, [name]: undefined })
+    }
+    setError(false)
   }
 
   const backbtnHandle = () => {
@@ -111,6 +147,7 @@ export function AddUsers() {
   const [profileErrors, setProfileErrors] = useState<FormErrors>({})
   const [userErrors, setUserErrors] = useState<FormErrors>({})
   const [formData, setFormData] = useState<FormData>({
+    username: '',
     email: '',
     role: 'ADMIN',
     phone: '',
@@ -125,7 +162,51 @@ export function AddUsers() {
     has_sales_access: false,
     has_marketing_access: false,
     is_organization_admin: false,
+    inviteMode: 'invite',
+    temporaryPassword: '',
   })
+
+  const [isCheckingUsername, setIsCheckingUsername] = useState<boolean>(false)
+  const [isUsernameAvailable, setIsUsernameAvailable] = useState<boolean | null>(null)
+  const [usernameHelper, setUsernameHelper] = useState<string>('')
+
+  useEffect(() => {
+    const controller = new AbortController()
+    const { username } = formData
+    if (!username || username.length < 3) {
+      setIsUsernameAvailable(null)
+      setUsernameHelper('')
+      return
+    }
+    setIsCheckingUsername(true)
+    const timeout = setTimeout(() => {
+      const header = {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: localStorage.getItem('Token'),
+        org: localStorage.getItem('org'),
+      }
+      fetchData(
+        `${UsernameCheckUrl}?username=${encodeURIComponent(username)}`,
+        'GET',
+        null as any,
+        header
+      )
+        .then((res: any) => {
+          setIsUsernameAvailable(!!res?.available)
+          setUsernameHelper(res?.message || (res?.available ? 'Username is available' : 'Username is taken'))
+        })
+        .catch(() => {
+          setIsUsernameAvailable(null)
+          setUsernameHelper('')
+        })
+        .finally(() => setIsCheckingUsername(false))
+    }, 400)
+    return () => {
+      clearTimeout(timeout)
+      controller.abort()
+    }
+  }, [formData.username])
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] || null
@@ -138,54 +219,106 @@ export function AddUsers() {
     }
   }
 
+  const validateForm = () => {
+    const errors: FormErrors = {}
+    if (!formData.username) {
+      errors.username = ['Username is required']
+    } else if (!/^[a-zA-Z0-9_\.\-]{3,30}$/.test(formData.username)) {
+      errors.username = ['3-30 chars; letters, numbers, underscore, dot, dash']
+    }
+    
+    if (!formData.email) {
+      errors.email = ['Email is required']
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = ['Email is invalid']
+    }
+    
+    if (!formData.phone) {
+      errors.phone = ['Phone number is required']
+    } else if (!formData.phone.startsWith('+91')) {
+      errors.phone = ['Phone number must start with +91']
+    }
+
+    if (formData.inviteMode === 'tempPassword' && !formData.temporaryPassword) {
+      errors.temporary_password = ['Temporary password is required']
+    }
+    
+    return errors
+  }
+
   const submitForm = () => {
+    const validationErrors = validateForm()
+    if (Object.keys(validationErrors).length > 0) {
+      setProfileErrors(validationErrors)
+      return
+    }
+
     const Header = {
       Accept: 'application/json',
       'Content-Type': 'application/json',
       Authorization: localStorage.getItem('Token'),
       org: localStorage.getItem('org'),
     }
-    // console.log('Form data:', data);
-
+    
     const data = {
-      email: formData.email,
+      username: formData.username.trim(),
+      email: formData.email.trim(),
       role: formData.role,
-      phone: formData.phone,
-      alternate_phone: formData.alternate_phone,
-      address_line: formData.address_line,
-      street: formData.street,
-      city: formData.city,
-      state: formData.state,
-      pincode: formData.pincode,
-      country: formData.country,
-      profile_pic: formData.profile_pic,
+      phone: formData.phone.trim(),
+      alternate_phone: formData.alternate_phone.trim() || null,
+      address_line: formData.address_line.trim() || null,
+      street: formData.street.trim() || null,
+      city: formData.city.trim() || null,
+      state: formData.state.trim() || null,
+      pincode: formData.pincode.trim() || null,
+      country: formData.country || null,
+      profile_pic: null,
       has_sales_access: formData.has_sales_access,
       has_marketing_access: formData.has_marketing_access,
       is_organization_admin: formData.is_organization_admin,
+      invite: formData.inviteMode === 'invite',
+      temporary_password: formData.inviteMode === 'tempPassword' ? formData.temporaryPassword : undefined,
     }
 
-    fetchData(`${UsersUrl}/`, 'POST', JSON.stringify(data), Header)
-      .then((res: any) => {
-        console.log('Form data:', res)
-        if (!res.error) {
-          // setResponceError(data.error)
-          // navigate('/contacts')profile_errors
+    console.log('Submitting user data:', data)
 
+    fetchData(`${UsersUrl}`, 'POST', JSON.stringify(data), Header)
+      .then((res: any) => {
+        console.log('API Response:', res)
+        if (!res.error) {
+          if (formData.inviteMode === 'tempPassword' && formData.temporaryPassword) {
+            const setPwdHeader = {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            }
+            fetchData(
+              `${SetPasswordUrl}`,
+              'POST',
+              JSON.stringify({
+                email: formData.email.trim(),
+                password: formData.temporaryPassword,
+                confirmPassword: formData.temporaryPassword,
+              }),
+              setPwdHeader
+            ).catch(() => {})
+          }
           resetForm()
           navigate('/app/users')
         }
         if (res.error) {
-          // profile_errors
-          // user_errors
           setError(true)
-          setProfileErrors(res?.errors?.profile_errors)
-          setUserErrors(res?.errors?.user_errors)
+          setProfileErrors(res?.errors?.profile_errors || {})
+          setUserErrors(res?.errors?.user_errors || {})
         }
       })
-      .catch(() => {})
+      .catch((err) => {
+        console.error('Submit error:', err)
+        setError(true)
+      })
   }
   const resetForm = () => {
     setFormData({
+      username: '',
       email: '',
       role: 'ADMIN',
       phone: '',
@@ -200,6 +333,8 @@ export function AddUsers() {
       has_sales_access: false,
       has_marketing_access: false,
       is_organization_admin: false,
+      inviteMode: 'invite',
+      temporaryPassword: '',
     })
     setProfileErrors({})
     setUserErrors({})
@@ -243,6 +378,27 @@ export function AddUsers() {
                     autoComplete="off"
                   >
                     <div className="fieldContainer">
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Username</div>
+                        <RequiredTextField
+                          required
+                          name="username"
+                          value={formData.username}
+                          onChange={handleChange}
+                          style={{ width: '70%' }}
+                          size="small"
+                          error={
+                            !!profileErrors?.username?.[0] ||
+                            !!userErrors?.username?.[0] ||
+                            (isUsernameAvailable === false)
+                          }
+                          helperText={
+                            profileErrors?.username?.[0] ||
+                            userErrors?.username?.[0] ||
+                            usernameHelper
+                          }
+                        />
+                      </div>
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Email</div>
                         <RequiredTextField
@@ -345,6 +501,48 @@ export function AddUsers() {
                           />
                         </Tooltip>
                       </div>
+                    </div>
+                    <div className="fieldContainer2">
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Invite Mode</div>
+                        <FormControl sx={{ width: '70%' }}>
+                          <Select
+                            name="inviteMode"
+                            value={formData.inviteMode}
+                            onChange={handleChange}
+                            className={'select'}
+                          >
+                            {[
+                              { value: 'invite', label: 'Send invite link' },
+                              { value: 'tempPassword', label: 'Set temporary password' },
+                            ].map((option) => (
+                              <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </div>
+                      {formData.inviteMode === 'tempPassword' && (
+                        <div className="fieldSubContainer">
+                          <div className="fieldTitle">Temporary Password</div>
+                          <RequiredTextField
+                            required
+                            name="temporaryPassword"
+                            type="password"
+                            value={formData.temporaryPassword}
+                            onChange={handleChange}
+                            style={{ width: '70%' }}
+                            size="small"
+                            error={!!profileErrors?.temporary_password?.[0] || !!userErrors?.temporary_password?.[0]}
+                            helperText={
+                              profileErrors?.temporary_password?.[0] ||
+                              userErrors?.temporary_password?.[0] ||
+                              ''
+                            }
+                          />
+                        </div>
+                      )}
                     </div>
                     {/* <div className='fieldContainer2'>
                                             <div className='fieldSubContainer'>
@@ -603,8 +801,8 @@ export function AddUsers() {
                             onChange={handleChange}
                             error={!!profileErrors?.country?.[0]}
                           >
-                            {state?.countries?.length &&
-                              state?.countries.map((option: any) => (
+                            {countries?.length > 0 &&
+                              countries.map((option: any) => (
                                 <MenuItem key={option[0]} value={option[0]}>
                                   {option[1]}
                                 </MenuItem>

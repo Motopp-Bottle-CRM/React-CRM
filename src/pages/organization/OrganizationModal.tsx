@@ -54,7 +54,7 @@ export default function OrganizationModal(props: any) {
     Authorization: localStorage.getItem('Token'),
   }
   const getOrganization = () => {
-    fetchData(`${OrgUrl}/`, 'GET', null as any, headers)
+    fetchData(`${OrgUrl}`, 'GET', null as any, headers)
       .then((res: any) => {
         // console.log(res, 'org')
         if (res?.profile_org_list) {
@@ -68,7 +68,7 @@ export default function OrganizationModal(props: any) {
   }
   const addOrganization = () => {
     const organizationName = { name: newOrganization }
-    fetchData(`${OrgUrl}/`, 'POST', JSON.stringify(organizationName), headers)
+    fetchData(`${OrgUrl}`, 'POST', JSON.stringify(organizationName), headers)
       .then((res) => {
         // console.log(res)
         if (res?.error) {
