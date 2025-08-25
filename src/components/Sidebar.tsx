@@ -79,6 +79,7 @@ export default function Sidebar(props: any) {
   const [drawerWidth, setDrawerWidth] = useState(200)
   const [headerWidth, setHeaderWidth] = useState(drawerWidth)
   const [userDetail, setUserDetail] = useState('')
+//  const [userDetail, setUserDetail] = useState({ role: 'USER' });
   const [organizationModal, setOrganizationModal] = useState(false)
   const organizationModalClose = () => {
     setOrganizationModal(false)
@@ -132,15 +133,20 @@ export default function Sidebar(props: any) {
   const userProfile = () => {
     fetchData(`${ProfileUrl}/`, 'GET', null as any, Header1)
       .then((res: any) => {
-        // console.log(res, 'user')
+        console.log('API response:', res);         // logs entire response
+        console.log('User object:', res?.user_obj); // logs user_obj specifically
         if (res?.user_obj) {
-          setUserDetail(res?.user_obj)
+          setUserDetail(res.user_obj)
         }
       })
       .catch((error) => {
         console.error('Error:', error)
       })
   }
+//get user details on component mount
+/*  useEffect(() => {
+   userProfile();
+  }, []);*/
 
   const navList = [
     'leads',
@@ -151,6 +157,19 @@ export default function Sidebar(props: any) {
     'users',
     'cases',
   ]
+
+  //hiding users menu from not ADMIN
+  /*
+  const filteredNavList = navList.filter((text) => {
+  if (text === 'users' && userDetail.role !== 'ADMIN') {
+    return false; // hide Users menu for non-admin
+  }
+  return true; // show everything else
+});
+
+*/
+//
+
   const navIcons = (text: any, screen: any): React.ReactNode => {
     switch (text) {
       case 'leads':
@@ -353,7 +372,8 @@ export default function Sidebar(props: any) {
         >
           <Box>
             <List sx={{ pt: '65px' }}>
-              {navList.map((text, index) => (
+ 
+                {navList.map((text, index) => (
                 <ListItem key={text} disablePadding>
                   <StyledListItemButton
                     sx={{ pt: '6px', pb: '6px' }}

@@ -21,7 +21,7 @@ import {
   FormHelperText,
 } from '@mui/material'
 import { UserUrl } from '../../services/ApiUrls'
-import { fetchData } from '../../components/FetchData'
+import { fetchData, Header } from '../../components/FetchData'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import { FaArrowDown, FaTimes, FaUpload } from 'react-icons/fa'
 import { AntSwitch, RequiredTextField } from '../../styles/CssStyled'
@@ -72,6 +72,7 @@ export function EditUser() {
   const [userErrors, setUserErrors] = useState<FormErrors>({})
   const [roleSelectOpen, setRoleSelectOpen] = useState(false)
   const [countrySelectOpen, setCountrySelectOpen] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState<FormData>({
     email: '',
     role: 'ADMIN',
@@ -125,6 +126,41 @@ export function EditUser() {
     }
   }, [reset])
 
+  useEffect(() => {
+    async function load() {
+      try {
+        setLoading(true)
+        setError(false)
+
+        fetchData(`${UserUrl}/${state?.id}/`, 'GET', null as any, Header).then(
+          (res: any) => {
+            if (!res.error) {
+              setLoading(false)
+              const data = res?.data?.profile_obj
+              setFormData({
+                email: data?.user_details?.email || '',
+                role: data?.role || '',
+                phone: data?.phone || '',
+                alternate_phone: data?.alternate_phone || '',
+                address_line: data?.address?.address_line || '',
+                street: data?.address?.street || '',
+                city: data?.address?.city || '',
+                state: data?.address?.state || '',
+                pincode: data?.address?.pincode || '',
+                country: data?.address?.country || '',
+              })
+            }
+          }
+        )
+      } catch (error) {
+        console.error('Error fetching user data:', error)
+        setError(true)
+      }
+    }
+
+    load()
+  }, [state?.id])
+
   const handleChange = (e: any) => {
     const { name, value, files, type, checked } = e.target
     if (type === 'file') {
@@ -148,6 +184,16 @@ export function EditUser() {
   }
   const handleSubmit = (e: any) => {
     e.preventDefault()
+    if (formData.phone) {
+      if (formData.phone === formData.alternate_phone) {
+        setProfileErrors({
+          ...profileErrors,
+          alternate_phone: ['Alternate phone cannot be the same as phone'],
+        })
+        return
+      }
+    }
+
     submitForm()
   }
 
@@ -219,20 +265,17 @@ export function EditUser() {
 
     fetchData(`${UserUrl}${state?.id}/`, 'PUT', JSON.stringify(data), Header)
       .then((res: any) => {
-        // console.log('editsubmit:', res);
-        if (!res.error) {
-          resetForm()
-          navigate('/app/users')
-        }
-        if (res.error) {
-          setError(true)
-          setProfileErrors(
-            res?.errors?.profile_errors || res?.profile_errors[0]
-          )
-          setUserErrors(res?.errors?.user_errors || res?.user_errors[0])
-        }
+        resetForm()
+        navigate('/app/users')
       })
-      .catch(() => {})
+      .catch(async (err: any) => {
+        setError(true)
+        const profileErr = err?.profile_errors?.[0] || {}
+        const userErr = err?.user_errors?.[0] || {}
+
+        setProfileErrors(profileErr)
+        setUserErrors(userErr)
+      })
   }
   const resetForm = () => {
     setFormData({
@@ -679,7 +722,7 @@ export function EditUser() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                         </div>
@@ -729,7 +772,7 @@ export function EditUser() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                             <div className='fieldSubContainer'>
@@ -750,7 +793,7 @@ export function EditUser() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                         </div>
@@ -773,7 +816,7 @@ export function EditUser() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                             <div className='fieldSubContainer'>
@@ -794,7 +837,7 @@ export function EditUser() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                         </div>
@@ -817,7 +860,7 @@ export function EditUser() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                             <div className='fieldSubContainer'>
@@ -838,7 +881,7 @@ export function EditUser() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                         </div>
@@ -873,7 +916,7 @@ export function EditUser() {
                                                     name='description'
                                                     minRows={8}
                                                     // defaultValue={state.editData && state.editData.description ? state.editData.description : ''}
-                                                    // onChange={onChange} 
+                                                    // onChange={onChange}
                                                     style={{ width: '70%', padding: '5px' }}
                                                     placeholder='Add Description'
                                                 />
