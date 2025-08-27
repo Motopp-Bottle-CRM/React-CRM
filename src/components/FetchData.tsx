@@ -28,7 +28,7 @@ export function fetchData(url: any, method: any, data = '', header: any) {
 }*/
 
 //  updated fuction to handle unauthorized access
-export function fetchData(url: any, method: any, data = '', header: any) {
+export function fetchData(url: any, method: any, data: any, header: any) {
   return fetch(`${SERVER}${url}`, {
     method,
     headers: header,
