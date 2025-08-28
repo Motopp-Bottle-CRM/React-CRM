@@ -78,6 +78,14 @@ export function AddUsers() {
   const { state } = useLocation()
   const navigate = useNavigate()
 
+  // Hardcoded countries array for the dropdown
+  const countries = [
+    'India', 'United States', 'United Kingdom', 'Canada', 'Australia', 
+    'Germany', 'France', 'Japan', 'China', 'Brazil', 'Mexico', 'Italy',
+    'Spain', 'Netherlands', 'Switzerland', 'Sweden', 'Norway', 'Denmark',
+    'Finland', 'Poland', 'Russia', 'South Korea', 'Singapore', 'Thailand'
+  ]
+
   const [roleSelectOpen, setRoleSelectOpen] = useState(false)
   const [countrySelectOpen, setCountrySelectOpen] = useState(false)
   const [error, setError] = useState(false)
@@ -168,11 +176,10 @@ export function AddUsers() {
       .then((res: any) => {
         console.log('Form data:', res)
         if (!res.error) {
-          // setResponceError(data.error)
-          // navigate('/contacts')profile_errors
-
+          console.log('User created successfully, navigating to users page...')
           resetForm()
-          navigate('/app/users')
+          // Navigate to users page with inactive tab
+          navigate('/app/users?tab=inactive', { replace: true })
         }
         if (res.error) {
           // profile_errors
@@ -603,12 +610,11 @@ export function AddUsers() {
                             onChange={handleChange}
                             error={!!profileErrors?.country?.[0]}
                           >
-                            {state?.countries?.length &&
-                              state?.countries.map((option: any) => (
-                                <MenuItem key={option[0]} value={option[0]}>
-                                  {option[1]}
-                                </MenuItem>
-                              ))}
+                            {countries.map((option) => (
+                              <MenuItem key={option} value={option}>
+                                {option}
+                              </MenuItem>
+                            ))}
                           </Select>
                           <FormHelperText>
                             {profileErrors?.country?.[0]

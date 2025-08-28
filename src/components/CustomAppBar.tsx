@@ -17,6 +17,7 @@ export function CustomAppBar(props: any) {
     backBtn,
     onCancel,
     onSubmit,
+    isSubmitting = false,
   } = props
 
   const Module = module.toLowerCase()
@@ -154,8 +155,9 @@ export function CustomAppBar(props: any) {
                     style={{ fill: 'white', width: '16px', marginLeft: '2px' }}
                   />
                 }
+                disabled={isSubmitting}
               >
-                Save
+                {isSubmitting ? 'Saving...' : 'Save'}
               </Button>
             </div>
           </div>
