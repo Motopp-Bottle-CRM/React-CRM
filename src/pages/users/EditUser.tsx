@@ -110,7 +110,14 @@ export function EditUser() {
         setLoading(true)
         setError(false)
 
-        fetchData(`${UserUrl}/${state?.id}/`, 'GET', null as any, Header).then(
+        const MyHeader = {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            Authorization: localStorage.getItem('Token'),
+            org: localStorage.getItem('org')
+        }
+
+        fetchData(`${UserUrl}/${state?.id}/`, 'GET', null as any, MyHeader).then(
           (res: any) => {
             if (!res.error) {
               setLoading(false)
@@ -138,8 +145,8 @@ export function EditUser() {
 
     load()
   }, [state?.id])
-  
-  
+
+
 //new Somayeh code
 /*
 useEffect(() => {
@@ -147,14 +154,14 @@ useEffect(() => {
       try {
         setLoading(true)
         setError(false)
- 
+
         const Header = {
           Accept: 'application/json',
           'Content-Type': 'application/json',
           Authorization: localStorage.getItem('Token'),
           org: localStorage.getItem('org'),
         }
- 
+
         fetchData(`${UserUrl}/${state?.id}/`, 'GET', null as any, Header).then(
           (res: any) => {
             if (!res.error) {
