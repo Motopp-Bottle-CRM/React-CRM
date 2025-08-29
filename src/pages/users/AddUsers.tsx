@@ -109,7 +109,7 @@ export function AddUsers() {
   }
 
   const backbtnHandle = () => {
-    navigate('/app/users')
+    navigate('/app/users?tab=inactive')
   }
   const handleSubmit = (e: any) => {
     e.preventDefault()
@@ -178,8 +178,11 @@ export function AddUsers() {
         if (!res.error) {
           console.log('User created successfully, navigating to users page...')
           resetForm()
-          // Navigate to users page with inactive tab
-          navigate('/app/users?tab=inactive', { replace: true })
+          // Show success message briefly, then navigate
+          setMsg('User created successfully!')
+          setTimeout(() => {
+            navigate('/app/users?tab=inactive', { replace: true })
+          }, 1000)
         }
         if (res.error) {
           // profile_errors
@@ -189,7 +192,11 @@ export function AddUsers() {
           setUserErrors(res?.errors?.user_errors)
         }
       })
-      .catch(() => {})
+      .catch((error) => {
+        console.error('Error creating user:', error)
+        setError(true)
+        setMsg('An error occurred while creating the user.')
+      })
   }
   const resetForm = () => {
     setFormData({
@@ -214,6 +221,7 @@ export function AddUsers() {
   const onCancel = () => {
     resetForm()
   }
+  
   const module = 'Users'
   const crntPage = 'Add Users'
   const backBtn = 'Back To Users'
@@ -230,6 +238,22 @@ export function AddUsers() {
         onSubmit={handleSubmit}
       />
       <Box sx={{ mt: '120px' }}>
+        {/* Success/Error Messages */}
+        {msg && (
+          <Box sx={{ mb: 2, px: 2 }}>
+            <div style={{
+              padding: '12px 16px',
+              borderRadius: '4px',
+              backgroundColor: error ? '#ffebee' : '#e8f5e8',
+              color: error ? '#c62828' : '#2e7d32',
+              border: `1px solid ${error ? '#ef9a9a' : '#a5d6a7'}`,
+              fontSize: '14px'
+            }}>
+              {msg}
+            </div>
+          </Box>
+        )}
+        
         <form onSubmit={handleSubmit}>
           <div style={{ padding: '10px' }}>
             <div className="leadContainer">
