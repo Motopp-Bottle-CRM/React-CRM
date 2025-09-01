@@ -40,7 +40,7 @@ export default function SetPassword() {
   const fetchInvitationData = async () => {
     try {
       const response = await fetchData(
-        `auth/set-password/${token}/`,
+        `api/set-password/${token}/`,
         'GET',
         null,
         {
@@ -82,7 +82,7 @@ export default function SetPassword() {
     if (isInvitation) {
       // Handle invitation-based password setting
       fetchData(
-        `auth/set-password/${token}/`,
+        `api/set-password/${token}/`,
         'POST',
         JSON.stringify({
           password,
