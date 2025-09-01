@@ -108,6 +108,13 @@ export function EditUser() {
         setLoading(true)
         setError(false)
 
+        const Header = {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: localStorage.getItem('Token'),
+          org: localStorage.getItem('org'),
+        }
+
         fetchData(`${UserUrl}/${state?.id}/`, 'GET', null as any, Header).then(
           (res: any) => {
             if (!res.error) {
