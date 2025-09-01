@@ -1,10 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom'
-import Login from './pages/auth/Login';
-import { Home } from './pages/home/Home';
+import React, { useEffect, useState } from 'react'
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from 'react-router-dom'
+import Login from './pages/auth/Login'
+import { Home } from './pages/home/Home'
+import SetPassword from './pages/auth/SetPassword'
 
 function App() {
-
   return (
     <>
       <Router>
@@ -18,7 +24,9 @@ function App() {
           {/* <Route path='*' element={isLoggedIn ? <Home /> : <Login />} /> */}
           <Route path="*" element={<Home />} />
           <Route path="/app" element={<Home />} />
-          <Route path='/login' element={<Login />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/set-password" element={<SetPassword />} />
+          <Route path="/auth/set-password/:token" element={<SetPassword />} />
           {/* <Route path="/" element={<Navigate to="/contacts" replace />} /> */}
           {/* <Route
             path='/'
@@ -30,7 +38,7 @@ function App() {
         </Routes>
       </Router>
     </>
-  );
+  )
 }
 
-export default App;
+export default App

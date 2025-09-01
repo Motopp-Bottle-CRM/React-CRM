@@ -1,24 +1,24 @@
 import React, { ChangeEvent, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import {
-    TextField,
-    AccordionDetails,
-    Accordion,
-    AccordionSummary,
-    Typography,
-    Box,
-    TextareaAutosize,
-    MenuItem,
-    Tooltip,
-    Button,
-    Input,
-    Avatar,
-    IconButton,
-    Stack,
-    Divider,
-    Select,
-    FormControl,
-    FormHelperText
+  TextField,
+  AccordionDetails,
+  Accordion,
+  AccordionSummary,
+  Typography,
+  Box,
+  TextareaAutosize,
+  MenuItem,
+  Tooltip,
+  Button,
+  Input,
+  Avatar,
+  IconButton,
+  Stack,
+  Divider,
+  Select,
+  FormControl,
+  FormHelperText,
 } from '@mui/material'
 // import { makeStyles } from '@mui/styles'
 // import isEmail from 'validator/lib/isEmail'
@@ -27,281 +27,357 @@ import '../../styles/style.css'
 import { UsersUrl } from '../../services/ApiUrls'
 import { fetchData, Header } from '../../components/FetchData'
 import { CustomAppBar } from '../../components/CustomAppBar'
-import { FaArrowAltCircleDown, FaArrowDown, FaTimes, FaUpload } from 'react-icons/fa'
-import { AntSwitch, CustomSelectField, CustomSelectTextField, RequiredTextField } from '../../styles/CssStyled'
+import {
+  FaArrowAltCircleDown,
+  FaArrowDown,
+  FaTimes,
+  FaUpload,
+} from 'react-icons/fa'
+import {
+  AntSwitch,
+  CustomSelectField,
+  CustomSelectTextField,
+  RequiredTextField,
+} from '../../styles/CssStyled'
 import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
 
 type FormErrors = {
-    email?: string[];
-    role?: string[];
-    phone?: string[];
-    alternate_phone?: string[];
-    address_line?: string[];
-    street?: string[];
-    city?: string[];
-    state?: string[];
-    pincode?: string[];
-    country?: string[];
-    profile_pic?: string[];
-    has_sales_access?: string[];
-    has_marketing_access?: string[];
-    is_organization_admin?: string[];
-};
+  email?: string[]
+  role?: string[]
+  phone?: string[]
+  alternate_phone?: string[]
+  address_line?: string[]
+  street?: string[]
+  city?: string[]
+  state?: string[]
+  pincode?: string[]
+  country?: string[]
+  profile_pic?: string[]
+  has_sales_access?: string[]
+  has_marketing_access?: string[]
+  is_organization_admin?: string[]
+}
 interface FormData {
-    email: string,
-    role: string,
-    phone: string,
-    alternate_phone: string,
-    address_line: string,
-    street: string,
-    city: string,
-    state: string,
-    pincode: string,
-    country: string,
-    profile_pic: string | null,
-    has_sales_access: boolean,
-    has_marketing_access: boolean,
-    is_organization_admin: boolean
-
-
+  email: string
+  role: string
+  phone: string
+  alternate_phone: string
+  address_line: string
+  street: string
+  city: string
+  state: string
+  pincode: string
+  country: string
+  profile_pic: string | null
+  has_sales_access: boolean
+  has_marketing_access: boolean
+  is_organization_admin: boolean
 }
 export function AddUsers() {
-    const { state } = useLocation()
-    const navigate = useNavigate()
+  const { state } = useLocation()
+  const navigate = useNavigate()
 
-    const [roleSelectOpen, setRoleSelectOpen] = useState(false)
-    const [countrySelectOpen, setCountrySelectOpen] = useState(false)
-    const [error, setError] = useState(false)
-    const [msg, setMsg] = useState('')
-    const [responceError, setResponceError] = useState(false)
+  // Hardcoded countries array for the dropdown
+  const countries = [
+    'India', 'United States', 'United Kingdom', 'Canada', 'Australia', 
+    'Germany', 'France', 'Japan', 'China', 'Brazil', 'Mexico', 'Italy',
+    'Spain', 'Netherlands', 'Switzerland', 'Sweden', 'Norway', 'Denmark',
+    'Finland', 'Poland', 'Russia', 'South Korea', 'Singapore', 'Thailand'
+  ]
 
+  const [roleSelectOpen, setRoleSelectOpen] = useState(false)
+  const [countrySelectOpen, setCountrySelectOpen] = useState(false)
+  const [error, setError] = useState(false)
+  const [msg, setMsg] = useState('')
+  const [responceError, setResponceError] = useState(false)
 
-    const handleChange = (e: any) => {
-        const { name, value, files, type, checked } = e.target;
-        if (type === 'file') {
-            setFormData({ ...formData, [name]: e.target.files?.[0] || null });
-        }
-        if (type === 'checkbox') {
-            setFormData({ ...formData, [name]: checked });
-        }
-        else {
-            setFormData({ ...formData, [name]: value });
-        }
-        // setValidationErrors(({ ...validationErrors, [name]: '' }));
-        // setErrors({});
-        // const newValue = type === 'checkbox' ? checked : value;
-        // setFormData({ ...formData, [name]: newValue });
-    };
-
-    const backbtnHandle = () => {
-        navigate('/app/users')
+  const handleChange = (e: any) => {
+    const { name, value, files, type, checked } = e.target
+    if (type === 'file') {
+      setFormData({ ...formData, [name]: e.target.files?.[0] || null })
     }
-    const handleSubmit = (e: any) => {
-        e.preventDefault();
-        submitForm();
+    if (type === 'checkbox') {
+      setFormData({ ...formData, [name]: checked })
+    } else {
+      setFormData({ ...formData, [name]: value })
     }
-    const [errors, setErrors] = useState<FormErrors>({});
-    const [profileErrors, setProfileErrors] = useState<FormErrors>({});
-    const [userErrors, setUserErrors] = useState<FormErrors>({});
-    const [formData, setFormData] = useState<FormData>({
-        email: '',
-        role: 'ADMIN',
-        phone: '',
-        alternate_phone: '',
-        address_line: '',
-        street: '',
-        city: '',
-        state: '',
-        pincode: '',
-        country: '',
-        profile_pic: null,
-        has_sales_access: false,
-        has_marketing_access: false,
-        is_organization_admin: false
+    // setValidationErrors(({ ...validationErrors, [name]: '' }));
+    // setErrors({});
+    // const newValue = type === 'checkbox' ? checked : value;
+    // setFormData({ ...formData, [name]: newValue });
+  }
 
+  const backbtnHandle = () => {
+    navigate('/app/users?tab=inactive')
+  }
+  const handleSubmit = (e: any) => {
+    e.preventDefault()
+    submitForm()
+  }
+  const [errors, setErrors] = useState<FormErrors>({})
+  const [profileErrors, setProfileErrors] = useState<FormErrors>({})
+  const [userErrors, setUserErrors] = useState<FormErrors>({})
+  const [formData, setFormData] = useState<FormData>({
+    email: '',
+    role: 'ADMIN',
+    phone: '',
+    alternate_phone: '',
+    address_line: '',
+    street: '',
+    city: '',
+    state: '',
+    pincode: '',
+    country: '',
+    profile_pic: null,
+    has_sales_access: false,
+    has_marketing_access: false,
+    is_organization_admin: false,
+  })
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] || null
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = () => {
+        setFormData({ ...formData, profile_pic: reader.result as string })
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const submitForm = () => {
+    const Header = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: localStorage.getItem('Token'),
+      org: localStorage.getItem('org'),
+    }
+    // console.log('Form data:', data);
+
+    const data = {
+      email: formData.email,
+      role: formData.role,
+      phone: formData.phone,
+      alternate_phone: formData.alternate_phone,
+      address_line: formData.address_line,
+      street: formData.street,
+      city: formData.city,
+      state: formData.state,
+      pincode: formData.pincode,
+      country: formData.country,
+      profile_pic: formData.profile_pic,
+      has_sales_access: formData.has_sales_access,
+      has_marketing_access: formData.has_marketing_access,
+      is_organization_admin: formData.is_organization_admin,
+    }
+
+    fetchData(`${UsersUrl}/`, 'POST', JSON.stringify(data), Header)
+      .then((res: any) => {
+        console.log('Form data:', res)
+        if (!res.error) {
+          console.log('User created successfully, navigating to users page...')
+          resetForm()
+          // Show success message briefly, then navigate
+          setMsg('User created successfully!')
+          setTimeout(() => {
+            navigate('/app/users?tab=inactive', { replace: true })
+          }, 1000)
+        }
+        if (res.error) {
+          // profile_errors
+          // user_errors
+          setError(true)
+          setProfileErrors(res?.errors?.profile_errors)
+          setUserErrors(res?.errors?.user_errors)
+        }
+      })
+      .catch((error) => {
+        console.error('Error creating user:', error)
+        setError(true)
+        setMsg('An error occurred while creating the user.')
+      })
+  }
+  const resetForm = () => {
+    setFormData({
+      email: '',
+      role: 'ADMIN',
+      phone: '',
+      alternate_phone: '',
+      address_line: '',
+      street: '',
+      city: '',
+      state: '',
+      pincode: '',
+      country: '',
+      profile_pic: null,
+      has_sales_access: false,
+      has_marketing_access: false,
+      is_organization_admin: false,
     })
+    setProfileErrors({})
+    setUserErrors({})
+  }
+  const onCancel = () => {
+    resetForm()
+  }
+  
+  const module = 'Users'
+  const crntPage = 'Add Users'
+  const backBtn = 'Back To Users'
 
-    const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0] || null;
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = () => {
-                setFormData({ ...formData, profile_pic: reader.result as string });
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-    const submitForm = () => {
-        const Header = {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-            Authorization: localStorage.getItem('Token'),
-            org: localStorage.getItem('org')
-          }
-        // console.log('Form data:', data);
-
-        const data = {
-            email: formData.email,
-            role: formData.role,
-            phone: formData.phone,
-            alternate_phone: formData.alternate_phone,
-            address_line: formData.address_line,
-            street: formData.street,
-            city: formData.city,
-            state: formData.state,
-            pincode: formData.pincode,
-            country: formData.country,
-            profile_pic: formData.profile_pic,
-            has_sales_access: formData.has_sales_access,
-            has_marketing_access: formData.has_marketing_access,
-            is_organization_admin: formData.is_organization_admin
-        }
-
-        fetchData(`${UsersUrl}/`, 'POST', JSON.stringify(data), Header)
-            .then((res: any) => {
-                console.log('Form data:', res);
-                if (!res.error) {
-                    // setResponceError(data.error)
-                    // navigate('/contacts')profile_errors
-
-                    resetForm()
-                    navigate('/app/users')
-                }
-                if (res.error) {
-                    // profile_errors
-                    // user_errors
-                    setError(true)
-                    setProfileErrors(res?.errors?.profile_errors)
-                    setUserErrors(res?.errors?.user_errors)
-                }
-            })
-            .catch(() => {
-            })
-    };
-    const resetForm = () => {
-        setFormData({
-            email: '',
-            role: 'ADMIN',
-            phone: '',
-            alternate_phone: '',
-            address_line: '',
-            street: '',
-            city: '',
-            state: '',
-            pincode: '',
-            country: '',
-            profile_pic: null,
-            has_sales_access: false,
-            has_marketing_access: false,
-            is_organization_admin: false
-        });
-        setProfileErrors({})
-        setUserErrors({})
-    }
-    const onCancel = () => {
-        resetForm()
-    }
-    const module = 'Users'
-    const crntPage = 'Add Users'
-    const backBtn = 'Back To Users'
-
-    // console.log(formData.profile_pic, 'formData.profile_pic')
-    return (
-        <Box sx={{ mt: '60px' }}>
-            <CustomAppBar backbtnHandle={backbtnHandle} module={module} backBtn={backBtn} crntPage={crntPage} onCancel={onCancel} onSubmit={handleSubmit} />
-            <Box sx={{ mt: "120px" }}>
-                <form onSubmit={handleSubmit}>
-                    <div style={{ padding: '10px' }}>
-                        <div className='leadContainer'>
-                            <Accordion defaultExpanded style={{ width: '98%' }}>
-                                <AccordionSummary expandIcon={<FiChevronDown style={{ fontSize: '25px' }} />}>
-                                    <Typography className='accordion-header'>User Information</Typography>
-                                </AccordionSummary>
-                                <Divider className='divider' />
-                                <AccordionDetails>
-                                    <Box
-                                        sx={{ width: '98%', color: '#1A3353', mb: 1 }}
-                                        component='form'
-                                        noValidate
-                                        autoComplete='off'
-                                    >
-                                        <div className='fieldContainer'>
-                                            <div className='fieldSubContainer'>
-                                                <div className='fieldTitle'>Email</div>
-                                                <RequiredTextField
-                                                    required
-                                                    name='email'
-                                                    value={formData.email}
-                                                    onChange={handleChange}
-                                                    style={{ width: '70%' }}
-                                                    size='small'
-                                                    error={!!profileErrors?.email?.[0] || !!userErrors?.email?.[0]}
-                                                    helperText={profileErrors?.email?.[0] || userErrors?.email?.[0] || ''}
-                                                />
-                                            </div>
-                                            <div className='fieldSubContainer'>
-                                                <div className='fieldTitle'>Role</div>
-                                                <FormControl sx={{ width: '70%' }}>
-                                                    <Select
-                                                        name='role'
-                                                        value={formData.role}
-                                                        open={roleSelectOpen}
-                                                        onClick={() => setRoleSelectOpen(!roleSelectOpen)}
-                                                        IconComponent={() => (
-                                                            <div onClick={() => setRoleSelectOpen(!roleSelectOpen)} className="select-icon-background">
-                                                                {roleSelectOpen ? <FiChevronUp className='select-icon' /> : <FiChevronDown className='select-icon' />}
-                                                            </div>
-                                                        )}
-                                                        className={'select'}
-                                                        onChange={handleChange}
-                                                        error={!!errors?.role?.[0]}
-                                                    >
-                                                        {['ADMIN', 'USER'].map((option) => (
-                                                            <MenuItem key={option} value={option}>
-                                                                {option}
-                                                            </MenuItem>
-                                                        ))}
-                                                    </Select>
-                                                    {/* <FormHelperText>{errors?.[0] ? errors[0] : ''}</FormHelperText> */}
-                                                </FormControl>
-                                            </div>
-                                        </div>
-                                        <div className='fieldContainer2'>
-                                            <div className='fieldSubContainer'>
-                                                <div className='fieldTitle'>Phone Number</div>
-                                                <Tooltip title="Number must starts with +91">
-                                                    <RequiredTextField
-                                                        name='phone'
-                                                        id='outlined-error-helper-text'
-                                                        value={formData.phone}
-                                                        onChange={handleChange}
-                                                        required
-                                                        style={{ width: '70%' }}
-                                                        size='small'
-                                                        error={!!profileErrors?.phone?.[0] || !!userErrors?.phone?.[0]}
-                                                        helperText={profileErrors?.phone?.[0] || userErrors?.phone?.[0] || ''}
-                                                    />
-                                                </Tooltip>
-                                            </div>
-                                            <div className='fieldSubContainer'>
-                                                <div className='fieldTitle'>Alternate Phone</div>
-                                                <Tooltip title="Number must starts with +91">
-                                                    <RequiredTextField
-                                                        required
-                                                        name='alternate_phone'
-                                                        value={formData.alternate_phone}
-                                                        onChange={handleChange}
-                                                        style={{ width: '70%' }}
-                                                        size='small'
-                                                        error={!!profileErrors?.alternate_phone?.[0] || !!userErrors?.alternate_phone?.[0]}
-                                                        helperText={profileErrors?.alternate_phone?.[0] || userErrors?.alternate_phone?.[0] || ''}
-                                                    />
-                                                </Tooltip>
-                                            </div>
-                                        </div>
-                                        {/* <div className='fieldContainer2'>
+  // console.log(formData.profile_pic, 'formData.profile_pic')
+  return (
+    <Box sx={{ mt: '60px' }}>
+      <CustomAppBar
+        backbtnHandle={backbtnHandle}
+        module={module}
+        backBtn={backBtn}
+        crntPage={crntPage}
+        onCancel={onCancel}
+        onSubmit={handleSubmit}
+      />
+      <Box sx={{ mt: '120px' }}>
+        {/* Success/Error Messages */}
+        {msg && (
+          <Box sx={{ mb: 2, px: 2 }}>
+            <div style={{
+              padding: '12px 16px',
+              borderRadius: '4px',
+              backgroundColor: error ? '#ffebee' : '#e8f5e8',
+              color: error ? '#c62828' : '#2e7d32',
+              border: `1px solid ${error ? '#ef9a9a' : '#a5d6a7'}`,
+              fontSize: '14px'
+            }}>
+              {msg}
+            </div>
+          </Box>
+        )}
+        
+        <form onSubmit={handleSubmit}>
+          <div style={{ padding: '10px' }}>
+            <div className="leadContainer">
+              <Accordion defaultExpanded style={{ width: '98%' }}>
+                <AccordionSummary
+                  expandIcon={<FiChevronDown style={{ fontSize: '25px' }} />}
+                >
+                  <Typography className="accordion-header">
+                    User Information
+                  </Typography>
+                </AccordionSummary>
+                <Divider className="divider" />
+                <AccordionDetails>
+                  <Box
+                    sx={{ width: '98%', color: '#1A3353', mb: 1 }}
+                    component="form"
+                    noValidate
+                    autoComplete="off"
+                  >
+                    <div className="fieldContainer">
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Email</div>
+                        <RequiredTextField
+                          required
+                          name="email"
+                          value={formData.email}
+                          onChange={handleChange}
+                          style={{ width: '70%' }}
+                          size="small"
+                          error={
+                            !!profileErrors?.email?.[0] ||
+                            !!userErrors?.email?.[0]
+                          }
+                          helperText={
+                            profileErrors?.email?.[0] ||
+                            userErrors?.email?.[0] ||
+                            ''
+                          }
+                        />
+                      </div>
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Role</div>
+                        <FormControl sx={{ width: '70%' }}>
+                          <Select
+                            name="role"
+                            value={formData.role}
+                            open={roleSelectOpen}
+                            onClick={() => setRoleSelectOpen(!roleSelectOpen)}
+                            IconComponent={() => (
+                              <div
+                                onClick={() =>
+                                  setRoleSelectOpen(!roleSelectOpen)
+                                }
+                                className="select-icon-background"
+                              >
+                                {roleSelectOpen ? (
+                                  <FiChevronUp className="select-icon" />
+                                ) : (
+                                  <FiChevronDown className="select-icon" />
+                                )}
+                              </div>
+                            )}
+                            className={'select'}
+                            onChange={handleChange}
+                            error={!!errors?.role?.[0]}
+                          >
+                            {['ADMIN', 'USER'].map((option) => (
+                              <MenuItem key={option} value={option}>
+                                {option}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                          {/* <FormHelperText>{errors?.[0] ? errors[0] : ''}</FormHelperText> */}
+                        </FormControl>
+                      </div>
+                    </div>
+                    <div className="fieldContainer2">
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Phone Number</div>
+                        <Tooltip title="Number must starts with +91">
+                          <RequiredTextField
+                            name="phone"
+                            id="outlined-error-helper-text"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            required
+                            style={{ width: '70%' }}
+                            size="small"
+                            error={
+                              !!profileErrors?.phone?.[0] ||
+                              !!userErrors?.phone?.[0]
+                            }
+                            helperText={
+                              profileErrors?.phone?.[0] ||
+                              userErrors?.phone?.[0] ||
+                              ''
+                            }
+                          />
+                        </Tooltip>
+                      </div>
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Alternate Phone</div>
+                        <Tooltip title="Number must starts with +91">
+                          <RequiredTextField
+                            required
+                            name="alternate_phone"
+                            value={formData.alternate_phone}
+                            onChange={handleChange}
+                            style={{ width: '70%' }}
+                            size="small"
+                            error={
+                              !!profileErrors?.alternate_phone?.[0] ||
+                              !!userErrors?.alternate_phone?.[0]
+                            }
+                            helperText={
+                              profileErrors?.alternate_phone?.[0] ||
+                              userErrors?.alternate_phone?.[0] ||
+                              ''
+                            }
+                          />
+                        </Tooltip>
+                      </div>
+                    </div>
+                    {/* <div className='fieldContainer2'>
                                             <div className='fieldSubContainer'>
                                                 <div className='fieldTitle'>Profile picture</div>
                                                 <Stack sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -405,127 +481,179 @@ export function AddUsers() {
                                                 />
                                             </div>
                                         </div> */}
-                                    </Box>
-                                </AccordionDetails>
-                            </Accordion>
-                        </div>
-                        {/* Address Details */}
-                        <div className='leadContainer'>
-                            <Accordion defaultExpanded style={{ width: '98%' }}>
-                                <AccordionSummary expandIcon={<FiChevronDown style={{ fontSize: '25px' }} />}>
-                                    <Typography className='accordion-header'>Address</Typography>
-                                </AccordionSummary>
-                                <Divider className='divider' />
-                                <AccordionDetails>
-                                    <Box
-                                        sx={{ width: '98%', color: '#1A3353', mb: 1 }}
-                                        component='form'
-                                        noValidate
-                                        autoComplete='off'
-                                    >
-                                        <div className='fieldContainer'>
-                                            <div className='fieldSubContainer'>
-                                                <div className='fieldTitle'>Address Lane</div>
-                                                <TextField
-                                                    required
-                                                    name='address_line'
-                                                    value={formData.address_line}
-                                                    onChange={handleChange}
-                                                    style={{ width: '70%' }}
-                                                    size='small'
-                                                    error={!!profileErrors?.address_line?.[0] || !!userErrors?.address_line?.[0]}
-                                                    helperText={profileErrors?.address_line?.[0] || userErrors?.address_line?.[0] || ''}
-                                                />
-                                            </div>
-                                            <div className='fieldSubContainer'>
-                                                <div className='fieldTitle'>Street</div>
-                                                <TextField
-                                                    required
-                                                    name='street'
-                                                    value={formData.street}
-                                                    onChange={handleChange}
-                                                    style={{ width: '70%' }}
-                                                    size='small'
-                                                    error={!!profileErrors?.street?.[0] || !!userErrors?.street?.[0]}
-                                                    helperText={profileErrors?.street?.[0] || userErrors?.street?.[0] || ''}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className='fieldContainer2'>
-                                            <div className='fieldSubContainer'>
-                                                <div className='fieldTitle'>City</div>
-                                                <TextField
-                                                    required
-                                                    name='city'
-                                                    value={formData.city}
-                                                    onChange={handleChange}
-                                                    style={{ width: '70%' }}
-                                                    size='small'
-                                                    error={!!profileErrors?.city?.[0] || !!userErrors?.city?.[0]}
-                                                    helperText={profileErrors?.city?.[0] || userErrors?.city?.[0] || ''}
-                                                />
-                                            </div>
-                                            <div className='fieldSubContainer'>
-                                                <div className='fieldTitle'>State</div>
-                                                <TextField
-                                                    required
-                                                    name='state'
-                                                    value={formData.state}
-                                                    onChange={handleChange}
-                                                    style={{ width: '70%' }}
-                                                    size='small'
-                                                    error={!!profileErrors?.state?.[0] || !!userErrors?.state?.[0]}
-                                                    helperText={profileErrors?.state?.[0] || userErrors?.state?.[0] || ''}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className='fieldContainer2'>
-                                            <div className='fieldSubContainer'>
-                                                <div className='fieldTitle'>Pincode</div>
-                                                <TextField
-                                                    required
-                                                    name='pincode'
-                                                    value={formData.pincode}
-                                                    onChange={handleChange}
-                                                    style={{ width: '70%' }}
-                                                    size='small'
-                                                    error={!!profileErrors?.pincode?.[0] || !!userErrors?.pincode?.[0]}
-                                                    helperText={profileErrors?.pincode?.[0] || userErrors?.pincode?.[0] || ''}
-                                                />
-                                            </div>
-                                            <div className='fieldSubContainer'>
-                                                <div className='fieldTitle'>Country</div>
-                                                <FormControl sx={{ width: '70%' }}>
-                                                    <Select
-                                                        name='country'
-                                                        value={formData.country}
-                                                        open={countrySelectOpen}
-                                                        onClick={() => setCountrySelectOpen(!countrySelectOpen)}
-                                                        IconComponent={() => (
-                                                            <div onClick={() => setCountrySelectOpen(!countrySelectOpen)} className="select-icon-background">
-                                                                {countrySelectOpen ? <FiChevronUp className='select-icon' /> : <FiChevronDown className='select-icon' />}
-                                                            </div>
-                                                        )}
-                                                        className={'select'}
-                                                        onChange={handleChange}
-                                                        error={!!profileErrors?.country?.[0]}
-                                                    >
-                                                        {state?.countries?.length && state?.countries.map((option: any) => (
-                                                            <MenuItem key={option[0]} value={option[0]}>
-                                                                {option[1]}
-                                                            </MenuItem>
-                                                        ))}
-                                                    </Select>
-                                                    <FormHelperText>{profileErrors?.country?.[0] ? profileErrors?.country?.[0] : ''}</FormHelperText>
-                                                </FormControl>
-                                            </div>
-                                        </div>
-                                    </Box>
-                                </AccordionDetails>
-                            </Accordion>
-                        </div>
-                        {/* Business Hours */}
-                        {/* <div className='leadContainer'>
+                  </Box>
+                </AccordionDetails>
+              </Accordion>
+            </div>
+            {/* Address Details */}
+            <div className="leadContainer">
+              <Accordion defaultExpanded style={{ width: '98%' }}>
+                <AccordionSummary
+                  expandIcon={<FiChevronDown style={{ fontSize: '25px' }} />}
+                >
+                  <Typography className="accordion-header">Address</Typography>
+                </AccordionSummary>
+                <Divider className="divider" />
+                <AccordionDetails>
+                  <Box
+                    sx={{ width: '98%', color: '#1A3353', mb: 1 }}
+                    component="form"
+                    noValidate
+                    autoComplete="off"
+                  >
+                    <div className="fieldContainer">
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Address Lane</div>
+                        <TextField
+                          required
+                          name="address_line"
+                          value={formData.address_line}
+                          onChange={handleChange}
+                          style={{ width: '70%' }}
+                          size="small"
+                          error={
+                            !!profileErrors?.address_line?.[0] ||
+                            !!userErrors?.address_line?.[0]
+                          }
+                          helperText={
+                            profileErrors?.address_line?.[0] ||
+                            userErrors?.address_line?.[0] ||
+                            ''
+                          }
+                        />
+                      </div>
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Street</div>
+                        <TextField
+                          required
+                          name="street"
+                          value={formData.street}
+                          onChange={handleChange}
+                          style={{ width: '70%' }}
+                          size="small"
+                          error={
+                            !!profileErrors?.street?.[0] ||
+                            !!userErrors?.street?.[0]
+                          }
+                          helperText={
+                            profileErrors?.street?.[0] ||
+                            userErrors?.street?.[0] ||
+                            ''
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="fieldContainer2">
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">City</div>
+                        <TextField
+                          required
+                          name="city"
+                          value={formData.city}
+                          onChange={handleChange}
+                          style={{ width: '70%' }}
+                          size="small"
+                          error={
+                            !!profileErrors?.city?.[0] ||
+                            !!userErrors?.city?.[0]
+                          }
+                          helperText={
+                            profileErrors?.city?.[0] ||
+                            userErrors?.city?.[0] ||
+                            ''
+                          }
+                        />
+                      </div>
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">State</div>
+                        <TextField
+                          required
+                          name="state"
+                          value={formData.state}
+                          onChange={handleChange}
+                          style={{ width: '70%' }}
+                          size="small"
+                          error={
+                            !!profileErrors?.state?.[0] ||
+                            !!userErrors?.state?.[0]
+                          }
+                          helperText={
+                            profileErrors?.state?.[0] ||
+                            userErrors?.state?.[0] ||
+                            ''
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="fieldContainer2">
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Pincode</div>
+                        <TextField
+                          required
+                          name="pincode"
+                          value={formData.pincode}
+                          onChange={handleChange}
+                          style={{ width: '70%' }}
+                          size="small"
+                          error={
+                            !!profileErrors?.pincode?.[0] ||
+                            !!userErrors?.pincode?.[0]
+                          }
+                          helperText={
+                            profileErrors?.pincode?.[0] ||
+                            userErrors?.pincode?.[0] ||
+                            ''
+                          }
+                        />
+                      </div>
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Country</div>
+                        <FormControl sx={{ width: '70%' }}>
+                          <Select
+                            name="country"
+                            value={formData.country}
+                            open={countrySelectOpen}
+                            onClick={() =>
+                              setCountrySelectOpen(!countrySelectOpen)
+                            }
+                            IconComponent={() => (
+                              <div
+                                onClick={() =>
+                                  setCountrySelectOpen(!countrySelectOpen)
+                                }
+                                className="select-icon-background"
+                              >
+                                {countrySelectOpen ? (
+                                  <FiChevronUp className="select-icon" />
+                                ) : (
+                                  <FiChevronDown className="select-icon" />
+                                )}
+                              </div>
+                            )}
+                            className={'select'}
+                            onChange={handleChange}
+                            error={!!profileErrors?.country?.[0]}
+                          >
+                            {countries.map((option) => (
+                              <MenuItem key={option} value={option}>
+                                {option}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                          <FormHelperText>
+                            {profileErrors?.country?.[0]
+                              ? profileErrors?.country?.[0]
+                              : ''}
+                          </FormHelperText>
+                        </FormControl>
+                      </div>
+                    </div>
+                  </Box>
+                </AccordionDetails>
+              </Accordion>
+            </div>
+            {/* Business Hours */}
+            {/* <div className='leadContainer'>
                             <Accordion defaultExpanded style={{ width: '98%' }}>
                         <AccordionSummary expandIcon={<FiChevronDown style={{ fontSize: '25px' }} />}>
                                     <Typography className='accordion-header'>Account Information</Typography>
@@ -565,8 +693,8 @@ export function AddUsers() {
                                 </AccordionDetails>
                             </Accordion>
                         </div> */}
-                        {/* Preferences */}
-                        {/* <div className='leadContainer'>
+            {/* Preferences */}
+            {/* <div className='leadContainer'>
                             <Accordion defaultExpanded style={{ width: '98%' }}>
                        <AccordionSummary expandIcon={<FiChevronDown style={{ fontSize: '25px' }} />}>
                                     <Typography className='accordion-header'>Account Information</Typography>
@@ -715,8 +843,8 @@ export function AddUsers() {
                                 </AccordionDetails>
                             </Accordion>
                         </div> */}
-                        {/* Signature Block */}
-                        {/* <div className='leadContainer'>
+            {/* Signature Block */}
+            {/* <div className='leadContainer'>
                             <Accordion defaultExpanded style={{ width: '98%' }}>
                               <AccordionSummary expandIcon={<FiChevronDown style={{ fontSize: '25px' }} />}>
                                     <Typography className='accordion-header'>Account Information</Typography>
@@ -747,9 +875,9 @@ export function AddUsers() {
                                 </AccordionDetails>
                             </Accordion>
                         </div> */}
-                    </div>
-                </form>
-            </Box>
-        </Box>
-    )
+          </div>
+        </form>
+      </Box>
+    </Box>
+  )
 }

@@ -1,142 +1,297 @@
 import { useEffect, useState } from 'react'
-import { Grid, Stack, Typography } from '@mui/material'
-import { useGoogleLogin } from '@react-oauth/google';
-import { useNavigate } from 'react-router-dom';
+import { Grid, Stack, Typography, Box, TextField, Button } from '@mui/material'
+import { useGoogleLogin } from '@react-oauth/google'
+import { Form, useNavigate } from 'react-router-dom'
 import imgGoogle from '../../assets/images/auth/google.svg'
 import imgLogo from '../../assets/images/auth/img_logo.png'
 import imgLogin from '../../assets/images/auth/img_login.png'
-import { GoogleButton } from '../../styles/CssStyled';
-import { fetchData } from '../../components/FetchData';
-import { AuthUrl } from '../../services/ApiUrls';
+import { GoogleButton } from '../../styles/CssStyled'
+import { fetchData } from '../../components/FetchData'
+import { LoginUrl, AuthUrl } from '../../services/ApiUrls'
 import '../../styles/style.css'
 
 declare global {
-    interface Window {
-        google: any;
-        gapi: any;
-    }
+  interface Window {
+    google: any
+    gapi: any
+  }
 }
 
 export default function Login() {
-    const navigate = useNavigate()
-    const [token, setToken] = useState(false)
+  const navigate = useNavigate()
+  const [token, setToken] = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
 
-    useEffect(() => {
-        if (localStorage.getItem('Token')) {
-            // navigate('/organization')
-            navigate('/app')
-        }
-    }, [token])
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    submitForm()
+  }
+  const submitForm = () => {
+    const header = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    }
 
-    const login = useGoogleLogin({
-        onSuccess: tokenResponse => {
-            const apiToken = { token: tokenResponse.access_token }
-            // const formData = new FormData()
-            // formData.append('token', tokenResponse.access_token)
-            const head = {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-            fetchData(`${AuthUrl}/`, 'POST', JSON.stringify(apiToken), head)
-                .then((res: any) => {
-                    localStorage.setItem('Token', `Bearer ${res.access_token}`)
-                    setToken(true)
-                })
-                .catch((error: any) => {
-                    console.error('Error:', error)
-                })
-        },
-
-    });
-    return (
-        <div>
-            <Stack
-                direction={{ xs: 'column', sm: 'row' }}
-                justifyContent='center'
-                alignItems='center'
-                sx={{ height: '100%', width: '100%', position: 'fixed' }}
-            >
-                <Grid
-                    container
-                    item
-                    xs={8}
-                    direction='column'
-                    justifyContent='space-evenly'
-                    alignItems='center'
-                    sx={{ height: '100%', overflow: 'hidden' }}
-                >
-                    <Grid item>
-                        <Grid sx={{ mt: 2 }}>
-                            <img src={imgLogo} alt='register_logo' className='register-logo' />
-                        </Grid>
-                        <Typography variant='h5' style={{ fontWeight: 'bolder' }}>Sign In</Typography>
-                        <Grid item sx={{ mt: 4 }}>
-                            {/* <GoogleLogin
-                                onSuccess={credentialResponse => {
-                                    console.log(credentialResponse);
-                                }}
-
-                                onError={() => {
-                                    console.log('Login Failed');
-                                }}
-                            />
-                            <Button onClick={signout}>logout</Button> */}
-
-                            <GoogleButton variant='outlined' onClick={() => login()} sx={{ fontSize: '12px', fontWeight: 500 }}>
-                                Sign in with Google
-                                <img src={imgGoogle} alt='google' style={{ width: '17px', marginLeft: '5px' }} />
-                            </GoogleButton>
-                            {/* <Grid item sx={{ mt: 2, alignItems: 'center', alignContent: 'center' }}>
-                                <Grid item sx={{ mt: 1, ml: 6 }}>
-                                    <div className='authentication_wrapper'>
-                                        <div className='authentication_block'>
-                                            <div className='buttons'>
-                                                <GoogleLogin
-                                                    onSuccess={credentialResponse => {
-                                                        console.log(credentialResponse);
-                                                    }}
-
-                                                    onError={() => {
-                                                        console.log('Login Failed');
-                                                    }}
-
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Grid>
-                            </Grid> */}
-                        </Grid>
-
-                    </Grid>
-                </Grid>
-                <Grid
-                    container
-                    item
-                    xs={8}
-                    direction='column'
-                    justifyContent='center'
-                    alignItems='center'
-                    className='rightBg'
-                    sx={{ height: '100%', overflow: 'hidden', justifyItems: 'center' }}
-                >
-                    <Grid item >
-                        <Stack sx={{ alignItems: 'center' }}>
-                            <h3>Welcome to BottleCRM</h3>
-                            <p> Free and OpenSource CRM from small medium business.</p>
-                            <img
-                                src={imgLogin}
-                                alt='register_ad_image'
-                                className='register-ad-image'
-                            />
-                            <footer className='register-footer'>
-                                bottlecrm.com
-                            </footer>
-                        </Stack>
-                    </Grid>
-                </Grid>
-            </Stack>
-        </div>
-
+    fetchData(
+      `${LoginUrl}/`,
+      'POST',
+      JSON.stringify({
+        email,
+        password,
+      }),
+      header
     )
+      .then((res: any) => {
+        localStorage.setItem('Token', `Bearer ${res.access}`)
+        setToken(true)
+        navigate('/app') // Redirect to app after successful login
+      })
+      .catch((err: any) => {
+        if (err.email) {
+          setError(err.email) // user not found
+        } else if (err.non_field_errors) {
+          setError(err.non_field_errors[0]) // other general errors
+        } else if (err.password) {
+          setError(err.password[0]) // password validation errors
+        } else {
+          setError('An unexpected error occurred.')
+        }
+      })
+  }
+
+  useEffect(() => {
+    if (localStorage.getItem('Token')) {
+      // navigate('/organization')
+      navigate('/app')
+    }
+  }, [token])
+
+  const login = useGoogleLogin({
+    onSuccess: (tokenResponse) => {
+      const apiToken = { token: tokenResponse.access_token }
+      // const formData = new FormData()
+      // formData.append('token', tokenResponse.access_token)
+      const head = {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      }
+      fetchData(`${AuthUrl}/`, 'POST', JSON.stringify(apiToken), head)
+        .then((res: any) => {
+          localStorage.setItem('Token', `Bearer ${res.access_token}`)
+          setToken(true)
+        })
+        .catch((error: any) => {
+          console.error('Error:', error)
+        })
+    },
+  })
+  return (
+    <Stack
+      direction={{ xs: 'column', sm: 'row' }}
+      justifyContent="center"
+      alignItems="center"
+      sx={{ height: '100vh', width: '100%', position: 'fixed' }}
+    >
+      <Grid container xs={12} md={6}>
+        <Grid
+          spacing={5}
+          item
+          xs={12}
+          md={12}
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100%',
+          }}
+        >
+          <Stack
+            direction="column"
+            justifyContent="center"
+            alignItems="center"
+            spacing={2}
+          >
+            <img src={imgLogo} alt="logo" className="login-logo" width={150} />
+
+            <Box
+              display="flex"
+              flexDirection="row"
+              alignItems="center"
+              justifyContent="center"
+              sx={{
+                height: '70%',
+                width: '50%',
+                border: 1,
+                boxShadow: 3,
+                borderColor: 'grey.300',
+                borderRadius: 2,
+                overflow: 'hidden',
+              }}
+            >
+              {/* left form section */}
+              <Box
+                flex={1}
+                component={'form'}
+                flexDirection="column"
+                display="flex"
+                justifyContent="center"
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                  // maxWidthwidth: '350px',
+                  margin: 'auto',
+                  padding: 3,
+                }}
+                onSubmit={handleSubmit}
+              >
+                <Typography variant="h4" fontWeight="bold" mb={3}>
+                  Sign In
+                </Typography>
+                <TextField
+                  label="Email Address"
+                  variant="outlined"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  sx={{
+                    mb: 2,
+                    bgcolor: '#fff',
+                    borderRadius: '8px',
+                    '& .MuiOutlinedInput-root': { borderRadius: '8px' },
+                    width: '90%',
+                  }}
+                ></TextField>
+                <TextField
+                  label="Password"
+                  type="password"
+                  required
+                  variant="outlined"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  sx={{
+                    mb: 2,
+                    bgcolor: '#fff',
+                    borderRadius: '8px',
+                    '& .MuiOutlinedInput-root': { borderRadius: '8px' },
+                    width: '90%',
+                  }}
+                ></TextField>
+
+                <Button
+                  type="submit"
+                  variant="contained"
+                  fullWidth
+                  sx={{
+                    bgcolor: '#1E73BE',
+                    borderRadius: '8px',
+                    textTransform: 'none',
+                    fontSize: '16px',
+                    py: 1,
+                    '&:hover': { bgcolor: '#155a91' },
+                    width: '90%',
+                  }}
+                >
+                  Sign In
+                </Button>
+                {error && (
+                  <Typography color="error.main" mt={2} textAlign="center">
+                    {error}
+                  </Typography>
+                )}
+              </Box>
+
+              {/* right blue section*/}
+              <Box
+                flex={1}
+                position="relative"
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                sx={{ height: '350px', width: '800px', overflow: 'hidden' }}
+              >
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    left: '0',
+                    bottom: '-40px',
+                    width: '120px',
+                    height: '120px',
+                    backgroundColor: '#37A2E4',
+                    zIndex: '2',
+                    borderRadius: '50%',
+                  }}
+                ></Box>
+
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: '-30px',
+                    right: '-20px',
+                    width: '120px',
+                    height: '120px',
+                    backgroundColor: '#37A2E4',
+                    zIndex: '2',
+                    borderRadius: '50%',
+                    bottom: '0',
+                  }}
+                ></Box>
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: '0',
+                    right: '0',
+                    bottom: '0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexDirection: 'column',
+                    width: '90%',
+                    height: '100%',
+                    backgroundColor: '#1E73BE',
+                    zIndex: '1',
+                    borderRadius: '98% 0 0 0%',
+                  }}
+                ></Box>
+              </Box>
+            </Box>
+            <GoogleButton onClick={() => login()}>
+              <img src={imgGoogle} alt="google" width={15} />
+              Login with Google
+            </GoogleButton>
+          </Stack>
+        </Grid>
+      </Grid>
+      <Grid
+        container
+        xs={12}
+        md={6}
+        direction="column"
+        justifyContent="center"
+        alignItems="center"
+        className="rightBg"
+        sx={{
+          height: '100%',
+          overflow: 'hidden',
+          justifyItems: 'center',
+          display: { xs: 'none', md: 'flex' },
+        }}
+      >
+        <Grid item>
+          <Stack sx={{ alignItems: 'center' }}>
+            <h3>Welcome to BottleCRM</h3>
+            <p> Free and OpenSource CRM from small medium business.</p>
+            <img
+              src={imgLogin}
+              alt="register_ad_image"
+              className="register-ad-image"
+            />
+            <footer className="register-footer">bottlecrm.com</footer>
+          </Stack>
+        </Grid>
+      </Grid>
+    </Stack>
+  )
 }

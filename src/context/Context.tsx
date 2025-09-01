@@ -1,20 +1,20 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext } from 'react'
 
 // interface MyContextData {
 //   screen: string;
 //   drawerWidth: number;
-  // count: number;
-  // updateCount: (newCount: number) => void;
+// count: number;
+// updateCount: (newCount: number) => void;
 // }
 
-const MyContext = createContext<any>(undefined);
+const MyContext = createContext<any>(undefined)
 
 export const useMyContext = () => {
-  const context = useContext(MyContext);
+  const context = useContext(MyContext)
   if (!context) {
-    throw new Error('');
+    throw new Error('')
   }
-  return context;
-};
+  return context
+}
 
-export default MyContext;
+export default MyContext
