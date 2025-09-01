@@ -75,7 +75,7 @@ export function ViewProfile(props: any) {
         textAlign: 'center',
       }}
     >
-      <Box>
+
         <Typography variant="h5">User Information</Typography>
         <Box sx={{ mt: 3, mb: 3 }}>
           <Box
@@ -188,7 +188,7 @@ export function ViewProfile(props: any) {
             <Typography variant="body1">{profileData.date_of_joining}</Typography>
           </Box>
         </Box>
-      </Box>
+
       <Button variant="contained" onClick={() => handleEditClick()}>
         Edit My Profile
       </Button>
