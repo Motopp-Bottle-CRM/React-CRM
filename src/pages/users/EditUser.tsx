@@ -406,7 +406,7 @@ export function EditUser() {
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Alternate Phone</div>
                         <Tooltip title="Number must starts with +91">
-                          <RequiredTextField
+                          <TextField
                             required
                             name="alternate_phone"
                             value={formData.alternate_phone}

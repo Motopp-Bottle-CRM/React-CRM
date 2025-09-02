@@ -80,7 +80,7 @@ export function AddUsers() {
 
   // Hardcoded countries array for the dropdown
   const countries = [
-    'India', 'United States', 'United Kingdom', 'Canada', 'Australia', 
+    'India', 'United States', 'United Kingdom', 'Canada', 'Australia',
     'Germany', 'France', 'Japan', 'China', 'Brazil', 'Mexico', 'Italy',
     'Spain', 'Netherlands', 'Switzerland', 'Sweden', 'Norway', 'Denmark',
     'Finland', 'Poland', 'Russia', 'South Korea', 'Singapore', 'Thailand'
@@ -221,7 +221,7 @@ export function AddUsers() {
   const onCancel = () => {
     resetForm()
   }
-  
+
   const module = 'Users'
   const crntPage = 'Add Users'
   const backBtn = 'Back To Users'
@@ -253,7 +253,7 @@ export function AddUsers() {
             </div>
           </Box>
         )}
-        
+
         <form onSubmit={handleSubmit}>
           <div style={{ padding: '10px' }}>
             <div className="leadContainer">
@@ -357,7 +357,7 @@ export function AddUsers() {
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Alternate Phone</div>
                         <Tooltip title="Number must starts with +91">
-                          <RequiredTextField
+                          <TextField
                             required
                             name="alternate_phone"
                             value={formData.alternate_phone}
@@ -441,9 +441,9 @@ export function AddUsers() {
                                                     <IconButton type='file' onChange={handleChange}
                                                     name='profile_pic' >
                                                         <Avatar src={formData.profile_pic}></Avatar></IconButton>
-                                                         Upload Files 
-                                                     </Button> 
-                                                </label> 
+                                                         Upload Files
+                                                     </Button>
+                                                </label>
                                                  <TextField
                                                     type="file"
                                                     onChange={handleChange}
@@ -452,7 +452,7 @@ export function AddUsers() {
                                                     size='small'
                                                     error={!!errors.profile_pic || !!errors?.profile_pic?.[0]}
                                                     helperText={errors.profile_pic || errors?.profile_pic?.[0] || ''}
-                                                /> 
+                                                />
                                             </div>
                                             <div className='fieldSubContainer'>
                                                 <div className='fieldTitle'>Sales Access</div>
@@ -685,7 +685,7 @@ export function AddUsers() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                         </div>
@@ -726,7 +726,7 @@ export function AddUsers() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                             <div className='fieldSubContainer'>
@@ -747,7 +747,7 @@ export function AddUsers() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                         </div>
@@ -770,7 +770,7 @@ export function AddUsers() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                             <div className='fieldSubContainer'>
@@ -791,7 +791,7 @@ export function AddUsers() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                         </div>
@@ -814,7 +814,7 @@ export function AddUsers() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                             <div className='fieldSubContainer'>
@@ -835,7 +835,7 @@ export function AddUsers() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                         </div>
@@ -865,7 +865,7 @@ export function AddUsers() {
                                                     name='description'
                                                     minRows={8}
                                                     // defaultValue={state.editData && state.editData.description ? state.editData.description : ''}
-                                                    // onChange={onChange} 
+                                                    // onChange={onChange}
                                                     style={{ width: '70%', padding: '5px' }}
                                                     placeholder='Add Description'
                                                 />
