@@ -78,13 +78,25 @@ export function AddUsers() {
   const { state } = useLocation()
   const navigate = useNavigate()
 
-  // Hardcoded countries array for the dropdown
+  // Countries array with phone prefixes [code, name, phone_prefix]
   const countries = [
-    'India', 'United States', 'United Kingdom', 'Canada', 'Australia', 
-    'Germany', 'France', 'Japan', 'China', 'Brazil', 'Mexico', 'Italy',
-    'Spain', 'Netherlands', 'Switzerland', 'Sweden', 'Norway', 'Denmark',
-    'Finland', 'Poland', 'Russia', 'South Korea', 'Singapore', 'Thailand'
+    ['IN', 'India', '+91'], ['US', 'United States', '+1'], ['GB', 'United Kingdom', '+44'], ['CA', 'Canada', '+1'], ['AU', 'Australia', '+61'], 
+    ['DE', 'Germany', '+49'], ['FR', 'France', '+33'], ['JP', 'Japan', '+81'], ['CN', 'China', '+86'], ['BR', 'Brazil', '+55'], ['MX', 'Mexico', '+52'], ['IT', 'Italy', '+39'],
+    ['ES', 'Spain', '+34'], ['NL', 'Netherlands', '+31'], ['CH', 'Switzerland', '+41'], ['SE', 'Sweden', '+46'], ['NO', 'Norway', '+47'], ['DK', 'Denmark', '+45'],
+    ['FI', 'Finland', '+358'], ['PL', 'Poland', '+48'], ['RU', 'Russian Federation', '+7'], ['KR', 'Korea, Republic of', '+82'], ['SG', 'Singapore', '+65'], ['TH', 'Thailand', '+66']
   ]
+
+  // Helper function to convert country code to country name
+  const getCountryNameFromCode = (countryCode: string) => {
+    const country = countries.find(([code, name, prefix]) => code === countryCode)
+    return country ? country[1] : countryCode // Return the name if found, otherwise return the original value
+  }
+
+  // Helper function to get phone prefix for a country
+  const getPhonePrefixForCountry = (countryCode: string) => {
+    const country = countries.find(([code, name, prefix]) => code === countryCode)
+    return country ? country[2] : '+91' // Return the prefix if found, otherwise default to +91
+  }
 
   const [roleSelectOpen, setRoleSelectOpen] = useState(false)
   const [countrySelectOpen, setCountrySelectOpen] = useState(false)
@@ -100,7 +112,19 @@ export function AddUsers() {
     if (type === 'checkbox') {
       setFormData({ ...formData, [name]: checked })
     } else {
-      setFormData({ ...formData, [name]: value })
+      // If country changes, update phone number prefix
+      if (name === 'country') {
+        const newPrefix = getPhonePrefixForCountry(value)
+        setFormData({ 
+          ...formData, 
+          [name]: value,
+          // Only update phone numbers if they already have a prefix
+          phone: formData.phone.startsWith('+') ? newPrefix + ' ' : formData.phone,
+          alternate_phone: formData.alternate_phone.startsWith('+') ? newPrefix + ' ' : formData.alternate_phone
+        })
+      } else {
+        setFormData({ ...formData, [name]: value })
+      }
     }
     // setValidationErrors(({ ...validationErrors, [name]: '' }));
     // setErrors({});
@@ -158,14 +182,14 @@ export function AddUsers() {
     const data = {
       email: formData.email,
       role: formData.role,
-      phone: formData.phone,
-      alternate_phone: formData.alternate_phone,
+      phone: formData.phone.startsWith('+') ? formData.phone : getPhonePrefixForCountry(formData.country) + ' ' + formData.phone,
+      alternate_phone: formData.alternate_phone.startsWith('+') ? formData.alternate_phone : getPhonePrefixForCountry(formData.country) + ' ' + formData.alternate_phone,
       address_line: formData.address_line,
       street: formData.street,
       city: formData.city,
       state: formData.state,
       pincode: formData.pincode,
-      country: formData.country,
+      country: getCountryNameFromCode(formData.country),
       profile_pic: formData.profile_pic,
       has_sales_access: formData.has_sales_access,
       has_marketing_access: formData.has_marketing_access,
@@ -333,7 +357,7 @@ export function AddUsers() {
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Phone Number</div>
-                        <Tooltip title="Number must starts with +91">
+                        <Tooltip title={`Number must start with ${getPhonePrefixForCountry(formData.country)}`}>
                           <RequiredTextField
                             name="phone"
                             id="outlined-error-helper-text"
@@ -356,7 +380,7 @@ export function AddUsers() {
                       </div>
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Alternate Phone</div>
-                        <Tooltip title="Number must starts with +91">
+                        <Tooltip title={`Number must start with ${getPhonePrefixForCountry(formData.country)}`}>
                           <RequiredTextField
                             required
                             name="alternate_phone"
@@ -635,8 +659,8 @@ export function AddUsers() {
                             error={!!profileErrors?.country?.[0]}
                           >
                             {countries.map((option) => (
-                              <MenuItem key={option} value={option}>
-                                {option}
+                              <MenuItem key={option[0]} value={option[0]}>
+                                {option[1]}
                               </MenuItem>
                             ))}
                           </Select>
