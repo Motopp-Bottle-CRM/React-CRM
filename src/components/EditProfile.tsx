@@ -69,7 +69,7 @@ export function EditProfile(props: any) {
             </Typography>
           </Box>
 
-          <Typography variant="body1">email address</Typography>
+          <Typography variant="body1">{props.profileData.email}</Typography>
         </Box>
         <Box
           sx={{
@@ -99,6 +99,7 @@ export function EditProfile(props: any) {
           <TextField
             id="outlined-basic"
             label="Phone number"
+            value={props.profileData.phone}
             variant="outlined"
             size="small"
             sx={{ width: 250 }}

@@ -11,53 +11,53 @@ import {
   FaRegCalendarAlt,
 } from 'react-icons/fa'
 export function ViewProfile(props: any) {
-  interface UserProfile {
-    email?: string
-    phone?: string
-    address?: string
-    role?: string
-    date_of_joining?: string
-    is_active?: boolean
-  }
-  const [profileData, setProfileData] = useState<UserProfile>({
-    email: '',
-    phone: '',
-    address: '',
-    role: '',
-    date_of_joining: '',
-    is_active: true,
-  })
+  // interface UserProfile {
+  //   email?: string
+  //   phone?: string
+  //   address?: string
+  //   role?: string
+  //   date_of_joining?: string
+  //   is_active?: boolean
+  // }
+  // const [profileData, setProfileData] = useState<UserProfile>({
+  //   email: '',
+  //   phone: '',
+  //   address: '',
+  //   role: '',
+  //   date_of_joining: '',
+  //   is_active: true,
+  // })
 
   const handleEditClick = () => {
     // Logic to switch to edit mode
     props.setEditMode(true)
   }
-  useEffect(() => {
-    // Fetch user data here
-    const Header = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: localStorage.getItem('Token'),
-      org: localStorage.getItem('org'),
-    }
-    fetchData(`${ProfileUrl}/`, 'GET', null as any, Header)
-      .then((res: any) => {
-        if (!res.error) {
-          const data = res?.user_obj
-          setProfileData({
-            email: data?.user_details?.email,
-            phone: data?.phone,
-            address: data?.address,
-            role: data?.role,
-            date_of_joining: data?.date_of_joining,
-            is_active: data?.is_active,
-          })
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching profile data:', error)
-      })
-  }, [])
+  // useEffect(() => {
+  //   // Fetch user data here
+  //   const Header = {
+  //     Accept: 'application/json',
+  //     'Content-Type': 'application/json',
+  //     Authorization: localStorage.getItem('Token'),
+  //     org: localStorage.getItem('org'),
+  //   }
+  //   fetchData(`${ProfileUrl}/`, 'GET', null as any, Header)
+  //     .then((res: any) => {
+  //       if (!res.error) {
+  //         const data = res?.user_obj
+  //         setProfileData({
+  //           email: data?.user_details?.email,
+  //           phone: data?.phone,
+  //           address: data?.address,
+  //           role: data?.role,
+  //           date_of_joining: data?.date_of_joining,
+  //           is_active: data?.is_active,
+  //         })
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error('Error fetching profile data:', error)
+  //     })
+  // }, [])
 
   return (
     <Box
@@ -104,7 +104,7 @@ export function ViewProfile(props: any) {
               </Typography>
             </Box>
 
-            <Typography variant="body1">{profileData.email}</Typography>
+            <Typography variant="body1">{props.profileData.email}</Typography>
           </Box>
           <Box
             sx={{
@@ -131,7 +131,7 @@ export function ViewProfile(props: any) {
                 Phone number
               </Typography>
             </Box>
-            <Typography variant="body1">{profileData.phone}</Typography>
+            <Typography variant="body1">{props.profileData.phone}</Typography>
           </Box>
           <Box
             sx={{
@@ -185,7 +185,7 @@ export function ViewProfile(props: any) {
                 Member Since
               </Typography>
             </Box>
-            <Typography variant="body1">{profileData.date_of_joining}</Typography>
+            <Typography variant="body1">{props.profileData.date_of_joining}</Typography>
           </Box>
         </Box>
 
