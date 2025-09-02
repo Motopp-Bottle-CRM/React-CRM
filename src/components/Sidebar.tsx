@@ -22,6 +22,7 @@ import {
   FaCog,
   FaDiceD6,
   FaHandshake,
+  FaUser,
   FaIndustry,
   FaSignOutAlt,
   FaTachometerAlt,
@@ -61,6 +62,7 @@ import { OpportunityDetails } from '../pages/opportunities/OpportunityDetails'
 import { AddCase } from '../pages/cases/AddCase'
 import { EditCase } from '../pages/cases/EditCase'
 import { CaseDetails } from '../pages/cases/CaseDetails'
+import { MyProfile } from '../pages/profile/MyProfile'
 import logo from '../assets/images/auth/img_logo.png'
 import { StyledListItemButton, StyledListItemText } from '../styles/CssStyled'
 // import MyContext, { MyContextData } from '../context/Context';
@@ -79,7 +81,7 @@ export default function Sidebar(props: any) {
   const [drawerWidth, setDrawerWidth] = useState(200)
   const [headerWidth, setHeaderWidth] = useState(drawerWidth)
   const [userDetail, setUserDetail] = useState('')
-//  const [userDetail, setUserDetail] = useState({ role: 'USER' });
+  //  const [userDetail, setUserDetail] = useState({ role: 'USER' });
   const [organizationModal, setOrganizationModal] = useState(false)
   const organizationModalClose = () => {
     setOrganizationModal(false)
@@ -131,10 +133,15 @@ export default function Sidebar(props: any) {
   // }, [])
 
   const userProfile = () => {
+    const Header1 = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: localStorage.getItem('Token'),
+    }
     fetchData(`${ProfileUrl}/`, 'GET', null as any, Header1)
       .then((res: any) => {
-        console.log('API response:', res);         // logs entire response
-        console.log('User object:', res?.user_obj); // logs user_obj specifically
+        console.log('API response:', res) // logs entire response
+        console.log('User object:', res?.user_obj) // logs user_obj specifically
         if (res?.user_obj) {
           setUserDetail(res.user_obj)
         }
@@ -143,8 +150,8 @@ export default function Sidebar(props: any) {
         console.error('Error:', error)
       })
   }
-//get user details on component mount
-/*  useEffect(() => {
+  //get user details on component mount
+  /*  useEffect(() => {
    userProfile();
   }, []);*/
 
@@ -168,7 +175,7 @@ export default function Sidebar(props: any) {
 });
 
 */
-//
+  //
 
   const navIcons = (text: any, screen: any): React.ReactNode => {
     switch (text) {
@@ -349,6 +356,24 @@ export default function Sidebar(props: any) {
                     />
                   </StyledListItemButton>
                 </ListItem>
+                <ListItem disablePadding>
+                  <StyledListItemButton
+                    onClick={() => {
+                      navigate('/app/profile')
+                      handleClose()
+                      setScreen('My Profile')
+                    }}
+                  >
+                    <ListItemIcon>
+                      {' '}
+                      <FaUser fill="#3e79f7" />
+                    </ListItemIcon>
+                    <StyledListItemText
+                      primary={'My Profile'}
+                      sx={{ ml: '-20px', color: '#3e79f7' }}
+                    />
+                  </StyledListItemButton>
+                </ListItem>
               </List>
               {/* <Tooltip title='logout' sx={{ ml: '15px' }}>
                                 <IconButton
@@ -372,8 +397,7 @@ export default function Sidebar(props: any) {
         >
           <Box>
             <List sx={{ pt: '65px' }}>
- 
-                {navList.map((text, index) => (
+              {navList.map((text, index) => (
                 <ListItem key={text} disablePadding>
                   <StyledListItemButton
                     sx={{ pt: '6px', pb: '6px' }}
@@ -480,6 +504,7 @@ export default function Sidebar(props: any) {
               <Route path="/app/cases/add-case" element={<AddCase />} />
               <Route path="/app/cases/edit-case" element={<EditCase />} />
               <Route path="/app/cases/case-details" element={<CaseDetails />} />
+              <Route path="/app/profile" element={<MyProfile />}></Route>
             </Routes>
           </Box>
         </MyContext.Provider>

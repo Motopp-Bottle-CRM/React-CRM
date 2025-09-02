@@ -72,20 +72,35 @@ export default function Login() {
   const login = useGoogleLogin({
     onSuccess: (tokenResponse) => {
       const apiToken = { token: tokenResponse.access_token }
-      // const formData = new FormData()
-      // formData.append('token', tokenResponse.access_token)
       const head = {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       }
       fetchData(`${AuthUrl}/`, 'POST', JSON.stringify(apiToken), head)
         .then((res: any) => {
-          localStorage.setItem('Token', `Bearer ${res.access_token}`)
-          setToken(true)
+          if (res.access_token) {
+            localStorage.setItem('Token', `Bearer ${res.access_token}`)
+            setToken(true)
+            setSuccess('Successfully logged in with Google!')
+            setError('')
+          } else {
+            setError('Failed to get access token from server')
+          }
         })
         .catch((error: any) => {
-          console.error('Error:', error)
+          console.error('Google login error:', error)
+          if (error.error) {
+            setError(error.error)
+          } else if (error.message) {
+            setError(error.message)
+          } else {
+            setError('Google authentication failed. Please try again.')
+          }
         })
+    },
+    onError: (error) => {
+      console.error('Google OAuth error:', error)
+      setError('Google authentication failed. Please try again.')
     },
   })
   return (
@@ -97,7 +112,6 @@ export default function Login() {
     >
       <Grid container xs={12} md={6}>
         <Grid
-          spacing={5}
           item
           xs={12}
           md={12}
@@ -199,6 +213,11 @@ export default function Login() {
                 {error && (
                   <Typography color="error.main" mt={2} textAlign="center">
                     {error}
+                  </Typography>
+                )}
+                {success && (
+                  <Typography color="success.main" mt={2} textAlign="center">
+                    {success}
                   </Typography>
                 )}
               </Box>
