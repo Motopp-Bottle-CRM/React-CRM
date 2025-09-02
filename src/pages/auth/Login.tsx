@@ -9,6 +9,7 @@ import { GoogleButton } from '../../styles/CssStyled'
 import { fetchData } from '../../components/FetchData'
 import { LoginUrl, AuthUrl } from '../../services/ApiUrls'
 import '../../styles/style.css'
+console.log("Login.tsx file is loaded")
 
 declare global {
   interface Window {
@@ -26,41 +27,50 @@ export default function Login() {
   const [success, setSuccess] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {
+    console.log("Form is being submitted")
     e.preventDefault()
+    console.log('Form submitted')
     submitForm()
   }
   const submitForm = () => {
-    const header = {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    }
-
-    fetchData(
-      `${LoginUrl}/`,
-      'POST',
-      JSON.stringify({
-        email,
-        password,
-      }),
-      header
-    )
-      .then((res: any) => {
-        localStorage.setItem('Token', `Bearer ${res.access}`)
-        setToken(true)
-        navigate('/app') // Redirect to app after successful login
-      })
-      .catch((err: any) => {
-        if (err.email) {
-          setError(err.email) // user not found
-        } else if (err.non_field_errors) {
-          setError(err.non_field_errors[0]) // other general errors
-        } else if (err.password) {
-          setError(err.password[0]) // password validation errors
-        } else {
-          setError('An unexpected error occurred.')
-        }
-      })
+    console.log("submitForm is running") 
+  console.log('submitForm is running', { email, password })
+  console.log("Email vefore sending to server : " , email)
+  
+  const header = {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
   }
+
+  fetchData(
+    `${LoginUrl}/`,
+    'POST',
+    JSON.stringify({ email, password }),
+    header
+  )
+    .then((res: any) => {
+      console.log('Response from server:', res)   // <--- Add this
+      localStorage.setItem('Token', `Bearer ${res.access}`)
+      localStorage.setItem('email', email)
+      console.log("Saving email to localStorage:", email)
+      setToken(true)
+      navigate('/app') // Redirect to app after successful login
+    })
+    .catch((err: any) => {
+      console.error('Login error :', err)
+      console.log("Login error details:", err)
+      if (err.email) {
+        setError(err.email) // user not found
+      } else if (err.non_field_errors) {
+        setError(err.non_field_errors[0]) // other general errors
+      } else if (err.password) {
+        setError(err.password[0]) // password validation errors
+      } else {
+        setError('An unexpected error occurred.')
+      }
+    })
+}
+
 
   useEffect(() => {
     if (localStorage.getItem('Token')) {
@@ -80,7 +90,9 @@ export default function Login() {
       }
       fetchData(`${AuthUrl}/`, 'POST', JSON.stringify(apiToken), head)
         .then((res: any) => {
+          console.log('Response from server:', res)
           localStorage.setItem('Token', `Bearer ${res.access_token}`)
+          localStorage.setItem('email', res.username)
           setToken(true)
         })
         .catch((error: any) => {
@@ -132,18 +144,15 @@ export default function Login() {
               }}
             >
               {/* left form section */}
-              <Box
-                flex={1}
-                component={'form'}
-                flexDirection="column"
-                display="flex"
-                justifyContent="center"
-                sx={{
+              <form
+                style={{
                   width: '100%',
                   height: '100%',
-                  // maxWidthwidth: '350px',
                   margin: 'auto',
-                  padding: 3,
+                  padding: '24px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center'
                 }}
                 onSubmit={handleSubmit}
               >
@@ -201,7 +210,7 @@ export default function Login() {
                     {error}
                   </Typography>
                 )}
-              </Box>
+              </form>
 
               {/* right blue section*/}
               <Box

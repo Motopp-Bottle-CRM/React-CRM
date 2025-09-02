@@ -81,6 +81,8 @@ export default function Sidebar(props: any) {
   const [userDetail, setUserDetail] = useState('')
 //  const [userDetail, setUserDetail] = useState({ role: 'USER' });
   const [organizationModal, setOrganizationModal] = useState(false)
+  // ✅ Get email from localStorage
+  const email = localStorage.getItem("email") || "No email";
   const organizationModalClose = () => {
     setOrganizationModal(false)
   }
@@ -292,7 +294,7 @@ export default function Sidebar(props: any) {
             style={{
               marginRight: '10px',
               display: 'flex',
-              flexDirection: 'row',
+              flexDirection: 'column',
               alignItems: 'center',
             }}
           >
@@ -303,6 +305,12 @@ export default function Sidebar(props: any) {
                 sx={{ height: '27px', width: '27px' }}
               />
             </IconButton>
+            <Typography
+  variant="body2"
+  sx={{ textAlign: 'left', mt: 0, fontWeight: 'bold', color: '#3e79f7' ,lineHeight: 1}}
+>
+  {email}
+</Typography>
             <Popover
               anchorOrigin={{
                 vertical: 'bottom',
@@ -349,6 +357,7 @@ export default function Sidebar(props: any) {
                     />
                   </StyledListItemButton>
                 </ListItem>
+    
               </List>
               {/* <Tooltip title='logout' sx={{ ml: '15px' }}>
                                 <IconButton
