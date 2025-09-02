@@ -112,7 +112,6 @@ export default function Login() {
     >
       <Grid container xs={12} md={6}>
         <Grid
-          spacing={5}
           item
           xs={12}
           md={12}

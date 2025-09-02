@@ -152,7 +152,7 @@ export default function OrganizationModal(props: any) {
               <List sx={{ width: '100%' }}>
                 {organization?.length > 0 &&
                   organization.map((item, i) => (
-                    <ListItem>
+                    <ListItem key={item?.org?.id || i}>
                       <StyledListItemButton
                         selected={
                           item?.org?.id === localStorage?.getItem('org')

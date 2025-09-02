@@ -15,11 +15,13 @@ import {
 } from 'react-icons/fa'
 import countries from 'world-countries'
 export function EditProfile(props: any) {
-  // const handleEditClick = () => {
-  //     // Logic to switch to edit mode
-  //     props.setEditMode(true);
-  //     }
   const [country, setCountry] = useState('')
+  
+  const handleEditClick = () => {
+    // Logic to save profile changes
+    props.setEditMode(false)
+  }
+  
   const handleCancelClick = () => {
     // Logic to switch to view mode
     props.setEditMode(false)
