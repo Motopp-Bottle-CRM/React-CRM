@@ -158,7 +158,7 @@ export function ViewProfile(props: any) {
                 Address
               </Typography>
             </Box>
-            <Typography variant="body1">Address</Typography>
+            <Typography variant="body1">{props.profileData.address}</Typography>
           </Box>
           <Box
             sx={{

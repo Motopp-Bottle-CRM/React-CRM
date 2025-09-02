@@ -15,11 +15,12 @@ import {
 } from 'react-icons/fa'
 import countries from 'world-countries'
 export function EditProfile(props: any) {
-  // const handleEditClick = () => {
-  //     // Logic to switch to edit mode
-  //     props.setEditMode(true);
-  //     }
-  const [country, setCountry] = useState('')
+  // const handleEditClick = (event) => {
+  //   // Logic to switch to edit mode
+  //   event.preventDefault()
+  // }
+
+
   const handleCancelClick = () => {
     // Logic to switch to view mode
     props.setEditMode(false)
@@ -100,6 +101,7 @@ export function EditProfile(props: any) {
             id="outlined-basic"
             label="Phone number"
             value={props.profileData.phone}
+            onChange={(e) =>props.setProfileData({...props.profileData, phone: e.target.value})}
             variant="outlined"
             size="small"
             sx={{ width: 250 }}
@@ -160,9 +162,9 @@ export function EditProfile(props: any) {
           <TextField
             select
             label="Select Country"
-            value={country}
+            value={props.profileData.address?.country || ''}
             size="small"
-            onChange={(e) => setCountry(e.target.value)}
+            onChange={(e) => props.setProfileData({...props.profileData, address: { ...props.profileData.address, country: e.target.value }})}
             sx={{ width: 250 }}
           >
             {countries.map((c) => (
@@ -200,6 +202,8 @@ export function EditProfile(props: any) {
           <TextField
             id="outlined-basic"
             label="PostCode"
+            value={props.profileData.address?.postcode || ''}
+            onChange={(e) =>props.setProfileData({...props.profileData, address: { ...props.profileData.address, postcode: e.target.value }})}
             variant="outlined"
             size="small"
             sx={{ width: 250 }}
@@ -233,6 +237,8 @@ export function EditProfile(props: any) {
           <TextField
             id="outlined-basic"
             label="state"
+            value={props.profileData.address?.state || ''}
+            onChange={(e) =>props.setProfileData({...props.profileData, address: { ...props.profileData.address, state: e.target.value }})}
             variant="outlined"
             size="small"
             sx={{ width: 250 }}
@@ -266,6 +272,8 @@ export function EditProfile(props: any) {
           <TextField
             id="outlined-basic"
             label="city"
+            value={props.profileData.address?.city || ''}
+            onChange={(e) =>props.setProfileData({...props.profileData, address: { ...props.profileData.address, city: e.target.value }})}
             variant="outlined"
             size="small"
             sx={{ width: 250 }}
@@ -299,6 +307,8 @@ export function EditProfile(props: any) {
           <TextField
             id="outlined-basic"
             label="street name and number"
+            value={props.profileData.address?.street || ''}
+            onChange={(e) =>props.setProfileData({...props.profileData, address: { ...props.profileData.address, street: e.target.value }})}
             variant="outlined"
             size="small"
             sx={{ width: 250 }}
@@ -332,6 +342,8 @@ export function EditProfile(props: any) {
           <TextField
             id="outlined-basic"
             label="Floor, Building, Apartment"
+            value={props.profileData.address?.address_line || ''}
+            onChange={(e) =>props.setProfileData({...props.profileData, address: { ...props.profileData.address, address_line: e.target.value }})}
             variant="outlined"
             size="small"
             sx={{ width: 250 }}
