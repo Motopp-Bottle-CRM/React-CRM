@@ -13,8 +13,6 @@ import {
   FaMailBulk,
   FaBuilding,
 } from 'react-icons/fa'
-import countries from 'world-countries'
-
 export function EditProfile(props: any) {
   // const handleEditClick = (event) => {
   //   // Logic to switch to edit mode
@@ -23,8 +21,13 @@ export function EditProfile(props: any) {
 
   const [country, setCountry] = useState('')
   
-  // Ensure countries is an array and add error handling
-  const countriesList = Array.isArray(countries) ? countries : []
+  // Countries array with phone prefixes [code, name, phone_prefix] - same format as other components
+  const countries = [
+    ['IN', 'India', '+91'], ['US', 'United States', '+1'], ['GB', 'United Kingdom', '+44'], ['CA', 'Canada', '+1'], ['AU', 'Australia', '+61'], 
+    ['DE', 'Germany', '+49'], ['FR', 'France', '+33'], ['JP', 'Japan', '+81'], ['CN', 'China', '+86'], ['BR', 'Brazil', '+55'], ['MX', 'Mexico', '+52'], ['IT', 'Italy', '+39'],
+    ['ES', 'Spain', '+34'], ['NL', 'Netherlands', '+31'], ['CH', 'Switzerland', '+41'], ['SE', 'Sweden', '+46'], ['NO', 'Norway', '+47'], ['DK', 'Denmark', '+45'],
+    ['FI', 'Finland', '+358'], ['PL', 'Poland', '+48'], ['RU', 'Russian Federation', '+7'], ['KR', 'Korea, Republic of', '+82'], ['SG', 'Singapore', '+65'], ['TH', 'Thailand', '+66']
+  ]
   
   // Ensure address object is properly initialized
   const initializeAddress = () => {
@@ -42,9 +45,6 @@ export function EditProfile(props: any) {
       })
     }
   }
-  
-  // Debug log to help identify the issue
-  console.log('Countries data:', countries, 'Type:', typeof countries, 'Is Array:', Array.isArray(countries))
   
   // Initialize address on component mount
   useEffect(() => {
@@ -202,15 +202,11 @@ export function EditProfile(props: any) {
             onChange={(e) => props.setProfileData({...props.profileData, address: { ...(props.profileData.address || {}), country: e.target.value }})}
             sx={{ width: 250 }}
           >
-            {countriesList.length > 0 ? countriesList.map((c) => (
-              <MenuItem key={c.cca2} value={c.name.common}>
-                {c.flag} {c.name.common}
+            {countries.map((option) => (
+              <MenuItem key={option[0]} value={option[1]}>
+                {option[1]}
               </MenuItem>
-            )) : (
-              <MenuItem value="">
-                <em>No countries available</em>
-              </MenuItem>
-            )}
+            ))}
           </TextField>
         </Box>
         <Box
