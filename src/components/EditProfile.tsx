@@ -1,5 +1,5 @@
 import React from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Box, Typography, Button, TextField, MenuItem } from '@mui/material'
 import {
   FaEnvelope,
@@ -13,9 +13,43 @@ import {
   FaMailBulk,
   FaBuilding,
 } from 'react-icons/fa'
-import countries from 'world-countries'
 export function EditProfile(props: any) {
+  // const handleEditClick = (event) => {
+  //   // Logic to switch to edit mode
+  //   event.preventDefault()
+  // }
+
   const [country, setCountry] = useState('')
+  
+  // Countries array with phone prefixes [code, name, phone_prefix] - same format as other components
+  const countries = [
+    ['IN', 'India', '+91'], ['US', 'United States', '+1'], ['GB', 'United Kingdom', '+44'], ['CA', 'Canada', '+1'], ['AU', 'Australia', '+61'], 
+    ['DE', 'Germany', '+49'], ['FR', 'France', '+33'], ['JP', 'Japan', '+81'], ['CN', 'China', '+86'], ['BR', 'Brazil', '+55'], ['MX', 'Mexico', '+52'], ['IT', 'Italy', '+39'],
+    ['ES', 'Spain', '+34'], ['NL', 'Netherlands', '+31'], ['CH', 'Switzerland', '+41'], ['SE', 'Sweden', '+46'], ['NO', 'Norway', '+47'], ['DK', 'Denmark', '+45'],
+    ['FI', 'Finland', '+358'], ['PL', 'Poland', '+48'], ['RU', 'Russian Federation', '+7'], ['KR', 'Korea, Republic of', '+82'], ['SG', 'Singapore', '+65'], ['TH', 'Thailand', '+66']
+  ]
+  
+  // Ensure address object is properly initialized
+  const initializeAddress = () => {
+    if (!props.profileData.address) {
+      props.setProfileData({
+        ...props.profileData,
+        address: {
+          address_line: '',
+          street: '',
+          city: '',
+          state: '',
+          postcode: '',
+          country: ''
+        }
+      })
+    }
+  }
+  
+  // Initialize address on component mount
+  useEffect(() => {
+    initializeAddress()
+  }, [])
   
   const handleEditClick = () => {
     // Logic to save profile changes
@@ -102,6 +136,7 @@ export function EditProfile(props: any) {
             id="outlined-basic"
             label="Phone number"
             value={props.profileData.phone}
+            onChange={(e) =>props.setProfileData({...props.profileData, phone: e.target.value})}
             variant="outlined"
             size="small"
             sx={{ width: 250 }}
@@ -162,14 +197,14 @@ export function EditProfile(props: any) {
           <TextField
             select
             label="Select Country"
-            value={country}
+            value={props.profileData.address?.country || ''}
             size="small"
-            onChange={(e) => setCountry(e.target.value)}
+            onChange={(e) => props.setProfileData({...props.profileData, address: { ...(props.profileData.address || {}), country: e.target.value }})}
             sx={{ width: 250 }}
           >
-            {countries.map((c) => (
-              <MenuItem key={c.cca2} value={c.name.common}>
-                {c.flag} {c.name.common}
+            {countries.map((option) => (
+              <MenuItem key={option[0]} value={option[1]}>
+                {option[1]}
               </MenuItem>
             ))}
           </TextField>
@@ -202,6 +237,8 @@ export function EditProfile(props: any) {
           <TextField
             id="outlined-basic"
             label="PostCode"
+            value={props.profileData.address?.postcode || ''}
+            onChange={(e) =>props.setProfileData({...props.profileData, address: { ...(props.profileData.address || {}), postcode: e.target.value }})}
             variant="outlined"
             size="small"
             sx={{ width: 250 }}
@@ -235,6 +272,8 @@ export function EditProfile(props: any) {
           <TextField
             id="outlined-basic"
             label="state"
+            value={props.profileData.address?.state || ''}
+            onChange={(e) =>props.setProfileData({...props.profileData, address: { ...(props.profileData.address || {}), state: e.target.value }})}
             variant="outlined"
             size="small"
             sx={{ width: 250 }}
@@ -268,6 +307,8 @@ export function EditProfile(props: any) {
           <TextField
             id="outlined-basic"
             label="city"
+            value={props.profileData.address?.city || ''}
+            onChange={(e) =>props.setProfileData({...props.profileData, address: { ...(props.profileData.address || {}), city: e.target.value }})}
             variant="outlined"
             size="small"
             sx={{ width: 250 }}
@@ -301,6 +342,8 @@ export function EditProfile(props: any) {
           <TextField
             id="outlined-basic"
             label="street name and number"
+            value={props.profileData.address?.street || ''}
+            onChange={(e) =>props.setProfileData({...props.profileData, address: { ...(props.profileData.address || {}), street: e.target.value }})}
             variant="outlined"
             size="small"
             sx={{ width: 250 }}
@@ -334,6 +377,8 @@ export function EditProfile(props: any) {
           <TextField
             id="outlined-basic"
             label="Floor, Building, Apartment"
+            value={props.profileData.address?.address_line || ''}
+            onChange={(e) =>props.setProfileData({...props.profileData, address: { ...(props.profileData.address || {}), address_line: e.target.value }})}
             variant="outlined"
             size="small"
             sx={{ width: 250 }}

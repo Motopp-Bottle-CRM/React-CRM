@@ -158,7 +158,12 @@ export function ViewProfile(props: any) {
                 Address
               </Typography>
             </Box>
-            <Typography variant="body1">Address</Typography>
+            <Typography variant="body1">
+              {props.profileData.address ? 
+                `${props.profileData.address.street || ''} ${props.profileData.address.city || ''} ${props.profileData.address.state || ''} ${props.profileData.address.postcode || ''} ${props.profileData.address.country || ''}`.trim() || 'No address provided' 
+                : 'No address provided'
+              }
+            </Typography>
           </Box>
           <Box
             sx={{
