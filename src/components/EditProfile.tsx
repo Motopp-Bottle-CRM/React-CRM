@@ -1,5 +1,5 @@
 import React from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Box, Typography, Button, TextField, MenuItem } from '@mui/material'
 import {
   FaEnvelope,
@@ -26,8 +26,30 @@ export function EditProfile(props: any) {
   // Ensure countries is an array and add error handling
   const countriesList = Array.isArray(countries) ? countries : []
   
+  // Ensure address object is properly initialized
+  const initializeAddress = () => {
+    if (!props.profileData.address) {
+      props.setProfileData({
+        ...props.profileData,
+        address: {
+          address_line: '',
+          street: '',
+          city: '',
+          state: '',
+          postcode: '',
+          country: ''
+        }
+      })
+    }
+  }
+  
   // Debug log to help identify the issue
   console.log('Countries data:', countries, 'Type:', typeof countries, 'Is Array:', Array.isArray(countries))
+  
+  // Initialize address on component mount
+  useEffect(() => {
+    initializeAddress()
+  }, [])
   
   const handleEditClick = () => {
     // Logic to save profile changes
@@ -177,7 +199,7 @@ export function EditProfile(props: any) {
             label="Select Country"
             value={props.profileData.address?.country || ''}
             size="small"
-            onChange={(e) => props.setProfileData({...props.profileData, address: { ...props.profileData.address, country: e.target.value }})}
+            onChange={(e) => props.setProfileData({...props.profileData, address: { ...(props.profileData.address || {}), country: e.target.value }})}
             sx={{ width: 250 }}
           >
             {countriesList.length > 0 ? countriesList.map((c) => (
@@ -220,7 +242,7 @@ export function EditProfile(props: any) {
             id="outlined-basic"
             label="PostCode"
             value={props.profileData.address?.postcode || ''}
-            onChange={(e) =>props.setProfileData({...props.profileData, address: { ...props.profileData.address, postcode: e.target.value }})}
+            onChange={(e) =>props.setProfileData({...props.profileData, address: { ...(props.profileData.address || {}), postcode: e.target.value }})}
             variant="outlined"
             size="small"
             sx={{ width: 250 }}
@@ -255,7 +277,7 @@ export function EditProfile(props: any) {
             id="outlined-basic"
             label="state"
             value={props.profileData.address?.state || ''}
-            onChange={(e) =>props.setProfileData({...props.profileData, address: { ...props.profileData.address, state: e.target.value }})}
+            onChange={(e) =>props.setProfileData({...props.profileData, address: { ...(props.profileData.address || {}), state: e.target.value }})}
             variant="outlined"
             size="small"
             sx={{ width: 250 }}
@@ -290,7 +312,7 @@ export function EditProfile(props: any) {
             id="outlined-basic"
             label="city"
             value={props.profileData.address?.city || ''}
-            onChange={(e) =>props.setProfileData({...props.profileData, address: { ...props.profileData.address, city: e.target.value }})}
+            onChange={(e) =>props.setProfileData({...props.profileData, address: { ...(props.profileData.address || {}), city: e.target.value }})}
             variant="outlined"
             size="small"
             sx={{ width: 250 }}
@@ -325,7 +347,7 @@ export function EditProfile(props: any) {
             id="outlined-basic"
             label="street name and number"
             value={props.profileData.address?.street || ''}
-            onChange={(e) =>props.setProfileData({...props.profileData, address: { ...props.profileData.address, street: e.target.value }})}
+            onChange={(e) =>props.setProfileData({...props.profileData, address: { ...(props.profileData.address || {}), street: e.target.value }})}
             variant="outlined"
             size="small"
             sx={{ width: 250 }}
@@ -360,7 +382,7 @@ export function EditProfile(props: any) {
             id="outlined-basic"
             label="Floor, Building, Apartment"
             value={props.profileData.address?.address_line || ''}
-            onChange={(e) =>props.setProfileData({...props.profileData, address: { ...props.profileData.address, address_line: e.target.value }})}
+            onChange={(e) =>props.setProfileData({...props.profileData, address: { ...(props.profileData.address || {}), address_line: e.target.value }})}
             variant="outlined"
             size="small"
             sx={{ width: 250 }}
