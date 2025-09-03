@@ -19,7 +19,13 @@ export function MyProfile() {
   interface UserProfile {
     email?: string
     phone?: string
-    address?: string
+    alternate_phone?: string
+    address_line?: string
+    street?: string
+    city?: string
+    state?: string
+    pincode?: string
+    country?: string
     role?: string
     date_of_joining?: string
     is_active?: boolean
@@ -27,7 +33,13 @@ export function MyProfile() {
   const [profileData, setProfileData] = useState<UserProfile>({
     email: '',
     phone: '',
-    address: '',
+    alternate_phone: '',
+    address_line: '',
+    street: '',
+    city: '',
+    state: '',
+    pincode: '',
+    country: '',
     role: '',
     date_of_joining: '',
     is_active: true,
@@ -48,7 +60,13 @@ export function MyProfile() {
           setProfileData({
             email: data?.user_details?.email,
             phone: data?.phone,
-            address: data?.address,
+            alternate_phone: data?.alternate_phone,
+            address_line: data?.address?.address_line,
+            street: data?.address?.street,
+            city: data?.address?.city,
+            state: data?.address?.state,
+            pincode: data?.address?.pincode,
+            country: data?.address?.country,
             role: data?.role,
             date_of_joining: data?.date_of_joining,
             is_active: data?.is_active,
