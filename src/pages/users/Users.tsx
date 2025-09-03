@@ -775,10 +775,9 @@ export default function Users() {
                       })
                     ) : (
                       <TableRow>
-                        {' '}
                         <TableCell colSpan={8} sx={{ border: 0 }}>
                           <Spinner />
-                        </TableCell>{' '}
+                        </TableCell>
                       </TableRow>
                     )}
                   </TableBody>
@@ -883,10 +882,9 @@ export default function Users() {
                       })
                     ) : (
                       <TableRow>
-                        {' '}
                         <TableCell colSpan={8} sx={{ border: 0 }}>
                           <Spinner />
-                        </TableCell>{' '}
+                        </TableCell>
                       </TableRow>
                     )}
                   </TableBody>

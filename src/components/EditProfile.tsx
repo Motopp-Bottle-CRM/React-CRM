@@ -38,6 +38,44 @@ export function EditProfile(props: any) {
     alternate_phone: ''
   })
 
+
+  const [country, setCountry] = useState('')
+
+  // Countries array with phone prefixes [code, name, phone_prefix] - same format as other components
+  const countries = [
+    ['IN', 'India', '+91'], ['US', 'United States', '+1'], ['GB', 'United Kingdom', '+44'], ['CA', 'Canada', '+1'], ['AU', 'Australia', '+61'],
+    ['DE', 'Germany', '+49'], ['FR', 'France', '+33'], ['JP', 'Japan', '+81'], ['CN', 'China', '+86'], ['BR', 'Brazil', '+55'], ['MX', 'Mexico', '+52'], ['IT', 'Italy', '+39'],
+    ['ES', 'Spain', '+34'], ['NL', 'Netherlands', '+31'], ['CH', 'Switzerland', '+41'], ['SE', 'Sweden', '+46'], ['NO', 'Norway', '+47'], ['DK', 'Denmark', '+45'],
+    ['FI', 'Finland', '+358'], ['PL', 'Poland', '+48'], ['RU', 'Russian Federation', '+7'], ['KR', 'Korea, Republic of', '+82'], ['SG', 'Singapore', '+65'], ['TH', 'Thailand', '+66']
+  ]
+
+  // Ensure address object is properly initialized
+  const initializeAddress = () => {
+    if (!props.profileData.address) {
+      props.setProfileData({
+        ...props.profileData,
+        address: {
+          address_line: '',
+          street: '',
+          city: '',
+          state: '',
+          postcode: '',
+          country: ''
+        }
+      })
+    }
+  }
+
+  // Initialize address on component mount
+  useEffect(() => {
+    initializeAddress()
+  }, [])
+
+  const handleEditClick = () => {
+    // Logic to save profile changes
+    props.setEditMode(false)
+  }
+
   const handleCancelClick = () => {
     // Logic to switch to view mode
     props.setEditMode(false)
@@ -242,9 +280,9 @@ export function EditProfile(props: any) {
             }
             sx={{ width: 250 }}
           >
-            {countries.map((c) => (
-              <MenuItem key={c.cca2} value={c.name.common}>
-                {c.flag} {c.name.common}
+            {countries.map((option) => (
+              <MenuItem key={option[0]} value={option[1]}>
+                {option[1]}
               </MenuItem>
             ))}
           </TextField>

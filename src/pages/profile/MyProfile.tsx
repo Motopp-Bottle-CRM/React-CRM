@@ -132,8 +132,8 @@ export function MyProfile() {
           <Avatar sx={{ width: 100, height: 100, mb: 2, bgcolor: "#3e79f7", fontSize: 40,}}>
             {profileData.email ? profileData.email.charAt(0).toUpperCase() : ""}
           </Avatar>
-          <Typography variant="h7" sx={{mb:2}}>{profileData.email}</Typography>
-          <Typography variant="h7">{profileData.role?.toLowerCase()}</Typography>
+          <Typography variant="h6" sx={{mb:2}}>{profileData.email}</Typography>
+          <Typography variant="h6">{profileData.role?.toLowerCase()}</Typography>
         </Box>
         {!editMode ? (
           <ViewProfile editMode={editMode} setEditMode={setEditMode} profileData={profileData} setProfileData={setProfileData} />
