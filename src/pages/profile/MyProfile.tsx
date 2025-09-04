@@ -13,7 +13,6 @@ import {
 import { ViewProfile } from '../../components/ViewProfile'
 import { EditProfile } from '../../components/EditProfile'
 
-
 export function MyProfile() {
   const [editMode, setEditMode] = useState(false)
   interface UserProfile {
@@ -65,7 +64,7 @@ export function MyProfile() {
             street: data?.address?.street,
             city: data?.address?.city,
             state: data?.address?.state,
-            pincode: data?.address?.pincode,
+            pincode: data?.address?.postcode,
             country: data?.address?.country,
             role: data?.role,
             date_of_joining: data?.date_of_joining,
@@ -97,7 +96,7 @@ export function MyProfile() {
           borderRadius: '8px',
         }}
       >
-        <Typography variant="h4" gutterBottom>
+        <Typography variant="h5" gutterBottom>
           My Profile
         </Typography>
       </Box>
@@ -129,16 +128,46 @@ export function MyProfile() {
             boxShadow: '0 4px 8px #d1ceceff',
           }}
         >
-          <Avatar sx={{ width: 100, height: 100, mb: 2, bgcolor: "#3e79f7", fontSize: 40,}}>
-            {profileData.email ? profileData.email.charAt(0).toUpperCase() : ""}
+          <Avatar
+            sx={{
+              width: 100,
+              height: 100,
+              mb: 2,
+              bgcolor: '#3e79f7',
+              fontSize: 40,
+            }}
+          >
+            {profileData.email ? profileData.email.charAt(0).toUpperCase() : ''}
           </Avatar>
-          <Typography variant="h6" sx={{mb:2}}>{profileData.email}</Typography>
-          <Typography variant="h6">{profileData.role?.toLowerCase()}</Typography>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
+            {profileData.email}
+          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, backgroundColor: '#95ddf0ff', pr: 2,pl: 2,pt: 1, pb:1, borderRadius: 10 }}>
+            <Typography variant="h6">
+            {' '}
+            {profileData.role
+              ? profileData.role.charAt(0).toUpperCase() +
+                profileData.role.slice(1).toLowerCase()
+              : ''}
+          </Typography>
+
+          </Box>
+
         </Box>
         {!editMode ? (
-          <ViewProfile editMode={editMode} setEditMode={setEditMode} profileData={profileData} setProfileData={setProfileData} />
+          <ViewProfile
+            editMode={editMode}
+            setEditMode={setEditMode}
+            profileData={profileData}
+            setProfileData={setProfileData}
+          />
         ) : (
-          <EditProfile editMode={editMode} setEditMode={setEditMode} profileData={profileData} setProfileData={setProfileData} />
+          <EditProfile
+            editMode={editMode}
+            setEditMode={setEditMode}
+            profileData={profileData}
+            setProfileData={setProfileData}
+          />
         )}
       </Box>
     </Box>

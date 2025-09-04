@@ -1,5 +1,5 @@
 import React from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Box,
   Typography,
@@ -8,7 +8,7 @@ import {
   MenuItem,
   Tooltip,
 } from '@mui/material'
-import { UserUrl } from '../services/ApiUrls'
+import { ProfileUrl, UserUrl } from '../services/ApiUrls'
 import { fetchData } from './FetchData'
 import { useLocation, useNavigate } from 'react-router-dom'
 
@@ -35,18 +35,37 @@ export function EditProfile(props: any) {
   const { state } = useLocation()
   const [profileErrors, setProfileErrors] = useState<any>({
     phone: '',
-    alternate_phone: ''
+    alternate_phone: '',
   })
-
 
   const [country, setCountry] = useState('')
 
   // Countries array with phone prefixes [code, name, phone_prefix] - same format as other components
   const countries = [
-    ['IN', 'India', '+91'], ['US', 'United States', '+1'], ['GB', 'United Kingdom', '+44'], ['CA', 'Canada', '+1'], ['AU', 'Australia', '+61'],
-    ['DE', 'Germany', '+49'], ['FR', 'France', '+33'], ['JP', 'Japan', '+81'], ['CN', 'China', '+86'], ['BR', 'Brazil', '+55'], ['MX', 'Mexico', '+52'], ['IT', 'Italy', '+39'],
-    ['ES', 'Spain', '+34'], ['NL', 'Netherlands', '+31'], ['CH', 'Switzerland', '+41'], ['SE', 'Sweden', '+46'], ['NO', 'Norway', '+47'], ['DK', 'Denmark', '+45'],
-    ['FI', 'Finland', '+358'], ['PL', 'Poland', '+48'], ['RU', 'Russian Federation', '+7'], ['KR', 'Korea, Republic of', '+82'], ['SG', 'Singapore', '+65'], ['TH', 'Thailand', '+66']
+    ['IN', 'India', '+91'],
+    ['US', 'United States', '+1'],
+    ['GB', 'United Kingdom', '+44'],
+    ['CA', 'Canada', '+1'],
+    ['AU', 'Australia', '+61'],
+    ['DE', 'Germany', '+49'],
+    ['FR', 'France', '+33'],
+    ['JP', 'Japan', '+81'],
+    ['CN', 'China', '+86'],
+    ['BR', 'Brazil', '+55'],
+    ['MX', 'Mexico', '+52'],
+    ['IT', 'Italy', '+39'],
+    ['ES', 'Spain', '+34'],
+    ['NL', 'Netherlands', '+31'],
+    ['CH', 'Switzerland', '+41'],
+    ['SE', 'Sweden', '+46'],
+    ['NO', 'Norway', '+47'],
+    ['DK', 'Denmark', '+45'],
+    ['FI', 'Finland', '+358'],
+    ['PL', 'Poland', '+48'],
+    ['RU', 'Russian Federation', '+7'],
+    ['KR', 'Korea, Republic of', '+82'],
+    ['SG', 'Singapore', '+65'],
+    ['TH', 'Thailand', '+66'],
   ]
 
   // Ensure address object is properly initialized
@@ -60,8 +79,8 @@ export function EditProfile(props: any) {
           city: '',
           state: '',
           postcode: '',
-          country: ''
-        }
+          country: '',
+        },
       })
     }
   }
@@ -74,15 +93,16 @@ export function EditProfile(props: any) {
   const handleEditClick = () => {
     // Logic to save profile changes
     props.setEditMode(false)
+    submitForm()
   }
 
   const handleCancelClick = () => {
     // Logic to switch to view mode
     props.setEditMode(false)
   }
-  const handleEditClick = () => {
-    submitForm()
-  }
+  // const handleEditClick = () => {
+  //   submitForm()
+  // }
 
   const submitForm = () => {
     const Header = {
@@ -105,21 +125,25 @@ export function EditProfile(props: any) {
       country: props.profileData.country,
     }
 
-    fetchData(`${UserUrl}/${state?.id}/`, 'PUT', JSON.stringify(data), Header)
+    fetchData(`${ProfileUrl}/`, 'PUT', JSON.stringify(data), Header)
       .then((res: any) => {
         if (!res.error) {
           alert('Profile updated successfully')
           props.setEditMode(false)
+        } else {
+          setError(true)
         }
-        else { setError(true) }
       })
       .catch(async (err: any) => {
         setError(true)
         profileErrors.phone = err?.profile_errors?.phone || {}
-        setProfileErrors({...profileErrors, phone: profileErrors.phone})
-        profileErrors.alternate_phone = err?.profile_errors?.alternate_phone || {}
-        setProfileErrors({...profileErrors, alternate_phone: profileErrors.alternate_phone})
-
+        setProfileErrors({ ...profileErrors, phone: profileErrors.phone })
+        profileErrors.alternate_phone =
+          err?.profile_errors?.alternate_phone || {}
+        setProfileErrors({
+          ...profileErrors,
+          alternate_phone: profileErrors.alternate_phone,
+        })
       })
   }
 
@@ -267,15 +291,12 @@ export function EditProfile(props: any) {
           <TextField
             select
             label="Select Country"
-            value={props.profileData.address?.country || ''}
+            value={props.profileData?.country || ''}
             size="small"
             onChange={(e) =>
               props.setProfileData({
                 ...props.profileData,
-                address: {
-                  ...props.profileData.address,
-                  country: e.target.value,
-                },
+                country: e.target.value,
               })
             }
             sx={{ width: 250 }}
@@ -315,14 +336,11 @@ export function EditProfile(props: any) {
           <TextField
             id="outlined-basic"
             label="PostCode"
-            value={props.profileData.address?.postcode || ''}
+            value={props.profileData?.postcode || ''}
             onChange={(e) =>
               props.setProfileData({
                 ...props.profileData,
-                address: {
-                  ...props.profileData.address,
-                  postcode: e.target.value,
-                },
+                postcode: e.target.value,
               })
             }
             variant="outlined"
@@ -358,14 +376,11 @@ export function EditProfile(props: any) {
           <TextField
             id="outlined-basic"
             label="state"
-            value={props.profileData.address?.state || ''}
+            value={props.profileData?.state || ''}
             onChange={(e) =>
               props.setProfileData({
                 ...props.profileData,
-                address: {
-                  ...props.profileData.address,
-                  state: e.target.value,
-                },
+                state: e.target.value,
               })
             }
             variant="outlined"
@@ -401,11 +416,11 @@ export function EditProfile(props: any) {
           <TextField
             id="outlined-basic"
             label="city"
-            value={props.profileData.address?.city || ''}
+            value={props.profileData?.city || ''}
             onChange={(e) =>
               props.setProfileData({
                 ...props.profileData,
-                address: { ...props.profileData.address, city: e.target.value },
+                city: e.target.value,
               })
             }
             variant="outlined"
@@ -441,14 +456,11 @@ export function EditProfile(props: any) {
           <TextField
             id="outlined-basic"
             label="street name and number"
-            value={props.profileData.address?.street || ''}
+            value={props.profileData?.street || ''}
             onChange={(e) =>
               props.setProfileData({
                 ...props.profileData,
-                address: {
-                  ...props.profileData.address,
-                  street: e.target.value,
-                },
+                street: e.target.value,
               })
             }
             variant="outlined"
@@ -484,14 +496,11 @@ export function EditProfile(props: any) {
           <TextField
             id="outlined-basic"
             label="Floor, Building, Apartment"
-            value={props.profileData.address?.address_line || ''}
+            value={props.profileData?.address_line || ''}
             onChange={(e) =>
               props.setProfileData({
                 ...props.profileData,
-                address: {
-                  ...props.profileData.address,
-                  address_line: e.target.value,
-                },
+                address_line: e.target.value,
               })
             }
             variant="outlined"
