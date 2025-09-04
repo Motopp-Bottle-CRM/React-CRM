@@ -276,14 +276,24 @@ export default function Login() {
                 ></Box>
               </Box>
             </Box>
-            <GoogleButton onClick={() => login()}>
+            <GoogleButton
+              onClick={() => login()}
+              sx={{
+                width: '30%',
+                textTransform: 'none',
+                borderRadius: '20px',
+                py: 1,
+              }}
+            >
               <img src={imgGoogle} alt="google" width={15} />
-              Login with Google
+              <Typography sx={{ ml: 1, fontSize: '16px', color: '#080808ff' }}>
+                Login with Google
+              </Typography>
             </GoogleButton>
           </Stack>
         </Grid>
       </Grid>
-      <Grid
+      {/* <Grid
         container
         xs={12}
         md={6}
@@ -310,7 +320,7 @@ export default function Login() {
             <footer className="register-footer">bottlecrm.com</footer>
           </Stack>
         </Grid>
-      </Grid>
+      </Grid> */}
     </Stack>
   )
 }
