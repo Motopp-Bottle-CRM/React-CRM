@@ -18,10 +18,10 @@ export default function SetPassword() {
   const navigate = useNavigate()
   const { token } = useParams<{ token: string }>()
   const location = useLocation()
-  
+
   // Check if we're coming from an invitation link
   const isInvitation = !!token
-  
+
   const [invitationData, setInvitationData] = useState<InvitationData | null>(null)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -48,7 +48,7 @@ export default function SetPassword() {
           Accept: 'application/json',
         }
       )
-      
+
       if (!response.error) {
         setInvitationData(response.data)
         setEmail(response.data.email)
@@ -78,7 +78,7 @@ export default function SetPassword() {
   const submitForm = () => {
     setLoading(true)
     setError('')
-    
+
     if (isInvitation) {
       // Handle invitation-based password setting
       fetchData(
@@ -226,7 +226,7 @@ export default function SetPassword() {
         alignItems="center"
         justifyContent="center"
         sx={{
-          height: '70%',
+          height: '85%',
           width: '50%',
           border: 1,
           boxShadow: 3,
@@ -253,7 +253,7 @@ export default function SetPassword() {
           <Typography variant="h4" fontWeight="bold" mb={3}>
             Set Your Password
           </Typography>
-          
+
           {isInvitation && invitationData && (
             <Box sx={{ mb: 3, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
               <Typography variant="body2" color="text.secondary" gutterBottom>
@@ -267,7 +267,7 @@ export default function SetPassword() {
               </Typography>
             </Box>
           )}
-          
+
           <TextField
             label="Email Address"
             variant="outlined"
