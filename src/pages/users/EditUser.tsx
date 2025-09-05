@@ -22,6 +22,7 @@ import {
 } from '@mui/material'
 import { UserUrl } from '../../services/ApiUrls'
 import { fetchData, Header } from '../../components/FetchData'
+//import { fetchData } from '../../components/FetchData'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import { FaArrowDown, FaTimes, FaUpload } from 'react-icons/fa'
 import { AntSwitch, RequiredTextField } from '../../styles/CssStyled'
@@ -130,6 +131,7 @@ export function EditUser() {
       setReset(false)
     }
   }, [reset])
+//
 
   useEffect(() => {
     async function load() {
@@ -172,6 +174,53 @@ export function EditUser() {
 
     load()
   }, [state?.id])
+  
+  
+//new Somayeh code
+/*
+useEffect(() => {
+    async function load() {
+      try {
+        setLoading(true)
+        setError(false)
+ 
+        const Header = {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: localStorage.getItem('Token'),
+          org: localStorage.getItem('org'),
+        }
+ 
+        fetchData(`${UserUrl}/${state?.id}/`, 'GET', null as any, Header).then(
+          (res: any) => {
+            if (!res.error) {
+              setLoading(false)
+              const data = res?.data?.profile_obj
+              setFormData({
+                email: data?.user_details?.email || '',
+                role: data?.role || '',
+                phone: data?.phone || '',
+                alternate_phone: data?.alternate_phone || '',
+                address_line: data?.address?.address_line || '',
+                street: data?.address?.street || '',
+                city: data?.address?.city || '',
+                state: data?.address?.state || '',
+                pincode: data?.address?.pincode || '',
+                country: data?.address?.country || '',
+              })
+            }
+          }
+        )
+      } catch (error) {
+        console.error('Error fetching user data:', error)
+        setError(true)
+      }
+    }
+
+    load()
+  }, [state?.id])
+*/
+      //end of Somayeh new code
 
   const handleChange = (e: any) => {
     const { name, value, files, type, checked } = e.target

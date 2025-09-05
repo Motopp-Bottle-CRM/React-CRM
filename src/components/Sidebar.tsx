@@ -83,6 +83,8 @@ export default function Sidebar(props: any) {
   const [userDetail, setUserDetail] = useState('')
   //  const [userDetail, setUserDetail] = useState({ role: 'USER' });
   const [organizationModal, setOrganizationModal] = useState(false)
+  // ✅ Get email from localStorage
+  const email = localStorage.getItem("email") || "No email";
   const organizationModalClose = () => {
     setOrganizationModal(false)
   }
@@ -180,7 +182,7 @@ export default function Sidebar(props: any) {
   const navIcons = (text: any, screen: any): React.ReactNode => {
     switch (text) {
       case 'leads':
-        return screen === 'leads' ? <FaUsers fill="#3e79f7" /> : <FaUsers />
+        return screen === 'leads' ? <FaUsers fill="#1A3353" /> : <FaUsers />
       case 'contacts':
         return screen === 'contacts' ? (
           <FaAddressBook fill="#3e79f7" />
@@ -304,12 +306,18 @@ export default function Sidebar(props: any) {
             }}
           >
             {/* <IconButton onClick={userProfile} sx={{ mr: 2 }}><FaCog /></IconButton> */}
+                    <Typography
+  variant="body2"
+  sx={{ textAlign: 'left', mt: 0, fontWeight: 'bold', color: '#0f3389ff' ,lineHeight: 1 }}
+>
+   {email.charAt(0).toUpperCase() + email.slice(1)}
+</Typography>
             <IconButton onClick={handleClick} sx={{ mr: 3 }}>
-              <Avatar
-                // src='hj'
-                sx={{ height: '27px', width: '27px' }}
-              />
+               <Avatar sx={{ height: '27px', width: '27px',bgcolor: "#3e79f7" }}>
+      {email.charAt(0).toUpperCase()} {/* first letter only */}
+    </Avatar>
             </IconButton>
+    
             <Popover
               anchorOrigin={{
                 vertical: 'bottom',
@@ -356,6 +364,9 @@ export default function Sidebar(props: any) {
                     />
                   </StyledListItemButton>
                 </ListItem>
+
+    
+
                 <ListItem disablePadding>
                   <StyledListItemButton
                     onClick={() => {
@@ -374,6 +385,7 @@ export default function Sidebar(props: any) {
                     />
                   </StyledListItemButton>
                 </ListItem>
+
               </List>
               {/* <Tooltip title='logout' sx={{ ml: '15px' }}>
                                 <IconButton
