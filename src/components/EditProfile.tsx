@@ -1,6 +1,17 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
-import { Box, Typography, Button, TextField, MenuItem } from '@mui/material'
+import {
+  Box,
+  Typography,
+  Button,
+  TextField,
+  MenuItem,
+  Tooltip,
+} from '@mui/material'
+import { ProfileUrl, UserUrl } from '../services/ApiUrls'
+import { fetchData } from './FetchData'
+import { useLocation, useNavigate } from 'react-router-dom'
+
 import {
   FaEnvelope,
   FaPhone,
@@ -13,22 +24,50 @@ import {
   FaMailBulk,
   FaBuilding,
 } from 'react-icons/fa'
+import countries from 'world-countries'
+import { RequiredTextField } from '../styles/CssStyled'
 export function EditProfile(props: any) {
   // const handleEditClick = (event) => {
   //   // Logic to switch to edit mode
   //   event.preventDefault()
   // }
+  const [error, setError] = useState(false)
+  const { state } = useLocation()
+  const [profileErrors, setProfileErrors] = useState<any>({
+    phone: '',
+    alternate_phone: '',
+  })
 
   const [country, setCountry] = useState('')
-  
+
   // Countries array with phone prefixes [code, name, phone_prefix] - same format as other components
   const countries = [
-    ['IN', 'India', '+91'], ['US', 'United States', '+1'], ['GB', 'United Kingdom', '+44'], ['CA', 'Canada', '+1'], ['AU', 'Australia', '+61'], 
-    ['DE', 'Germany', '+49'], ['FR', 'France', '+33'], ['JP', 'Japan', '+81'], ['CN', 'China', '+86'], ['BR', 'Brazil', '+55'], ['MX', 'Mexico', '+52'], ['IT', 'Italy', '+39'],
-    ['ES', 'Spain', '+34'], ['NL', 'Netherlands', '+31'], ['CH', 'Switzerland', '+41'], ['SE', 'Sweden', '+46'], ['NO', 'Norway', '+47'], ['DK', 'Denmark', '+45'],
-    ['FI', 'Finland', '+358'], ['PL', 'Poland', '+48'], ['RU', 'Russian Federation', '+7'], ['KR', 'Korea, Republic of', '+82'], ['SG', 'Singapore', '+65'], ['TH', 'Thailand', '+66']
+    ['IN', 'India', '+91'],
+    ['US', 'United States', '+1'],
+    ['GB', 'United Kingdom', '+44'],
+    ['CA', 'Canada', '+1'],
+    ['AU', 'Australia', '+61'],
+    ['DE', 'Germany', '+49'],
+    ['FR', 'France', '+33'],
+    ['JP', 'Japan', '+81'],
+    ['CN', 'China', '+86'],
+    ['BR', 'Brazil', '+55'],
+    ['MX', 'Mexico', '+52'],
+    ['IT', 'Italy', '+39'],
+    ['ES', 'Spain', '+34'],
+    ['NL', 'Netherlands', '+31'],
+    ['CH', 'Switzerland', '+41'],
+    ['SE', 'Sweden', '+46'],
+    ['NO', 'Norway', '+47'],
+    ['DK', 'Denmark', '+45'],
+    ['FI', 'Finland', '+358'],
+    ['PL', 'Poland', '+48'],
+    ['RU', 'Russian Federation', '+7'],
+    ['KR', 'Korea, Republic of', '+82'],
+    ['SG', 'Singapore', '+65'],
+    ['TH', 'Thailand', '+66'],
   ]
-  
+
   // Ensure address object is properly initialized
   const initializeAddress = () => {
     if (!props.profileData.address) {
@@ -40,25 +79,72 @@ export function EditProfile(props: any) {
           city: '',
           state: '',
           postcode: '',
-          country: ''
-        }
+          country: '',
+        },
       })
     }
   }
-  
+
   // Initialize address on component mount
   useEffect(() => {
     initializeAddress()
   }, [])
-  
+
   const handleEditClick = () => {
     // Logic to save profile changes
     props.setEditMode(false)
+    submitForm()
   }
-  
+
   const handleCancelClick = () => {
     // Logic to switch to view mode
     props.setEditMode(false)
+  }
+  // const handleEditClick = () => {
+  //   submitForm()
+  // }
+
+  const submitForm = () => {
+    const Header = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: localStorage.getItem('Token'),
+      org: localStorage.getItem('org'),
+    }
+    // console.log('Form data:', data);
+    const data = {
+      email: props.profileData.email,
+      role: props.profileData.role,
+      phone: props.profileData.phone,
+      alternate_phone: props.profileData.alternate_phone,
+      address_line: props.profileData.address_line,
+      street: props.profileData.street,
+      city: props.profileData.city,
+      state: props.profileData.state,
+      pincode: props.profileData.pincode,
+      country: props.profileData.country,
+    }
+
+    fetchData(`${ProfileUrl}/`, 'PUT', JSON.stringify(data), Header)
+      .then((res: any) => {
+        if (!res.error) {
+          alert('Profile updated successfully')
+          props.setEditMode(false)
+        } else {
+          setError(true)
+        }
+      })
+      .catch(async (err: any) => {
+        setError(true)
+        profileErrors.phone = err?.profile_errors?.phone || {}
+        setProfileErrors({ ...profileErrors, phone: profileErrors.phone })
+        profileErrors.alternate_phone =
+          err?.profile_errors?.alternate_phone || {}
+        setProfileErrors({
+          ...profileErrors,
+          alternate_phone: profileErrors.alternate_phone,
+        })
+      })
   }
 
   return (
@@ -132,15 +218,23 @@ export function EditProfile(props: any) {
               Phone number
             </Typography>
           </Box>
-          <TextField
-            id="outlined-basic"
-            label="Phone number"
-            value={props.profileData.phone}
-            onChange={(e) =>props.setProfileData({...props.profileData, phone: e.target.value})}
-            variant="outlined"
-            size="small"
-            sx={{ width: 250 }}
-          />
+          <Tooltip title="phone must starts with + and country code">
+            <RequiredTextField
+              id="outlined-basic"
+              label="Phone number"
+              value={props.profileData.phone}
+              onChange={(e) =>
+                props.setProfileData({
+                  ...props.profileData,
+                  phone: e.target.value,
+                })
+              }
+              variant="outlined"
+              size="small"
+              required
+              sx={{ width: 250 }}
+            />
+          </Tooltip>
         </Box>
         <Box
           sx={{
@@ -197,9 +291,14 @@ export function EditProfile(props: any) {
           <TextField
             select
             label="Select Country"
-            value={props.profileData.address?.country || ''}
+            value={props.profileData?.country || ''}
             size="small"
-            onChange={(e) => props.setProfileData({...props.profileData, address: { ...(props.profileData.address || {}), country: e.target.value }})}
+            onChange={(e) =>
+              props.setProfileData({
+                ...props.profileData,
+                country: e.target.value,
+              })
+            }
             sx={{ width: 250 }}
           >
             {countries.map((option) => (
@@ -237,8 +336,13 @@ export function EditProfile(props: any) {
           <TextField
             id="outlined-basic"
             label="PostCode"
-            value={props.profileData.address?.postcode || ''}
-            onChange={(e) =>props.setProfileData({...props.profileData, address: { ...(props.profileData.address || {}), postcode: e.target.value }})}
+            value={props.profileData?.postcode || ''}
+            onChange={(e) =>
+              props.setProfileData({
+                ...props.profileData,
+                postcode: e.target.value,
+              })
+            }
             variant="outlined"
             size="small"
             sx={{ width: 250 }}
@@ -272,8 +376,13 @@ export function EditProfile(props: any) {
           <TextField
             id="outlined-basic"
             label="state"
-            value={props.profileData.address?.state || ''}
-            onChange={(e) =>props.setProfileData({...props.profileData, address: { ...(props.profileData.address || {}), state: e.target.value }})}
+            value={props.profileData?.state || ''}
+            onChange={(e) =>
+              props.setProfileData({
+                ...props.profileData,
+                state: e.target.value,
+              })
+            }
             variant="outlined"
             size="small"
             sx={{ width: 250 }}
@@ -307,8 +416,13 @@ export function EditProfile(props: any) {
           <TextField
             id="outlined-basic"
             label="city"
-            value={props.profileData.address?.city || ''}
-            onChange={(e) =>props.setProfileData({...props.profileData, address: { ...(props.profileData.address || {}), city: e.target.value }})}
+            value={props.profileData?.city || ''}
+            onChange={(e) =>
+              props.setProfileData({
+                ...props.profileData,
+                city: e.target.value,
+              })
+            }
             variant="outlined"
             size="small"
             sx={{ width: 250 }}
@@ -342,8 +456,13 @@ export function EditProfile(props: any) {
           <TextField
             id="outlined-basic"
             label="street name and number"
-            value={props.profileData.address?.street || ''}
-            onChange={(e) =>props.setProfileData({...props.profileData, address: { ...(props.profileData.address || {}), street: e.target.value }})}
+            value={props.profileData?.street || ''}
+            onChange={(e) =>
+              props.setProfileData({
+                ...props.profileData,
+                street: e.target.value,
+              })
+            }
             variant="outlined"
             size="small"
             sx={{ width: 250 }}
@@ -377,8 +496,13 @@ export function EditProfile(props: any) {
           <TextField
             id="outlined-basic"
             label="Floor, Building, Apartment"
-            value={props.profileData.address?.address_line || ''}
-            onChange={(e) =>props.setProfileData({...props.profileData, address: { ...(props.profileData.address || {}), address_line: e.target.value }})}
+            value={props.profileData?.address_line || ''}
+            onChange={(e) =>
+              props.setProfileData({
+                ...props.profileData,
+                address_line: e.target.value,
+              })
+            }
             variant="outlined"
             size="small"
             sx={{ width: 250 }}

@@ -159,10 +159,10 @@ export function ViewProfile(props: any) {
               </Typography>
             </Box>
             <Typography variant="body1">
-              {props.profileData.address ? 
-                `${props.profileData.address.street || ''} ${props.profileData.address.city || ''} ${props.profileData.address.state || ''} ${props.profileData.address.postcode || ''} ${props.profileData.address.country || ''}`.trim() || 'No address provided' 
-                : 'No address provided'
-              }
+
+                {props.profileData.street || ''} {props.profileData.city || ''} {props.profileData.state || ''} {props.profileData.postcode || ''} {props.profileData.country || ''}
+
+
             </Typography>
           </Box>
           <Box

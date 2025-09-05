@@ -16,10 +16,10 @@ interface InvitationData {
 export default function SetPassword() {
   const navigate = useNavigate()
   const { token } = useParams<{ token: string }>()
-  
+
   // Check if we're coming from an invitation link
   const isInvitation = !!token
-  
+
   const [invitationData, setInvitationData] = useState<InvitationData | null>(null)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -35,7 +35,7 @@ export default function SetPassword() {
       navigate('/login')
       return
     }
-    
+
     if (isInvitation && token) {
       fetchInvitationData()
     }
@@ -52,7 +52,7 @@ export default function SetPassword() {
           Accept: 'application/json',
         }
       )
-      
+
       if (!response.error) {
         setInvitationData(response.data)
         setEmail(response.data.email)
@@ -82,7 +82,7 @@ export default function SetPassword() {
   const submitForm = () => {
     setLoading(true)
     setError('')
-    
+
     // Only handle invitation-based password setting
     fetchData(
       `set-password/${token}/`,
@@ -228,7 +228,7 @@ export default function SetPassword() {
           <Typography variant="body1" color="text.secondary" mb={3}>
             Complete your account setup by setting a secure password
           </Typography>
-          
+
           {isInvitation && invitationData && (
             <Box sx={{ mb: 3, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
               <Typography variant="body2" color="text.secondary" gutterBottom>
@@ -242,7 +242,7 @@ export default function SetPassword() {
               </Typography>
             </Box>
           )}
-          
+
           <TextField
             label="Email Address"
             variant="outlined"
@@ -325,9 +325,9 @@ export default function SetPassword() {
           display={{ xs: 'none', md: 'flex' }}
           justifyContent="center"
           alignItems="center"
-          sx={{ 
-            minHeight: '600px', 
-            width: '100%', 
+          sx={{
+            minHeight: '600px',
+            width: '100%',
             overflow: 'hidden',
             minWidth: '300px',
             maxWidth: '400px',

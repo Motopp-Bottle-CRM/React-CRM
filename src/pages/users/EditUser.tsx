@@ -67,7 +67,7 @@ export function EditUser() {
 
   // Countries array with phone prefixes [code, name, phone_prefix]
   const countries = [
-    ['IN', 'India', '+91'], ['US', 'United States', '+1'], ['GB', 'United Kingdom', '+44'], ['CA', 'Canada', '+1'], ['AU', 'Australia', '+61'], 
+    ['IN', 'India', '+91'], ['US', 'United States', '+1'], ['GB', 'United Kingdom', '+44'], ['CA', 'Canada', '+1'], ['AU', 'Australia', '+61'],
     ['DE', 'Germany', '+49'], ['FR', 'France', '+33'], ['JP', 'Japan', '+81'], ['CN', 'China', '+86'], ['BR', 'Brazil', '+55'], ['MX', 'Mexico', '+52'], ['IT', 'Italy', '+39'],
     ['ES', 'Spain', '+34'], ['NL', 'Netherlands', '+31'], ['CH', 'Switzerland', '+41'], ['SE', 'Sweden', '+46'], ['NO', 'Norway', '+47'], ['DK', 'Denmark', '+45'],
     ['FI', 'Finland', '+358'], ['PL', 'Poland', '+48'], ['RU', 'Russian Federation', '+7'], ['KR', 'Korea, Republic of', '+82'], ['SG', 'Singapore', '+65'], ['TH', 'Thailand', '+66']
@@ -184,8 +184,8 @@ export function EditUser() {
       // If country changes, update phone number prefix
       if (name === 'country') {
         const newPrefix = getPhonePrefixForCountry(value)
-        setFormData({ 
-          ...formData, 
+        setFormData({
+          ...formData,
           [name]: value,
           // Only update phone numbers if they already have a prefix
           phone: formData.phone.startsWith('+') ? newPrefix + ' ' : formData.phone,
@@ -424,7 +424,7 @@ export function EditUser() {
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Phone Number</div>
-                        <Tooltip title={`Number must start with ${getPhonePrefixForCountry(formData.country)}`}>
+                        <Tooltip title="Number must start with country code prefix">
                           <RequiredTextField
                             name="phone"
                             value={formData.phone}
@@ -446,9 +446,8 @@ export function EditUser() {
                       </div>
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Alternate Phone</div>
-                        <Tooltip title={`Number must start with ${getPhonePrefixForCountry(formData.country)}`}>
-                          <RequiredTextField
-                            required
+                        <Tooltip title= "Number must start with country code prefix">
+                          <TextField
                             name="alternate_phone"
                             value={formData.alternate_phone}
                             onChange={handleChange}
