@@ -10,7 +10,6 @@ import {
 } from '@mui/material'
 import { ProfileUrl, UserUrl } from '../services/ApiUrls'
 import { fetchData } from './FetchData'
-import { useLocation, useNavigate } from 'react-router-dom'
 
 import {
   FaEnvelope,
@@ -24,21 +23,14 @@ import {
   FaMailBulk,
   FaBuilding,
 } from 'react-icons/fa'
-import countries from 'world-countries'
 import { RequiredTextField } from '../styles/CssStyled'
 export function EditProfile(props: any) {
-  // const handleEditClick = (event) => {
-  //   // Logic to switch to edit mode
-  //   event.preventDefault()
-  // }
   const [error, setError] = useState(false)
-  const { state } = useLocation()
   const [profileErrors, setProfileErrors] = useState<any>({
     phone: '',
     alternate_phone: '',
   })
   const [localProfile, setLocalProfile] = useState(props.profileData)
-  const [country, setCountry] = useState('')
 
   // Countries array with phone prefixes [code, name, phone_prefix] - same format as other components
   const countries = [
