@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react'
 import { Grid, Stack, Typography, Box, TextField, Button } from '@mui/material'
 import { useGoogleLogin } from '@react-oauth/google'
@@ -33,10 +34,10 @@ export default function Login() {
     submitForm()
   }
   const submitForm = () => {
-    console.log("submitForm is running") 
+    console.log("submitForm is running")
   console.log('submitForm is running', { email, password })
   console.log("Email vefore sending to server : " , email)
-  
+
   const header = {
     'Content-Type': 'application/json',
     Accept: 'application/json',
@@ -89,10 +90,7 @@ export default function Login() {
       fetchData(`${AuthUrl}/`, 'POST', JSON.stringify(apiToken), head)
         .then((res: any) => {
 
-          
-          
-          
-         
+
 
           if (res.access_token) {
             localStorage.setItem('Token', `Bearer ${res.access_token}`)
@@ -164,15 +162,18 @@ export default function Login() {
               }}
             >
               {/* left form section */}
-              <form
-                style={{
+              <Box
+                flex={1}
+                component={'form'}
+                flexDirection="column"
+                display="flex"
+                justifyContent="center"
+                sx={{
                   width: '100%',
                   height: '100%',
+                  // maxWidthwidth: '350px',
                   margin: 'auto',
-                  padding: '24px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center'
+                  padding: 3,
                 }}
                 onSubmit={handleSubmit}
               >
@@ -230,9 +231,6 @@ export default function Login() {
                     {error}
                   </Typography>
                 )}
-
-              </form>
-
                 {success && (
                   <Typography color="success.main" mt={2} textAlign="center">
                     {success}
