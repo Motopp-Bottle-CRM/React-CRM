@@ -82,22 +82,43 @@ export default function Login() {
   const login = useGoogleLogin({
     onSuccess: (tokenResponse) => {
       const apiToken = { token: tokenResponse.access_token }
-      // const formData = new FormData()
-      // formData.append('token', tokenResponse.access_token)
       const head = {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       }
       fetchData(`${AuthUrl}/`, 'POST', JSON.stringify(apiToken), head)
         .then((res: any) => {
-          console.log('Response from server:', res)
-          localStorage.setItem('Token', `Bearer ${res.access_token}`)
-          localStorage.setItem('email', res.username)
-          setToken(true)
+
+          
+          
+          
+         
+
+          if (res.access_token) {
+            localStorage.setItem('Token', `Bearer ${res.access_token}`)
+            localStorage.setItem('email', res.username)
+            setToken(true)
+            setSuccess('Successfully logged in with Google!')
+            setError('')
+          } else {
+            setError('Failed to get access token from server')
+          }
+
         })
         .catch((error: any) => {
-          console.error('Error:', error)
+          console.error('Google login error:', error)
+          if (error.error) {
+            setError(error.error)
+          } else if (error.message) {
+            setError(error.message)
+          } else {
+            setError('Google authentication failed. Please try again.')
+          }
         })
+    },
+    onError: (error) => {
+      console.error('Google OAuth error:', error)
+      setError('Google authentication failed. Please try again.')
     },
   })
   return (
@@ -109,7 +130,6 @@ export default function Login() {
     >
       <Grid container xs={12} md={6}>
         <Grid
-          spacing={5}
           item
           xs={12}
           md={12}
@@ -210,7 +230,15 @@ export default function Login() {
                     {error}
                   </Typography>
                 )}
+
               </form>
+
+                {success && (
+                  <Typography color="success.main" mt={2} textAlign="center">
+                    {success}
+                  </Typography>
+                )}
+              </Box>
 
               {/* right blue section*/}
               <Box
@@ -266,14 +294,24 @@ export default function Login() {
                 ></Box>
               </Box>
             </Box>
-            <GoogleButton onClick={() => login()}>
+            <GoogleButton
+              onClick={() => login()}
+              sx={{
+                width: '30%',
+                textTransform: 'none',
+                borderRadius: '20px',
+                py: 1,
+              }}
+            >
               <img src={imgGoogle} alt="google" width={15} />
-              Login with Google
+              <Typography sx={{ ml: 1, fontSize: '16px', color: '#080808ff' }}>
+                Login with Google
+              </Typography>
             </GoogleButton>
           </Stack>
         </Grid>
       </Grid>
-      <Grid
+      {/* <Grid
         container
         xs={12}
         md={6}
@@ -300,7 +338,7 @@ export default function Login() {
             <footer className="register-footer">bottlecrm.com</footer>
           </Stack>
         </Grid>
-      </Grid>
+      </Grid> */}
     </Stack>
   )
 }

@@ -1,18 +1,70 @@
 import React from 'react'
 import { useEffect, useState } from 'react'
-import { Box, TextField, Typography, Button } from '@mui/material'
-import { useNavigate } from 'react-router-dom'
+import { Box, TextField, Typography, Button, Alert } from '@mui/material'
+import { useNavigate, useParams } from 'react-router-dom'
 import '../../styles/style.css'
 import { fetchData } from '../../components/FetchData'
-import { SetPasswordUrl } from '../../services/ApiUrls'
+
+interface InvitationData {
+  email: string
+  org_name: string
+  role: string
+  invited_by: string
+  expires_at: string
+}
+
 export default function SetPassword() {
   const navigate = useNavigate()
-  const [token, setToken] = useState('')
+  const { token } = useParams<{ token: string }>()
+
+  // Check if we're coming from an invitation link
+  const isInvitation = !!token
+
+  const [invitationData, setInvitationData] = useState<InvitationData | null>(null)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [loadingInvitation, setLoadingInvitation] = useState(isInvitation)
+
+  useEffect(() => {
+    // Redirect to login if no token is provided
+    if (!token) {
+      navigate('/login')
+      return
+    }
+
+    if (isInvitation && token) {
+      fetchInvitationData()
+    }
+  }, [token, isInvitation, navigate])
+
+  const fetchInvitationData = async () => {
+    try {
+      const response = await fetchData(
+        `set-password/${token}/`,
+        'GET',
+        null,
+        {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        }
+      )
+
+      if (!response.error) {
+        setInvitationData(response.data)
+        setEmail(response.data.email)
+      } else {
+        setError(response.errors || 'Invalid invitation link')
+      }
+    } catch (err: any) {
+      setError('Failed to load invitation details')
+    } finally {
+      setLoadingInvitation(false)
+    }
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -20,66 +72,138 @@ export default function SetPassword() {
       setError('Passwords do not match')
       return
     }
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters long')
+      return
+    }
     submitForm()
   }
 
   const submitForm = () => {
-    const header = {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    }
+    setLoading(true)
+    setError('')
 
+    // Only handle invitation-based password setting
     fetchData(
-      `${SetPasswordUrl}`,
+      `set-password/${token}/`,
       'POST',
       JSON.stringify({
-        email,
         password,
-        confirmPassword,
+        confirm_password: confirmPassword,
       }),
-      header
+      {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      }
     )
       .then((res: any) => {
-        setSuccess('Password set successfully!')
-        navigate('/login') // Redirect to login after successful password set
+        setSuccess('Password set successfully! You can now log in.')
+        setTimeout(() => {
+          navigate('/login')
+        }, 2000)
       })
       .catch((err: any) => {
-        if (err.email) {
-          setError(err.email) // user not found
-        } else if (err.non_field_errors) {
-          setError(err.non_field_errors[0]) // other general errors
-        } else if (err.password) {
-          setError(err.password[0]) // password validation errors
-        }
-         else {
-          setError('An unexpected error occurred.')
+        if (err.errors) {
+          if (typeof err.errors === 'string') {
+            setError(err.errors)
+          } else if (err.errors.password) {
+            setError(err.errors.password[0])
+          } else if (err.errors.confirm_password) {
+            setError(err.errors.confirm_password[0])
+          } else {
+            setError('An error occurred while setting your password')
+          }
+        } else {
+          setError('An unexpected error occurred')
         }
       })
+      .finally(() => {
+        setLoading(false)
+      })
+  }
+
+  if (loadingInvitation) {
+    return (
+      <div
+        style={{
+          height: '100vh',
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Typography variant="h6">Loading invitation details...</Typography>
+      </div>
+    )
+  }
+
+  if (error && isInvitation && !invitationData) {
+    return (
+      <div
+        style={{
+          height: '100vh',
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Box
+          sx={{
+            maxWidth: '500px',
+            padding: 3,
+            border: 1,
+            borderColor: 'error.main',
+            borderRadius: 2,
+            textAlign: 'center',
+          }}
+        >
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+          <Button
+            variant="contained"
+            onClick={() => navigate('/login')}
+            sx={{
+              bgcolor: '#1E73BE',
+              '&:hover': { bgcolor: '#155a91' },
+            }}
+          >
+            Go to Login
+          </Button>
+        </Box>
+      </div>
+    )
   }
 
   return (
     <div
       style={{
-        height: '100%',
+        minHeight: '100vh',
         width: '100%',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+        padding: '10px',
+        backgroundColor: '#f5f5f5',
       }}
     >
       <Box
         display="flex"
-        flexDirection="row"
-        alignItems="center"
+        flexDirection={{ xs: 'column', md: 'row' }}
+        alignItems="stretch"
         justifyContent="center"
         sx={{
-          height: '70%',
-          width: '50%',
+          minHeight: '600px',
+          width: '100%',
+          maxWidth: '900px',
           border: 1,
           boxShadow: 3,
           borderColor: 'grey.300',
           borderRadius: 2,
           overflow: 'hidden',
+          backgroundColor: 'white',
         }}
       >
         {/* left form section */}
@@ -88,33 +212,52 @@ export default function SetPassword() {
           component={'form'}
           flexDirection="column"
           display="flex"
-          justifyContent="center"
+          justifyContent="flex-start"
           sx={{
             width: '100%',
-            height: '100%',
-            // maxWidthwidth: '350px',
-            margin: 'auto',
-            padding: 3,
+            minHeight: { xs: '400px', md: '600px' },
+            maxHeight: '80vh',
+            padding: { xs: 3, md: 4 },
+            overflowY: 'auto',
           }}
           onSubmit={handleSubmit}
         >
           <Typography variant="h4" fontWeight="bold" mb={3}>
             Set Your Password
           </Typography>
+          <Typography variant="body1" color="text.secondary" mb={3}>
+            Complete your account setup by setting a secure password
+          </Typography>
+
+          {isInvitation && invitationData && (
+            <Box sx={{ mb: 3, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                You've been invited to join <strong>{invitationData.org_name}</strong>
+              </Typography>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Role: <strong>{invitationData.role}</strong>
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Invited by: <strong>{invitationData.invited_by}</strong>
+              </Typography>
+            </Box>
+          )}
+
           <TextField
             label="Email Address"
             variant="outlined"
-            required
+            required={false}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            disabled={true}
+            fullWidth
             sx={{
-              mb: 2,
-              bgcolor: '#fff',
+              mb: 3,
+              bgcolor: '#f5f5f5',
               borderRadius: '8px',
               '& .MuiOutlinedInput-root': { borderRadius: '8px' },
-              width: '80%',
             }}
-          ></TextField>
+          />
           <TextField
             label="Password"
             type="password"
@@ -122,14 +265,15 @@ export default function SetPassword() {
             variant="outlined"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            fullWidth
             sx={{
               mb: 2,
               bgcolor: '#fff',
               borderRadius: '8px',
               '& .MuiOutlinedInput-root': { borderRadius: '8px' },
-              width: '80%',
             }}
-          ></TextField>
+            helperText="Password must be at least 8 characters with uppercase, lowercase, and number"
+          />
           <TextField
             label="Confirm Password"
             type="password"
@@ -137,35 +281,40 @@ export default function SetPassword() {
             required
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
+            fullWidth
             sx={{
               mb: 3,
               bgcolor: '#fff',
               borderRadius: '8px',
               '& .MuiOutlinedInput-root': { borderRadius: '8px' },
-              width: '80%',
             }}
-          ></TextField>
+          />
           {error && (
-            <Typography color="error" variant="body2" mb={2}>
+            <Alert severity="error" sx={{ mb: 2 }}>
               {error}
-            </Typography>
+            </Alert>
+          )}
+          {success && (
+            <Alert severity="success" sx={{ mb: 2 }}>
+              {success}
+            </Alert>
           )}
           <Button
             type="submit"
             variant="contained"
+            disabled={loading}
             fullWidth
             sx={{
               bgcolor: '#1E73BE',
               borderRadius: '8px',
               textTransform: 'none',
               fontSize: '16px',
-              py: 1,
+              py: 1.5,
+              mt: 2,
               '&:hover': { bgcolor: '#155a91' },
-              width: '80%',
             }}
           >
-            {' '}
-            Submit
+            {loading ? 'Setting Password...' : 'Set Password'}
           </Button>
         </Box>
 
@@ -173,10 +322,16 @@ export default function SetPassword() {
         <Box
           flex={1}
           position="relative"
-          display="flex"
+          display={{ xs: 'none', md: 'flex' }}
           justifyContent="center"
           alignItems="center"
-          sx={{ height: '100%', width: '100%', overflow: 'hidden' }}
+          sx={{
+            minHeight: '600px',
+            width: '100%',
+            overflow: 'hidden',
+            minWidth: '300px',
+            maxWidth: '400px',
+          }}
         >
           <Box
             sx={{

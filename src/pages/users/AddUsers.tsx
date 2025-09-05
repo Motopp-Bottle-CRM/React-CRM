@@ -78,6 +78,26 @@ export function AddUsers() {
   const { state } = useLocation()
   const navigate = useNavigate()
 
+  // Countries array with phone prefixes [code, name, phone_prefix]
+  const countries = [
+    ['IN', 'India', '+91'], ['US', 'United States', '+1'], ['GB', 'United Kingdom', '+44'], ['CA', 'Canada', '+1'], ['AU', 'Australia', '+61'],
+    ['DE', 'Germany', '+49'], ['FR', 'France', '+33'], ['JP', 'Japan', '+81'], ['CN', 'China', '+86'], ['BR', 'Brazil', '+55'], ['MX', 'Mexico', '+52'], ['IT', 'Italy', '+39'],
+    ['ES', 'Spain', '+34'], ['NL', 'Netherlands', '+31'], ['CH', 'Switzerland', '+41'], ['SE', 'Sweden', '+46'], ['NO', 'Norway', '+47'], ['DK', 'Denmark', '+45'],
+    ['FI', 'Finland', '+358'], ['PL', 'Poland', '+48'], ['RU', 'Russian Federation', '+7'], ['KR', 'Korea, Republic of', '+82'], ['SG', 'Singapore', '+65'], ['TH', 'Thailand', '+66']
+  ]
+
+  // Helper function to convert country code to country name
+  const getCountryNameFromCode = (countryCode: string) => {
+    const country = countries.find(([code, name, prefix]) => code === countryCode)
+    return country ? country[1] : countryCode // Return the name if found, otherwise return the original value
+  }
+
+  // Helper function to get phone prefix for a country
+  const getPhonePrefixForCountry = (countryCode: string) => {
+    const country = countries.find(([code, name, prefix]) => code === countryCode)
+    return country ? country[2] : '+91' // Return the prefix if found, otherwise default to +91
+  }
+
   const [roleSelectOpen, setRoleSelectOpen] = useState(false)
   const [countrySelectOpen, setCountrySelectOpen] = useState(false)
   const [error, setError] = useState(false)
@@ -92,7 +112,19 @@ export function AddUsers() {
     if (type === 'checkbox') {
       setFormData({ ...formData, [name]: checked })
     } else {
-      setFormData({ ...formData, [name]: value })
+      // If country changes, update phone number prefix
+      if (name === 'country') {
+        const newPrefix = getPhonePrefixForCountry(value)
+        setFormData({
+          ...formData,
+          [name]: value,
+          // Only update phone numbers if they already have a prefix
+          phone: formData.phone.startsWith('+') ? newPrefix + ' ' : formData.phone,
+          alternate_phone: formData.alternate_phone.startsWith('+') ? newPrefix + ' ' : formData.alternate_phone
+        })
+      } else {
+        setFormData({ ...formData, [name]: value })
+      }
     }
     // setValidationErrors(({ ...validationErrors, [name]: '' }));
     // setErrors({});
@@ -101,7 +133,7 @@ export function AddUsers() {
   }
 
   const backbtnHandle = () => {
-    navigate('/app/users')
+    navigate('/app/users?tab=inactive')
   }
   const handleSubmit = (e: any) => {
     e.preventDefault()
@@ -150,14 +182,14 @@ export function AddUsers() {
     const data = {
       email: formData.email,
       role: formData.role,
-      phone: formData.phone,
-      alternate_phone: formData.alternate_phone,
+      phone: formData.phone.startsWith('+') ? formData.phone : getPhonePrefixForCountry(formData.country) + ' ' + formData.phone,
+      alternate_phone: formData.alternate_phone.startsWith('+') ? formData.alternate_phone : getPhonePrefixForCountry(formData.country) + ' ' + formData.alternate_phone,
       address_line: formData.address_line,
       street: formData.street,
       city: formData.city,
       state: formData.state,
       pincode: formData.pincode,
-      country: formData.country,
+      country: getCountryNameFromCode(formData.country),
       profile_pic: formData.profile_pic,
       has_sales_access: formData.has_sales_access,
       has_marketing_access: formData.has_marketing_access,
@@ -168,11 +200,13 @@ export function AddUsers() {
       .then((res: any) => {
         console.log('Form data:', res)
         if (!res.error) {
-          // setResponceError(data.error)
-          // navigate('/contacts')profile_errors
-
+          console.log('User created successfully, navigating to users page...')
           resetForm()
-          navigate('/app/users')
+          // Show success message briefly, then navigate
+          setMsg('User created successfully!')
+          setTimeout(() => {
+            navigate('/app/users?tab=inactive', { replace: true })
+          }, 1000)
         }
         if (res.error) {
           // profile_errors
@@ -182,7 +216,11 @@ export function AddUsers() {
           setUserErrors(res?.errors?.user_errors)
         }
       })
-      .catch(() => {})
+      .catch((error) => {
+        console.error('Error creating user:', error)
+        setError(true)
+        setMsg('An error occurred while creating the user.')
+      })
   }
   const resetForm = () => {
     setFormData({
@@ -207,6 +245,7 @@ export function AddUsers() {
   const onCancel = () => {
     resetForm()
   }
+
   const module = 'Users'
   const crntPage = 'Add Users'
   const backBtn = 'Back To Users'
@@ -223,6 +262,22 @@ export function AddUsers() {
         onSubmit={handleSubmit}
       />
       <Box sx={{ mt: '120px' }}>
+        {/* Success/Error Messages */}
+        {msg && (
+          <Box sx={{ mb: 2, px: 2 }}>
+            <div style={{
+              padding: '12px 16px',
+              borderRadius: '4px',
+              backgroundColor: error ? '#ffebee' : '#e8f5e8',
+              color: error ? '#c62828' : '#2e7d32',
+              border: `1px solid ${error ? '#ef9a9a' : '#a5d6a7'}`,
+              fontSize: '14px'
+            }}>
+              {msg}
+            </div>
+          </Box>
+        )}
+
         <form onSubmit={handleSubmit}>
           <div style={{ padding: '10px' }}>
             <div className="leadContainer">
@@ -302,7 +357,7 @@ export function AddUsers() {
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Phone Number</div>
-                        <Tooltip title="Number must starts with +91">
+                        <Tooltip title="Number must start with country code prefix">
                           <RequiredTextField
                             name="phone"
                             id="outlined-error-helper-text"
@@ -325,8 +380,8 @@ export function AddUsers() {
                       </div>
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Alternate Phone</div>
-                        <Tooltip title="Number must starts with +91">
-                          <RequiredTextField
+                        <Tooltip title="Number must start with country code prefix">
+                          <TextField
                             required
                             name="alternate_phone"
                             value={formData.alternate_phone}
@@ -410,9 +465,9 @@ export function AddUsers() {
                                                     <IconButton type='file' onChange={handleChange}
                                                     name='profile_pic' >
                                                         <Avatar src={formData.profile_pic}></Avatar></IconButton>
-                                                         Upload Files 
-                                                     </Button> 
-                                                </label> 
+                                                         Upload Files
+                                                     </Button>
+                                                </label>
                                                  <TextField
                                                     type="file"
                                                     onChange={handleChange}
@@ -421,7 +476,7 @@ export function AddUsers() {
                                                     size='small'
                                                     error={!!errors.profile_pic || !!errors?.profile_pic?.[0]}
                                                     helperText={errors.profile_pic || errors?.profile_pic?.[0] || ''}
-                                                /> 
+                                                />
                                             </div>
                                             <div className='fieldSubContainer'>
                                                 <div className='fieldTitle'>Sales Access</div>
@@ -603,12 +658,11 @@ export function AddUsers() {
                             onChange={handleChange}
                             error={!!profileErrors?.country?.[0]}
                           >
-                            {state?.countries?.length &&
-                              state?.countries.map((option: any) => (
-                                <MenuItem key={option[0]} value={option[0]}>
-                                  {option[1]}
-                                </MenuItem>
-                              ))}
+                            {countries.map((option) => (
+                              <MenuItem key={option[0]} value={option[0]}>
+                                {option[1]}
+                              </MenuItem>
+                            ))}
                           </Select>
                           <FormHelperText>
                             {profileErrors?.country?.[0]
@@ -655,7 +709,7 @@ export function AddUsers() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                         </div>
@@ -696,7 +750,7 @@ export function AddUsers() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                             <div className='fieldSubContainer'>
@@ -717,7 +771,7 @@ export function AddUsers() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                         </div>
@@ -740,7 +794,7 @@ export function AddUsers() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                             <div className='fieldSubContainer'>
@@ -761,7 +815,7 @@ export function AddUsers() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                         </div>
@@ -784,7 +838,7 @@ export function AddUsers() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                             <div className='fieldSubContainer'>
@@ -805,7 +859,7 @@ export function AddUsers() {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                         </div>
@@ -835,7 +889,7 @@ export function AddUsers() {
                                                     name='description'
                                                     minRows={8}
                                                     // defaultValue={state.editData && state.editData.description ? state.editData.description : ''}
-                                                    // onChange={onChange} 
+                                                    // onChange={onChange}
                                                     style={{ width: '70%', padding: '5px' }}
                                                     placeholder='Add Description'
                                                 />

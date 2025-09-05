@@ -1,5 +1,5 @@
 import React, { SyntheticEvent, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import {
   Box,
   Button,
@@ -25,6 +25,7 @@ import {
   Select,
   MenuItem,
   Container,
+  Alert,
 } from '@mui/material'
 import { EnhancedTableHead } from '../../components/EnchancedTableHead'
 import { getComparator, stableSort } from '../../components/Sorting'
@@ -109,7 +110,9 @@ type Item = {
 }
 export default function Users() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [tab, setTab] = useState('active')
+  const [successMessage, setSuccessMessage] = useState('')
   const [loading, setLoading] = useState(true)
   const [order, setOrder] = useState('asc')
   const [orderBy, setOrderBy] = useState('Website')
@@ -153,16 +156,35 @@ export default function Users() {
   const [inactiveLoading, setInactiveLoading] = useState(true)
 
   useEffect(() => {
+    // Read URL parameters for tab and success message
+    const urlParams = new URLSearchParams(location.search)
+    const tabParam = urlParams.get('tab')
+    if (tabParam === 'inactive') {
+      setTab('inactive')
+      setSuccessMessage('User created successfully! New user is now in the inactive tab.')
+      // Clear success message after 5 seconds
+      setTimeout(() => setSuccessMessage(''), 5000)
+    }
+  }, [location.search])
+
+  useEffect(() => {
     getUsers()
   }, [
     activeCurrentPage,
     activeRecordsPerPage,
     inactiveCurrentPage,
     inactiveRecordsPerPage,
+    tab, // Add tab as dependency to refresh data when switching tabs
   ])
 
   const handleChangeTab = (e: SyntheticEvent, val: any) => {
     setTab(val)
+    // Reset current page when switching tabs
+    if (val === 'active') {
+      setActiveCurrentPage(1)
+    } else {
+      setInactiveCurrentPage(1)
+    }
   }
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -477,8 +499,17 @@ export default function Users() {
 
   return (
     <Box sx={{ mt: '60px' }}>
+      {/* Success Message Alert */}
+      {successMessage && (
+        <Box sx={{ mb: 2, px: 2 }}>
+          <Alert severity="success" onClose={() => setSuccessMessage('')}>
+            {successMessage}
+          </Alert>
+        </Box>
+      )}
+      
       <CustomToolbar>
-        <Tabs defaultValue={tab} onChange={handleChangeTab} sx={{ mt: '26px' }}>
+        <Tabs value={tab} onChange={handleChangeTab} sx={{ mt: '26px' }}>
           <CustomTab
             value="active"
             label="Active"
@@ -744,10 +775,9 @@ export default function Users() {
                       })
                     ) : (
                       <TableRow>
-                        {' '}
                         <TableCell colSpan={8} sx={{ border: 0 }}>
                           <Spinner />
-                        </TableCell>{' '}
+                        </TableCell>
                       </TableRow>
                     )}
                   </TableBody>
@@ -852,10 +882,9 @@ export default function Users() {
                       })
                     ) : (
                       <TableRow>
-                        {' '}
                         <TableCell colSpan={8} sx={{ border: 0 }}>
                           <Spinner />
-                        </TableCell>{' '}
+                        </TableCell>
                       </TableRow>
                     )}
                   </TableBody>

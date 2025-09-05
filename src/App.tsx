@@ -26,8 +26,9 @@ function App() {
           <Route path="*" element={<Home />} />
           <Route path="/app" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/set-password" element={<SetPassword />} />
-          
+
+          <Route path="/set-password/:token" element={<SetPassword />} />
+
           {/* <Route path="/" element={<Navigate to="/contacts" replace />} /> */}
           {/* <Route
             path='/'
