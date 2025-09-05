@@ -175,7 +175,7 @@ export default function Sidebar(props: any) {
   const navIcons = (text: any, screen: any): React.ReactNode => {
     switch (text) {
       case 'leads':
-        return screen === 'leads' ? <FaUsers fill="#3e79f7" /> : <FaUsers />
+        return screen === 'leads' ? <FaUsers fill="#1A3353" /> : <FaUsers />
       case 'contacts':
         return screen === 'contacts' ? (
           <FaAddressBook fill="#3e79f7" />
@@ -294,23 +294,23 @@ export default function Sidebar(props: any) {
             style={{
               marginRight: '10px',
               display: 'flex',
-              flexDirection: 'column',
+              flexDirection: 'row',
               alignItems: 'center',
             }}
           >
             {/* <IconButton onClick={userProfile} sx={{ mr: 2 }}><FaCog /></IconButton> */}
-            <IconButton onClick={handleClick} sx={{ mr: 3 }}>
-              <Avatar
-                // src='hj'
-                sx={{ height: '27px', width: '27px' }}
-              />
-            </IconButton>
-            <Typography
+                    <Typography
   variant="body2"
-  sx={{ textAlign: 'left', mt: 0, fontWeight: 'bold', color: '#3e79f7' ,lineHeight: 1}}
+  sx={{ textAlign: 'left', mt: 0, fontWeight: 'bold', color: '#0f3389ff' ,lineHeight: 1 }}
 >
-  {email}
+   {email.charAt(0).toUpperCase() + email.slice(1)}
 </Typography>
+            <IconButton onClick={handleClick} sx={{ mr: 3 }}>
+               <Avatar sx={{ height: '27px', width: '27px',bgcolor: "#3e79f7" }}>
+      {email.charAt(0).toUpperCase()} {/* first letter only */}
+    </Avatar>
+            </IconButton>
+    
             <Popover
               anchorOrigin={{
                 vertical: 'bottom',
