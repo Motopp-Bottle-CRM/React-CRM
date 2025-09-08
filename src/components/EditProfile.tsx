@@ -159,7 +159,7 @@ export function EditProfile(props: any) {
               justifyContent: 'flex-start',
               alignItems: 'center',
               gap: '10px',
-              width: '150px',
+              width: '200px',
             }}
           >
             <FaEnvelope />
@@ -187,7 +187,7 @@ export function EditProfile(props: any) {
               justifyContent: 'flex-start',
               alignItems: 'center',
               gap: '10px',
-              width: '150px',
+              width: '200px',
             }}
           >
             <FaPhone />
@@ -209,6 +209,48 @@ export function EditProfile(props: any) {
               variant="outlined"
               size="small"
               required
+              sx={{ width: 250 }}
+            />
+          </Tooltip>
+        </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            gap: '10px',
+            mb: 2,
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              gap: '10px',
+              width: '200px',
+            }}
+          >
+            <FaPhone />
+            <Typography variant="body1" sx={{ mr: 2 }}>
+              Alternative phone
+            </Typography>
+          </Box>
+          <Tooltip title="phone must starts with + and country code">
+            <TextField
+              id="outlined-basic"
+              label="Alternate Phone"
+              value={localProfile.alternate_phone}
+              onChange={(e) =>
+                setLocalProfile({
+                  ...localProfile,
+                  alternate_phone: e.target.value,
+                })
+              }
+              variant="outlined"
+              size="small"
               sx={{ width: 250 }}
             />
           </Tooltip>
@@ -256,7 +298,7 @@ export function EditProfile(props: any) {
               justifyContent: 'flex-start',
               alignItems: 'center',
               gap: '10px',
-              width: '150px',
+              width: '200px',
             }}
           >
             <FaGlobe />
@@ -302,7 +344,7 @@ export function EditProfile(props: any) {
               justifyContent: 'flex-start',
               alignItems: 'center',
               gap: '10px',
-              width: '150px',
+              width: '200px',
             }}
           >
             <FaMailBulk />
@@ -342,7 +384,7 @@ export function EditProfile(props: any) {
               justifyContent: 'flex-start',
               alignItems: 'center',
               gap: '10px',
-              width: '150px',
+              width: '200px',
             }}
           >
             <FaMap />
@@ -382,7 +424,7 @@ export function EditProfile(props: any) {
               justifyContent: 'flex-start',
               alignItems: 'center',
               gap: '10px',
-              width: '150px',
+              width: '200px',
             }}
           >
             <FaCity />
@@ -422,7 +464,7 @@ export function EditProfile(props: any) {
               justifyContent: 'flex-start',
               alignItems: 'center',
               gap: '10px',
-              width: '150px',
+              width: '200px',
             }}
           >
             <FaHome />
@@ -462,7 +504,7 @@ export function EditProfile(props: any) {
               justifyContent: 'flex-start',
               alignItems: 'center',
               gap: '10px',
-              width: '150px',
+              width: '200px',
             }}
           >
             <FaBuilding />
