@@ -199,30 +199,26 @@ export function EditProfile(props: any) {
               Phone number
             </Typography>
           </Box>
-          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Tooltip title="phone must starts with + and country code">
-              <RequiredTextField
-                id="outlined-basic"
-                label="Phone number"
-                value={localProfile.phone}
-                onChange={(e) =>
-                  setLocalProfile({
-                    ...localProfile,
-                    phone: e.target.value.replace(/(?!^\+)\D/g, ''),
-                  })
-                }
-                variant="outlined"
-                size="small"
-                required
-                sx={{ width: 250 }}
-              />
-            </Tooltip>
-            {profileErrors && (
-              <Typography variant="body2" color="error">
-                {profileErrors.phone}
-              </Typography>
-            )}
-          </Box>
+
+          <Tooltip title="phone must starts with + and country code">
+            <RequiredTextField
+              id="outlined-basic"
+              label="Phone number"
+              value={localProfile.phone}
+              onChange={(e) =>
+                setLocalProfile({
+                  ...localProfile,
+                  phone: e.target.value.replace(/(?!^\+)\D/g, ''),
+                })
+              }
+              error={!!profileErrors.phone}
+              helperText={profileErrors.phone}
+              variant="outlined"
+              size="small"
+              required
+              sx={{ width: 250 }}
+            />
+          </Tooltip>
         </Box>
 
         <Box
@@ -250,29 +246,25 @@ export function EditProfile(props: any) {
               Alternative phone
             </Typography>
           </Box>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            <Tooltip title="phone must starts with + and country code">
-              <TextField
-                id="outlined-basic"
-                label="Alternate Phone"
-                value={localProfile.alternate_phone}
-                onChange={(e) =>
-                  setLocalProfile({
-                    ...localProfile,
-                    alternate_phone: e.target.value.replace(/(?!^\+)\D/g, ''),
-                  })
-                }
-                variant="outlined"
-                size="small"
-                sx={{ width: 250 }}
-              />
-            </Tooltip>
-            {profileErrors && (
-              <Typography variant="body2" color="error">
-                {profileErrors.alternate_phone}
-              </Typography>
-            )}
-          </Box>
+
+          <Tooltip title="phone must starts with + and country code">
+            <TextField
+              id="outlined-basic"
+              label="Alternate Phone"
+              value={localProfile.alternate_phone}
+              onChange={(e) =>
+                setLocalProfile({
+                  ...localProfile,
+                  alternate_phone: e.target.value.replace(/(?!^\+)\D/g, ''),
+                })
+              }
+              error={!!profileErrors.alternate_phone}
+              helperText={profileErrors.alternate_phone}
+              variant="outlined"
+              size="small"
+              sx={{ width: 250 }}
+            />
+          </Tooltip>
         </Box>
 
         <Box
