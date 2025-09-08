@@ -140,7 +140,7 @@ export function CustomAppBar(props: any) {
                   ':hover': { backgroundColor: '#1e3750' },
                 }}
               >
-                Cancel
+                Refresh
               </Button>
             </div>
             <div>
