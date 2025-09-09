@@ -215,12 +215,52 @@ export function EditLead() {
   }, [quill, hasInitialFocus])
 
   useEffect(() => {
-    setFormData(state?.value)
+    console.log('Setting form data from state:', state?.value);
+    console.log('Phone value:', state?.value?.phone);
+    
+    // Sanitize all string fields to remove JSX code
+    const sanitizedData = { ...state?.value };
+    
+    // Function to sanitize string fields
+    const sanitizeString = (str: string) => {
+      if (typeof str === 'string') {
+        return str.replace(/<[^>]*>/g, '').replace(/FaStar.*?\/>|<br\s*\/?>/gi, '').trim();
+      }
+      return str;
+    };
+    
+    // Sanitize all string fields
+    Object.keys(sanitizedData).forEach(key => {
+      if (typeof sanitizedData[key] === 'string') {
+        sanitizedData[key] = sanitizeString(sanitizedData[key]);
+      }
+    });
+    
+    console.log('Sanitized data:', sanitizedData);
+    setFormData(sanitizedData)
   }, [state?.id])
 
   useEffect(() => {
     if (reset) {
-      setFormData(state?.value)
+      // Sanitize all string fields to remove JSX code
+      const sanitizedData = { ...state?.value };
+      
+      // Function to sanitize string fields
+      const sanitizeString = (str: string) => {
+        if (typeof str === 'string') {
+          return str.replace(/<[^>]*>/g, '').replace(/FaStar.*?\/>|<br\s*\/?>/gi, '').trim();
+        }
+        return str;
+      };
+      
+      // Sanitize all string fields
+      Object.keys(sanitizedData).forEach(key => {
+        if (typeof sanitizedData[key] === 'string') {
+          sanitizedData[key] = sanitizeString(sanitizedData[key]);
+        }
+      });
+      
+      setFormData(sanitizedData)
       if (quill && initialContentRef.current !== null) {
         quill.clipboard.dangerouslyPasteHTML(initialContentRef.current)
       }
@@ -1142,6 +1182,16 @@ export function EditLead() {
                               errors?.phone?.[0] ? errors?.phone[0] : ''
                             }
                             error={!!errors?.phone?.[0]}
+                            inputProps={{
+                              style: { 
+                                fontSize: '14px',
+                                color: '#333'
+                              }
+                            }}
+                            onFocus={() => {
+                              console.log('Phone field focused, value:', formData.phone);
+                              console.log('Phone field type:', typeof formData.phone);
+                            }}
                           />
                         </Tooltip>
                       </div>
