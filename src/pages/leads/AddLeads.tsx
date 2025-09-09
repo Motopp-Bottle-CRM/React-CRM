@@ -28,13 +28,11 @@ import { fetchData, Header } from '../../components/FetchData'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import {
   FaArrowDown,
-  FaCheckCircle,
   FaFileUpload,
   FaPalette,
   FaPercent,
   FaPlus,
   FaTimes,
-  FaTimesCircle,
   FaUpload,
 } from 'react-icons/fa'
 import { useForm } from '../../components/UseForm'
@@ -281,16 +279,16 @@ export function AddLeads() {
     
     // console.log('Form data:', formData.lead_attachment,'sfs', formData.file);
     const data = {
-      title: formData.title || `New Lead ${Date.now()}`, // Ensure title is always provided and unique
+      title: formData.title || `New Lead ${Date.now()}`, 
       first_name: formData.first_name,
       last_name: formData.last_name,
       account_name: formData.account_name || `${formData.first_name} ${formData.last_name}`.trim() || 'Unknown Account',
-      phone: formData.phone ? (formData.phone.startsWith('+') ? formData.phone : `+31${formData.phone.replace(/\D/g, '')}`) : null, // Format phone number with country code
+      phone: formData.phone ? (formData.phone.startsWith('+') ? formData.phone : `+31${formData.phone.replace(/\D/g, '')}`) : null, 
       email: formData.email,
       opportunity_amount: formData.opportunity_amount ? parseFloat(formData.opportunity_amount) : null,
       website: formData.website,
-      description: quillContent, // Use Quill content instead of formData.description
-      status: 'assigned', // Use lowercase 'assigned' instead of 'Assigned'
+      description: quillContent, 
+      status: formData.status, 
       source: formData.source,
       address_line: formData.address_line,
       street: formData.street,
@@ -299,8 +297,8 @@ export function AddLeads() {
       postcode: formData.postcode,
       country: formData.country,
       company: formData.company,
-      organization: formData.company || 'Unknown Organization', // Ensure organization is not blank
-      probability: Math.round(Math.min(formData.probability, 100)), // Ensure probability is an integer
+      organization: formData.company || 'Unknown Organization', 
+      probability: Math.round(Math.min(formData.probability, 100)), 
       industry: formData.industry,
       skype_ID: formData.skype_ID,
     }
@@ -707,7 +705,7 @@ export function AddLeads() {
                           >
                             {state?.status?.length
                               ? state?.status.map((option: any) => (
-                                  <MenuItem key={option[0]} value={option[1]}>
+                                  <MenuItem key={option[0]} value={option[0]}>
                                     {option[1]}
                                   </MenuItem>
                                 ))
@@ -1319,60 +1317,6 @@ export function AddLeads() {
                         <div ref={quillRef} />
                       </div>
                     </div>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        mt: 1.5,
-                      }}
-                    >
-                      <Button
-                        className="header-button"
-                        onClick={resetQuillToInitialState}
-                        size="small"
-                        variant="contained"
-                        startIcon={
-                          <FaTimesCircle
-                            style={{
-                              fill: 'white',
-                              width: '16px',
-                              marginLeft: '2px',
-                            }}
-                          />
-                        }
-                        sx={{
-                          backgroundColor: '#2b5075',
-                          ':hover': { backgroundColor: '#1e3750' },
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        className="header-button"
-                        onClick={() =>
-                          setFormData({
-                            ...formData,
-                            description: quillRef.current.firstChild.innerHTML,
-                          })
-                        }
-                        variant="contained"
-                        size="small"
-                        startIcon={
-                          <FaCheckCircle
-                            style={{
-                              fill: 'white',
-                              width: '16px',
-                              marginLeft: '2px',
-                            }}
-                          />
-                        }
-                        sx={{ ml: 1 }}
-                      >
-                        Save
-                      </Button>
-                    </Box>
                   </Box>
                 </AccordionDetails>
               </Accordion>

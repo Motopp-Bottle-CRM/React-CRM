@@ -27,13 +27,11 @@ import { fetchData, Header } from '../../components/FetchData'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import {
   FaArrowDown,
-  FaCheckCircle,
   FaFileUpload,
   FaPalette,
   FaPercent,
   FaPlus,
   FaTimes,
-  FaTimesCircle,
   FaUpload,
 } from 'react-icons/fa'
 import {
@@ -789,7 +787,7 @@ export function EditLead() {
                           >
                             {state?.status?.length &&
                               state?.status.map((option: any) => (
-                                <MenuItem key={option[0]} value={option[1]}>
+                                <MenuItem key={option[0]} value={option[0]}>
                                   {option[1]}
                                 </MenuItem>
                               ))}
@@ -1399,60 +1397,6 @@ export function EditLead() {
                         <div ref={quillRef} />
                       </div>
                     </div>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        mt: 1.5,
-                      }}
-                    >
-                      <Button
-                        className="header-button"
-                        onClick={resetQuillToInitialState}
-                        size="small"
-                        variant="contained"
-                        startIcon={
-                          <FaTimesCircle
-                            style={{
-                              fill: 'white',
-                              width: '16px',
-                              marginLeft: '2px',
-                            }}
-                          />
-                        }
-                        sx={{
-                          backgroundColor: '#2b5075',
-                          ':hover': { backgroundColor: '#1e3750' },
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        className="header-button"
-                        onClick={() =>
-                          setFormData({
-                            ...formData,
-                            description: quillRef.current.firstChild.innerHTML,
-                          })
-                        }
-                        variant="contained"
-                        size="small"
-                        startIcon={
-                          <FaCheckCircle
-                            style={{
-                              fill: 'white',
-                              width: '16px',
-                              marginLeft: '2px',
-                            }}
-                          />
-                        }
-                        sx={{ ml: 1 }}
-                      >
-                        Save
-                      </Button>
-                    </Box>
                   </Box>
                 </AccordionDetails>
               </Accordion>
