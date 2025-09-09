@@ -1,5 +1,7 @@
 import React, { SyntheticEvent, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useQuill } from 'react-quilljs';
+import 'quill/dist/quill.snow.css';
 import {
   Avatar,
   AvatarGroup,
