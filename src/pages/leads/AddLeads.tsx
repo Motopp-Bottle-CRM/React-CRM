@@ -113,6 +113,7 @@ type FormErrors = {
   industry?: string[]
   skype_ID?: string[]
   file?: string[]
+  general?: string[]
 }
 interface FormData {
   title: string
@@ -268,23 +269,28 @@ export function AddLeads() {
     submitForm()
   }
   const submitForm = () => {
+    // Get the current content from Quill editor
+    const quillContent = quill ? quill.root.innerHTML : formData.description;
+    
+    // Basic validation
+    if (!formData.first_name && !formData.last_name) {
+      setError(true);
+      setErrors({ general: ['Please provide at least first name or last name'] });
+      return;
+    }
+    
     // console.log('Form data:', formData.lead_attachment,'sfs', formData.file);
     const data = {
-      title: formData.title,
+      title: formData.title || `New Lead ${Date.now()}`, // Ensure title is always provided and unique
       first_name: formData.first_name,
       last_name: formData.last_name,
-      account_name: formData.account_name,
-      phone: formData.phone,
+      account_name: formData.account_name || `${formData.first_name} ${formData.last_name}`.trim() || 'Unknown Account',
+      phone: formData.phone ? (formData.phone.startsWith('+') ? formData.phone : `+31${formData.phone.replace(/\D/g, '')}`) : null, // Format phone number with country code
       email: formData.email,
-      // lead_attachment: formData.lead_attachment,
-      lead_attachment: formData.file,
-      opportunity_amount: formData.opportunity_amount,
+      opportunity_amount: formData.opportunity_amount ? parseFloat(formData.opportunity_amount) : null,
       website: formData.website,
-      description: formData.description,
-      teams: formData.teams,
-      assigned_to: formData.assigned_to,
-      contacts: formData.contacts,
-      status: formData.status,
+      description: quillContent, // Use Quill content instead of formData.description
+      status: 'assigned', // Use lowercase 'assigned' instead of 'Assigned'
       source: formData.source,
       address_line: formData.address_line,
       street: formData.street,
@@ -292,16 +298,18 @@ export function AddLeads() {
       state: formData.state,
       postcode: formData.postcode,
       country: formData.country,
-      tags: formData.tags,
       company: formData.company,
-      probability: formData.probability,
+      organization: formData.company || 'Unknown Organization', // Ensure organization is not blank
+      probability: Math.round(Math.min(formData.probability, 100)), // Ensure probability is an integer
       industry: formData.industry,
       skype_ID: formData.skype_ID,
     }
+    
+    console.log('Submitting lead data:', data);
 
     fetchData(`${LeadUrl}/`, 'POST', JSON.stringify(data), Header)
       .then((res: any) => {
-        // console.log('Form data:', res);
+        console.log('Form data response:', res);
         if (!res.error) {
           resetForm()
           navigate('/app/leads')
@@ -311,7 +319,12 @@ export function AddLeads() {
           setErrors(res?.errors)
         }
       })
-      .catch(() => {})
+      .catch((error) => {
+        console.error('Lead creation error:', error);
+        console.error('Error details:', JSON.stringify(error, null, 2));
+        setError(true)
+        setErrors(error?.errors || { general: ['Failed to create lead. Please try again.'] })
+      })
   }
 
   const resetForm = () => {
@@ -397,6 +410,11 @@ export function AddLeads() {
                     noValidate
                     autoComplete="off"
                   >
+                    {error && errors?.general && (
+                      <div style={{ color: 'red', marginBottom: '10px', padding: '10px', backgroundColor: '#ffebee', border: '1px solid #f44336', borderRadius: '4px' }}>
+                        {errors.general[0]}
+                      </div>
+                    )}
                     <div className="fieldContainer">
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Lead Name</div>
