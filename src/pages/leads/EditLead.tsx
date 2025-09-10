@@ -84,12 +84,12 @@ import '../../styles/style.css'
 
 type FormErrors = {
   title?: string[]
+  job_title?: string[]
   first_name?: string[]
   last_name?: string[]
   account_name?: string[]
   phone?: string[]
   email?: string[]
-  lead_attachment?: string[]
   opportunity_amount?: string[]
   website?: string[]
   description?: string[]
@@ -114,6 +114,7 @@ type FormErrors = {
 }
 interface FormData {
   title: string
+  job_title: string
   first_name: string
   last_name: string
   account_name: string
@@ -170,6 +171,7 @@ export function EditLead() {
   const [errors, setErrors] = useState<FormErrors>({})
   const [formData, setFormData] = useState<FormData>({
     title: '',
+    job_title: '',
     first_name: '',
     last_name: '',
     account_name: '',
@@ -241,7 +243,10 @@ export function EditLead() {
     });
     
     console.log('Sanitized data:', sanitizedData);
-    setFormData(sanitizedData)
+    setFormData({
+      ...sanitizedData,
+      job_title: sanitizedData.job_title || ''
+    })
   }, [state?.id])
 
   useEffect(() => {
@@ -264,7 +269,10 @@ export function EditLead() {
         }
       });
       
-      setFormData(sanitizedData)
+      setFormData({
+        ...sanitizedData,
+        job_title: sanitizedData.job_title || ''
+      })
       if (quill && initialContentRef.current !== null) {
         quill.clipboard.dangerouslyPasteHTML(initialContentRef.current)
       }
@@ -391,8 +399,23 @@ export function EditLead() {
     submitForm()
   }
   const submitForm = () => {
-    const data = {
+    // Basic validation
+    if (!formData.title || formData.title.trim() === '') {
+      setError(true);
+      setErrors({ general: ['Lead Name is required'] });
+      return;
+    }
+    
+    if (!formData.first_name && !formData.last_name) {
+      setError(true);
+      setErrors({ general: ['Please provide at least first name or last name'] });
+      return;
+    }
+    
+    
+    const data: any = {
       title: formData.title,
+      job_title: formData.job_title,
       first_name: formData.first_name,
       last_name: formData.last_name,
       account_name: formData.account_name,
@@ -404,7 +427,6 @@ export function EditLead() {
       description: formData.description,
       teams: formData.teams || [],
       assigned_to: formData.assigned_to || [],
-      contacts: formData.contacts || [],
       status: formData.status,
       source: formData.source,
       address_line: formData.address_line,
@@ -414,14 +436,21 @@ export function EditLead() {
       postcode: formData.postcode,
       country: formData.country,
       tags: formData.tags || [],
-      company: formData.company ? companies.find(c => c.id === formData.company)?.name || formData.company : null,
+      company: formData.company || null,
       probability: formData.probability ? Math.round(Math.min(formData.probability, 100)) : 0,
       industry: formData.industry,
-      linkedin_id: formData.linkedin_id,
+      linkedin_id: formData.linkedin_id || '',
     }
+    
+    // Only include contacts if there are any
+    if (formData.contacts && formData.contacts.length > 0) {
+      data.contacts = formData.contacts;
+    }
+    
     console.log('EditLead - Submitting data:', data);
     console.log('EditLead - Industry value:', formData.industry);
     console.log('EditLead - Company field:', formData.company, 'Company name:', companies.find(c => c.id === formData.company)?.name);
+    console.log('EditLead - Company UUID being sent:', data.company);
     fetchData(`${LeadUrl}/${state?.id}/`, 'PUT', JSON.stringify(data), Header)
       .then((res: any) => {
         console.log('EditLead - API Response:', res);
@@ -439,13 +468,15 @@ export function EditLead() {
       })
       .catch((error) => {
         console.log('EditLead - Fetch Error:', error);
+        console.log('EditLead - Error details:', JSON.stringify(error, null, 2));
         setError(true)
-        setErrors({ general: ['An error occurred while saving the lead.'] })
+        setErrors(error?.errors || { general: ['An error occurred while saving the lead.'] })
       })
   }
   const resetForm = () => {
     setFormData({
       title: '',
+      job_title: '',
       first_name: '',
       last_name: '',
       account_name: '',
@@ -570,25 +601,26 @@ export function EditLead() {
                     <div className="fieldContainer">
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Lead Name</div>
-                        <TextField
+                        <RequiredTextField
                           ref={pageContainerRef}
                           tabIndex={-1}
                           autoFocus
-                          name="account_name"
-                          value={formData.account_name || ''}
+                          name="title"
+                          value={formData.title || ''}
                           onChange={handleChange}
                           style={{ width: '70%' }}
                           size="small"
+                          required
                           helperText={
-                            errors?.account_name?.[0]
-                              ? errors?.account_name[0]
+                            errors?.title?.[0]
+                              ? errors?.title[0]
                               : ''
                           }
-                          error={!!errors?.account_name?.[0]}
+                          error={!!errors?.title?.[0]}
                         />
                       </div>
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Amount</div>
+                        <div className="fieldTitle">Opportunity Amount</div>
                         <TextField
                           type={'number'}
                           name="opportunity_amount"
@@ -603,88 +635,6 @@ export function EditLead() {
                           }
                           error={!!errors?.opportunity_amount?.[0]}
                         />
-                      </div>
-                    </div>
-                    <div className="fieldContainer2">
-                      <div className="fieldSubContainer">
-                        <div className="fieldTitle">Website</div>
-                        <TextField
-                          name="website"
-                          value={formData.website}
-                          onChange={handleChange}
-                          style={{ width: '70%' }}
-                          size="small"
-                          helperText={
-                            errors?.website?.[0] ? errors?.website[0] : ''
-                          }
-                          error={!!errors?.website?.[0]}
-                        />
-                      </div>
-                      <div className="fieldSubContainer">
-                        <div className="fieldTitle">Contact Name</div>
-                        <FormControl
-                          error={!!errors?.contacts?.[0]}
-                          sx={{ width: '70%' }}
-                        >
-                          <Autocomplete
-                            multiple
-                            value={selectedContacts}
-                            limitTags={2}
-                            options={state.contacts || []}
-                            getOptionLabel={(option: any) =>
-                              state.contacts ? option?.first_name : option
-                            }
-                            onChange={(e: any, value: any) =>
-                              handleChange2('contacts', value)
-                            }
-                            size="small"
-                            filterSelectedOptions
-                            renderTags={(value: any, getTagProps: any) =>
-                              value.map((option: any, index: any) => (
-                                <Chip
-                                  deleteIcon={
-                                    <FaTimes style={{ width: '9px' }} />
-                                  }
-                                  sx={{
-                                    backgroundColor: 'rgba(0, 0, 0, 0.08)',
-                                    height: '18px',
-                                  }}
-                                  variant="outlined"
-                                  label={
-                                    state.contacts ? option?.first_name : option
-                                  }
-                                  {...getTagProps({ index })}
-                                />
-                              ))
-                            }
-                            popupIcon={
-                              <CustomPopupIcon>
-                                <FaPlus className="input-plus-icon" />
-                              </CustomPopupIcon>
-                            }
-                            renderInput={(params: any) => (
-                              <TextField
-                                {...params}
-                                placeholder="Add Contacts"
-                                InputProps={{
-                                  ...params.InputProps,
-                                  sx: {
-                                    '& .MuiAutocomplete-popupIndicator': {
-                                      '&:hover': { backgroundColor: 'white' },
-                                    },
-                                    '& .MuiAutocomplete-endAdornment': {
-                                      mt: '-8px',
-                                      mr: '-8px',
-                                    },
-                                  },
-                                }}
-                              />
-                            )}
-                          />
-                          <FormHelperText>
-                            {errors?.contacts?.[0] || ''}
-                          </FormHelperText>
-                        </FormControl>
                       </div>
                     </div>
                     <div className="fieldContainer2">
@@ -884,7 +834,7 @@ export function EditLead() {
                               companies.map((company: any) => (
                                 <MenuItem key={company?.id || ''} value={company?.id || ''}>
                                   {company?.name || 'Unknown Company'}
-                                </MenuItem>
+                              </MenuItem>
                               ))
                             ) : (
                               <MenuItem disabled>No companies available</MenuItem>
@@ -965,10 +915,32 @@ export function EditLead() {
                             onChange={handleChange}
                             error={!!errors?.source?.[0]}
                           >
-                            {state?.source?.length &&
-                              state?.source.map((option: any) => (
-                                <MenuItem key={option[0]} value={option[0]}>
-                                  {option[1]}
+                            {[
+                              { value: '', label: 'Select source' },
+                              { value: 'website', label: 'Website' },
+                              { value: 'phone_inquiry', label: 'Phone Inquiry' },
+                              { value: 'partner_referral', label: 'Partner Referral' },
+                              { value: 'cold_call', label: 'Cold Call' },
+                              { value: 'trade_show', label: 'Trade Show' },
+                              { value: 'employee_referral', label: 'Employee Referral' },
+                              { value: 'advertisement', label: 'Advertisement' },
+                              { value: 'social_media', label: 'Social Media' },
+                              { value: 'email_campaign', label: 'Email Campaign' },
+                              { value: 'webinar', label: 'Webinar' },
+                              { value: 'content_marketing', label: 'Content Marketing' },
+                              { value: 'seo_organic', label: 'SEO/Organic Search' },
+                              { value: 'ppc_advertising', label: 'Pay-Per-Click Advertising' },
+                              { value: 'direct_mail', label: 'Direct Mail' },
+                              { value: 'call', label: 'Call' },
+                              { value: 'email', label: 'Email' },
+                              { value: 'existing_customer', label: 'Existing Customer' },
+                              { value: 'partner', label: 'Partner' },
+                              { value: 'public_relations', label: 'Public Relations' },
+                              { value: 'campaign', label: 'Campaign' },
+                              { value: 'other', label: 'Other' }
+                            ].map((option) => (
+                              <MenuItem key={option.value} value={option.value}>
+                                {option.label}
                                 </MenuItem>
                               ))}
                           </Select>
@@ -1023,12 +995,6 @@ export function EditLead() {
                           }}
                           sx={{ width: '70%' }}
                           size="small"
-                          helperText={
-                            errors?.lead_attachment?.[0]
-                              ? errors?.lead_attachment[0]
-                              : ''
-                          }
-                          error={!!errors?.lead_attachment?.[0]}
                         />
                       </div>
                     </div>
@@ -1239,16 +1205,18 @@ export function EditLead() {
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Job Title</div>
-                        <RequiredTextField
-                          name="title"
-                          value={formData.title}
+                        <TextField
+                          name="job_title"
+                          value={formData.job_title || ''}
                           onChange={handleChange}
                           style={{ width: '70%' }}
                           size="small"
                           helperText={
-                            errors?.title?.[0] ? errors?.title[0] : ''
+                            errors?.job_title?.[0]
+                              ? errors?.job_title[0]
+                              : ''
                           }
-                          error={!!errors?.title?.[0]}
+                          error={!!errors?.job_title?.[0]}
                         />
                       </div>
                       <div className="fieldSubContainer">
@@ -1280,17 +1248,17 @@ export function EditLead() {
                     </div>
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Email Address</div>
-                        <TextField
-                          name="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={handleChange}
-                          style={{ width: '70%' }}
-                          size="small"
-                          helperText={errors?.email?.[0] ? errors?.email[0] : ''}
-                          error={!!errors?.email?.[0]}
-                        />
+                      <div className="fieldTitle">Email Address</div>
+                      <TextField
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        style={{ width: '70%' }}
+                        size="small"
+                        helperText={errors?.email?.[0] ? errors?.email[0] : ''}
+                        error={!!errors?.email?.[0]}
+                      />
                       </div>
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">LinkedIn ID</div>

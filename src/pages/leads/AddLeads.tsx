@@ -85,12 +85,12 @@ import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
 
 type FormErrors = {
   title?: string[]
+  job_title?: string[]
   first_name?: string[]
   last_name?: string[]
   account_name?: string[]
   phone?: string[]
   email?: string[]
-  lead_attachment?: string[]
   opportunity_amount?: string[]
   website?: string[]
   description?: string[]
@@ -115,6 +115,7 @@ type FormErrors = {
 }
 interface FormData {
   title: string
+  job_title: string
   first_name: string
   last_name: string
   account_name: string
@@ -168,6 +169,7 @@ export function AddLeads() {
   const [errors, setErrors] = useState<FormErrors>({})
   const [formData, setFormData] = useState<FormData>({
     title: '',
+    job_title: '',
     first_name: '',
     last_name: '',
     account_name: '',
@@ -290,18 +292,26 @@ export function AddLeads() {
     const quillContent = quill ? quill.root.innerHTML : formData.description;
     
     // Basic validation
+    if (!formData.title || formData.title.trim() === '') {
+      setError(true);
+      setErrors({ general: ['Lead Name is required'] });
+      return;
+    }
+    
     if (!formData.first_name && !formData.last_name) {
       setError(true);
       setErrors({ general: ['Please provide at least first name or last name'] });
       return;
     }
     
+    
     // console.log('Form data:', formData.lead_attachment,'sfs', formData.file);
     const data = {
       title: formData.title || `New Lead ${Date.now()}`, 
+      job_title: formData.job_title,
       first_name: formData.first_name,
       last_name: formData.last_name,
-      account_name: formData.account_name || `${formData.first_name} ${formData.last_name}`.trim() || 'Unknown Account',
+      account_name: formData.account_name || `${formData.first_name} ${formData.last_name}`.trim() + ` ${Date.now()}` || `Unknown Account ${Date.now()}`,
       phone: formData.phone ? (formData.phone.startsWith('+') ? formData.phone : `+31${formData.phone.replace(/\D/g, '')}`) : null, 
       email: formData.email,
       opportunity_amount: formData.opportunity_amount ? parseFloat(formData.opportunity_amount) : null,
@@ -322,8 +332,6 @@ export function AddLeads() {
       linkedin_id: formData.linkedin_id,
     }
     
-    console.log('Submitting lead data:', data);
-
     fetchData(`${LeadUrl}/`, 'POST', JSON.stringify(data), Header)
       .then((res: any) => {
         console.log('Form data response:', res);
@@ -347,6 +355,7 @@ export function AddLeads() {
   const resetForm = () => {
     setFormData({
       title: '',
+      job_title: '',
       first_name: '',
       last_name: '',
       account_name: '',
@@ -435,22 +444,23 @@ export function AddLeads() {
                     <div className="fieldContainer">
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Lead Name</div>
-                        <TextField
-                          name="account_name"
-                          value={formData.account_name}
+                        <RequiredTextField
+                          name="title"
+                          value={formData.title}
                           onChange={handleChange}
                           style={{ width: '70%' }}
                           size="small"
+                          required
                           helperText={
-                            errors?.account_name?.[0]
-                              ? errors?.account_name[0]
+                            errors?.title?.[0]
+                              ? errors?.title[0]
                               : ''
                           }
-                          error={!!errors?.account_name?.[0]}
+                          error={!!errors?.title?.[0]}
                         />
                       </div>
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Amount</div>
+                        <div className="fieldTitle">Opportunity Amount</div>
                         <TextField
                           type={'number'}
                           name="opportunity_amount"
@@ -465,95 +475,6 @@ export function AddLeads() {
                           }
                           error={!!errors?.opportunity_amount?.[0]}
                         />
-                      </div>
-                    </div>
-                    <div className="fieldContainer2">
-                      <div className="fieldSubContainer">
-                        <div className="fieldTitle">Website</div>
-                        <TextField
-                          name="website"
-                          value={formData.website}
-                          onChange={handleChange}
-                          style={{ width: '70%' }}
-                          size="small"
-                          helperText={
-                            errors?.website?.[0] ? errors?.website[0] : ''
-                          }
-                          error={!!errors?.website?.[0]}
-                        />
-                      </div>
-                      <div className="fieldSubContainer">
-                        <div className="fieldTitle">Contact Name</div>
-                        <FormControl
-                          error={!!errors?.contacts?.[0]}
-                          sx={{ width: '70%' }}
-                        >
-                          <Autocomplete
-                            // ref={autocompleteRef}
-                            multiple
-                            value={selectedContacts}
-                            limitTags={2}
-                            options={state?.contacts || []}
-                            // options={state.contacts ? state.contacts.map((option: any) => option) : ['']}
-                            getOptionLabel={(option: any) =>
-                              state?.contacts ? option?.first_name : option
-                            }
-                            // value={formData.contacts}
-                            // onChange={handleChange}
-                            onChange={(e: any, value: any) =>
-                              handleChange2('contacts', value)
-                            }
-                            // style={{ width: '80%' }}
-                            size="small"
-                            filterSelectedOptions
-                            renderTags={(value: any, getTagProps: any) =>
-                              value.map((option: any, index: any) => (
-                                <Chip
-                                  deleteIcon={
-                                    <FaTimes style={{ width: '9px' }} />
-                                  }
-                                  sx={{
-                                    backgroundColor: 'rgba(0, 0, 0, 0.08)',
-                                    height: '18px',
-                                  }}
-                                  variant="outlined"
-                                  label={
-                                    state?.contacts
-                                      ? option?.first_name
-                                      : option
-                                  }
-                                  {...getTagProps({ index })}
-                                />
-                              ))
-                            }
-                            popupIcon={
-                              <CustomPopupIcon>
-                                <FaPlus className="input-plus-icon" />
-                              </CustomPopupIcon>
-                            }
-                            renderInput={(params: any) => (
-                              <TextField
-                                {...params}
-                                placeholder="Add Contacts"
-                                InputProps={{
-                                  ...params.InputProps,
-                                  sx: {
-                                    '& .MuiAutocomplete-popupIndicator': {
-                                      '&:hover': { backgroundColor: 'white' },
-                                    },
-                                    '& .MuiAutocomplete-endAdornment': {
-                                      mt: '-8px',
-                                      mr: '-8px',
-                                    },
-                                  },
-                                }}
-                              />
-                            )}
-                          />
-                          <FormHelperText>
-                            {errors?.contacts?.[0] || ''}
-                          </FormHelperText>
-                        </FormControl>
                       </div>
                     </div>
                     <div className="fieldContainer2">
@@ -851,13 +772,34 @@ export function AddLeads() {
                             onChange={handleChange}
                             error={!!errors?.source?.[0]}
                           >
-                            {state?.source?.length
-                              ? state?.source.map((option: any) => (
-                                  <MenuItem key={option[0]} value={option[0]}>
-                                    {option[1]}
-                                  </MenuItem>
-                                ))
-                              : ''}
+                            {[
+                              { value: '', label: 'Select source' },
+                              { value: 'website', label: 'Website' },
+                              { value: 'phone_inquiry', label: 'Phone Inquiry' },
+                              { value: 'partner_referral', label: 'Partner Referral' },
+                              { value: 'cold_call', label: 'Cold Call' },
+                              { value: 'trade_show', label: 'Trade Show' },
+                              { value: 'employee_referral', label: 'Employee Referral' },
+                              { value: 'advertisement', label: 'Advertisement' },
+                              { value: 'social_media', label: 'Social Media' },
+                              { value: 'email_campaign', label: 'Email Campaign' },
+                              { value: 'webinar', label: 'Webinar' },
+                              { value: 'content_marketing', label: 'Content Marketing' },
+                              { value: 'seo_organic', label: 'SEO/Organic Search' },
+                              { value: 'ppc_advertising', label: 'Pay-Per-Click Advertising' },
+                              { value: 'direct_mail', label: 'Direct Mail' },
+                              { value: 'call', label: 'Call' },
+                              { value: 'email', label: 'Email' },
+                              { value: 'existing_customer', label: 'Existing Customer' },
+                              { value: 'partner', label: 'Partner' },
+                              { value: 'public_relations', label: 'Public Relations' },
+                              { value: 'campaign', label: 'Campaign' },
+                              { value: 'other', label: 'Other' }
+                            ].map((option) => (
+                              <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                              </MenuItem>
+                            ))}
                           </Select>
                           <FormHelperText>
                             {errors?.source?.[0] ? errors?.source[0] : ''}
@@ -910,12 +852,6 @@ export function AddLeads() {
                           }}
                           sx={{ width: '70%' }}
                           size="small"
-                          helperText={
-                            errors?.lead_attachment?.[0]
-                              ? errors?.lead_attachment[0]
-                              : ''
-                          }
-                          error={!!errors?.lead_attachment?.[0]}
                         />
                       </div>
                     </div>
@@ -1128,16 +1064,18 @@ export function AddLeads() {
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Job Title</div>
-                        <RequiredTextField
-                          name="title"
-                          value={formData.title}
+                        <TextField
+                          name="job_title"
+                          value={formData.job_title}
                           onChange={handleChange}
                           style={{ width: '70%' }}
                           size="small"
                           helperText={
-                            errors?.title?.[0] ? errors?.title[0] : ''
+                            errors?.job_title?.[0]
+                              ? errors?.job_title[0]
+                              : ''
                           }
-                          error={!!errors?.title?.[0]}
+                          error={!!errors?.job_title?.[0]}
                         />
                       </div>
                       <div className="fieldSubContainer">
