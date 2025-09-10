@@ -148,6 +148,10 @@ export function AddLeads() {
   const { state } = useLocation()
   const { quill, quillRef } = useQuill()
   const initialContentRef = useRef(null)
+  
+  // Debug: Log the industries data
+  console.log('AddLeads - Industries data:', state?.industries);
+  console.log('AddLeads - Industries length:', state?.industries?.length);
 
   const autocompleteRef = useRef<any>(null)
   const [error, setError] = useState(false)
@@ -611,14 +615,16 @@ export function AddLeads() {
                             name="industry"
                             value={formData.industry}
                             open={industrySelectOpen}
-                            onClick={() =>
-                              setIndustrySelectOpen(!industrySelectOpen)
-                            }
+                            onClick={() => {
+                              console.log('Industry dropdown clicked, current state:', industrySelectOpen);
+                              setIndustrySelectOpen(!industrySelectOpen);
+                            }}
                             IconComponent={() => (
                               <div
-                                onClick={() =>
-                                  setIndustrySelectOpen(!industrySelectOpen)
-                                }
+                                onClick={() => {
+                                  console.log('Industry icon clicked, current state:', industrySelectOpen);
+                                  setIndustrySelectOpen(!industrySelectOpen);
+                                }}
                                 className="select-icon-background"
                               >
                                 {industrySelectOpen ? (
@@ -640,12 +646,50 @@ export function AddLeads() {
                             }}
                           >
                             {state?.industries?.length
-                              ? state?.industries.map((option: any) => (
-                                  <MenuItem key={option[0]} value={option[1]}>
+                              ? state?.industries.map((option: any) => {
+                                  console.log('Industry option:', option);
+                                  return (
+                                    <MenuItem key={option[0]} value={option[0]}>
+                                      {option[1]}
+                                    </MenuItem>
+                                  );
+                                })
+                              : [
+                                  ['ADVERTISING', 'ADVERTISING'],
+                                  ['AGRICULTURE', 'AGRICULTURE'],
+                                  ['APPAREL & ACCESSORIES', 'APPAREL & ACCESSORIES'],
+                                  ['AUTOMOTIVE', 'AUTOMOTIVE'],
+                                  ['BANKING', 'BANKING'],
+                                  ['BIOTECHNOLOGY', 'BIOTECHNOLOGY'],
+                                  ['BUILDING MATERIALS & EQUIPMENT', 'BUILDING MATERIALS & EQUIPMENT'],
+                                  ['CHEMICAL', 'CHEMICAL'],
+                                  ['COMPUTER', 'COMPUTER'],
+                                  ['EDUCATION', 'EDUCATION'],
+                                  ['ELECTRONICS', 'ELECTRONICS'],
+                                  ['ENERGY', 'ENERGY'],
+                                  ['ENTERTAINMENT & LEISURE', 'ENTERTAINMENT & LEISURE'],
+                                  ['FINANCE', 'FINANCE'],
+                                  ['FOOD & BEVERAGE', 'FOOD & BEVERAGE'],
+                                  ['GROCERY', 'GROCERY'],
+                                  ['HEALTHCARE', 'HEALTHCARE'],
+                                  ['INSURANCE', 'INSURANCE'],
+                                  ['LEGAL', 'LEGAL'],
+                                  ['MANUFACTURING', 'MANUFACTURING'],
+                                  ['PUBLISHING', 'PUBLISHING'],
+                                  ['REAL ESTATE', 'REAL ESTATE'],
+                                  ['SERVICE', 'SERVICE'],
+                                  ['SOFTWARE', 'SOFTWARE'],
+                                  ['SPORTS', 'SPORTS'],
+                                  ['TECHNOLOGY', 'TECHNOLOGY'],
+                                  ['TELECOMMUNICATIONS', 'TELECOMMUNICATIONS'],
+                                  ['TELEVISION', 'TELEVISION'],
+                                  ['TRANSPORTATION', 'TRANSPORTATION'],
+                                  ['VENTURE CAPITAL', 'VENTURE CAPITAL']
+                                ].map((option: any) => (
+                                  <MenuItem key={option[0]} value={option[0]}>
                                     {option[1]}
                                   </MenuItem>
-                                ))
-                              : ''}
+                                ))}
                           </Select>
                           <FormHelperText>
                             {errors?.industry?.[0] ? errors?.industry[0] : ''}

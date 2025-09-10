@@ -110,6 +110,7 @@ type FormErrors = {
   industry?: string[]
   skype_ID?: string[]
   file?: string[]
+  general?: string[]
 }
 interface FormData {
   title: string
@@ -395,10 +396,11 @@ export function EditLead() {
       industry: formData.industry,
       skype_ID: formData.skype_ID,
     }
-    // console.log(data, 'edit')
+    console.log('EditLead - Submitting data:', data);
+    console.log('EditLead - Industry value:', formData.industry);
     fetchData(`${LeadUrl}/${state?.id}/`, 'PUT', JSON.stringify(data), Header)
       .then((res: any) => {
-        // console.log('Form data:', res);
+        console.log('EditLead - API Response:', res);
         if (!res.error) {
           backbtnHandle()
           // setResponceError(data.error)
@@ -406,11 +408,16 @@ export function EditLead() {
           // resetForm()
         }
         if (res.error) {
+          console.log('EditLead - API Error:', res.errors);
           setError(true)
           setErrors(res?.errors)
         }
       })
-      .catch(() => {})
+      .catch((error) => {
+        console.log('EditLead - Fetch Error:', error);
+        setError(true)
+        setErrors({ general: ['An error occurred while saving the lead.'] })
+      })
   }
   const resetForm = () => {
     setFormData({
@@ -763,37 +770,51 @@ export function EditLead() {
                           >
                             {state?.industries?.length
                               ? state?.industries.map((option: any) => (
-                                  <MenuItem key={option[0]} value={option[1]}>
+                                  <MenuItem key={option[0]} value={option[0]}>
                                     {option[1]}
                                   </MenuItem>
                                 ))
-                              : [['ADVERTISING', 'ADVERTISING']].map(
-                                  (option: any) => (
-                                    <MenuItem key={option[0]} value={option[1]}>
-                                      {option[1]}
-                                    </MenuItem>
-                                  )
-                                )}
+                              : [
+                                  ['ADVERTISING', 'ADVERTISING'],
+                                  ['AGRICULTURE', 'AGRICULTURE'],
+                                  ['APPAREL & ACCESSORIES', 'APPAREL & ACCESSORIES'],
+                                  ['AUTOMOTIVE', 'AUTOMOTIVE'],
+                                  ['BANKING', 'BANKING'],
+                                  ['BIOTECHNOLOGY', 'BIOTECHNOLOGY'],
+                                  ['BUILDING MATERIALS & EQUIPMENT', 'BUILDING MATERIALS & EQUIPMENT'],
+                                  ['CHEMICAL', 'CHEMICAL'],
+                                  ['COMPUTER', 'COMPUTER'],
+                                  ['EDUCATION', 'EDUCATION'],
+                                  ['ELECTRONICS', 'ELECTRONICS'],
+                                  ['ENERGY', 'ENERGY'],
+                                  ['ENTERTAINMENT & LEISURE', 'ENTERTAINMENT & LEISURE'],
+                                  ['FINANCE', 'FINANCE'],
+                                  ['FOOD & BEVERAGE', 'FOOD & BEVERAGE'],
+                                  ['GROCERY', 'GROCERY'],
+                                  ['HEALTHCARE', 'HEALTHCARE'],
+                                  ['INSURANCE', 'INSURANCE'],
+                                  ['LEGAL', 'LEGAL'],
+                                  ['MANUFACTURING', 'MANUFACTURING'],
+                                  ['PUBLISHING', 'PUBLISHING'],
+                                  ['REAL ESTATE', 'REAL ESTATE'],
+                                  ['SERVICE', 'SERVICE'],
+                                  ['SOFTWARE', 'SOFTWARE'],
+                                  ['SPORTS', 'SPORTS'],
+                                  ['TECHNOLOGY', 'TECHNOLOGY'],
+                                  ['TELECOMMUNICATIONS', 'TELECOMMUNICATIONS'],
+                                  ['TELEVISION', 'TELEVISION'],
+                                  ['TRANSPORTATION', 'TRANSPORTATION'],
+                                  ['VENTURE CAPITAL', 'VENTURE CAPITAL']
+                                ].map((option: any) => (
+                                  <MenuItem key={option[0]} value={option[0]}>
+                                    {option[1]}
+                                  </MenuItem>
+                                ))}
                           </Select>
                           <FormHelperText>
                             {errors?.industry?.[0] ? errors?.industry[0] : ''}
                           </FormHelperText>
                         </FormControl>
-                        {/* <FormControl sx={{ width: '70%' }} error={!!errors?.industry?.[0]}>
-                          <Select
-                            // multiple
-                            value={formData.industry}
-                            onChange={handleChange}
-                            sx={{ height: '40px', maxHeight: '40px' }}
-                          >
-                            {state?.industries?.length && state?.industries.map((option: any) => (
-                              <MenuItem key={option[0]} value={option[1]}>
-                                {option[1]}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                          <FormHelperText>{errors?.industry?.[0] ? errors?.industry[0] : ''}</FormHelperText>
-                        </FormControl> */}
                       </div>
                     </div>
                     <div className="fieldContainer2">
