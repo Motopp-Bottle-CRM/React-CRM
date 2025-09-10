@@ -109,7 +109,7 @@ type FormErrors = {
   company?: string[]
   probability?: number[]
   industry?: string[]
-  skype_ID?: string[]
+  linkedin_id?: string[]
   file?: string[]
   general?: string[]
 }
@@ -139,7 +139,7 @@ interface FormData {
   company: string
   probability: number
   industry: string
-  skype_ID: string
+  linkedin_id: string
   file: string | null
 }
 
@@ -163,6 +163,8 @@ export function AddLeads() {
   const [statusSelectOpen, setStatusSelectOpen] = useState(false)
   const [countrySelectOpen, setCountrySelectOpen] = useState(false)
   const [industrySelectOpen, setIndustrySelectOpen] = useState(false)
+  const [companySelectOpen, setCompanySelectOpen] = useState(false)
+  const [companies, setCompanies] = useState<any[]>([])
   const [errors, setErrors] = useState<FormErrors>({})
   const [formData, setFormData] = useState<FormData>({
     title: '',
@@ -190,7 +192,7 @@ export function AddLeads() {
     company: '',
     probability: 1,
     industry: 'ADVERTISING',
-    skype_ID: '',
+    linkedin_id: '',
     file: null,
   })
 
@@ -200,6 +202,19 @@ export function AddLeads() {
       initialContentRef.current = quillRef.current.firstChild.innerHTML
     }
   }, [quill])
+
+  // Fetch companies on component mount
+  useEffect(() => {
+    fetchData('leads/companies', 'GET', null, Header)
+      .then((res: any) => {
+        if (!res.error) {
+          setCompanies(res.data || [])
+        }
+      })
+      .catch((error) => {
+        console.log('Error fetching companies:', error)
+      })
+  }, [])
 
   const handleChange2 = (title: any, val: any) => {
     // const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -292,7 +307,7 @@ export function AddLeads() {
       opportunity_amount: formData.opportunity_amount ? parseFloat(formData.opportunity_amount) : null,
       website: formData.website,
       description: quillContent, 
-      status: formData.status, 
+      status: formData.status,
       source: formData.source,
       address_line: formData.address_line,
       street: formData.street,
@@ -301,10 +316,10 @@ export function AddLeads() {
       postcode: formData.postcode,
       country: formData.country,
       company: formData.company,
-      organization: formData.company || 'Unknown Organization', 
+      organization: formData.company ? companies.find(c => c.id === formData.company)?.name || 'Unknown Organization' : 'Unknown Organization', 
       probability: Math.round(Math.min(formData.probability, 100)), 
       industry: formData.industry,
-      skype_ID: formData.skype_ID,
+      linkedin_id: formData.linkedin_id,
     }
     
     console.log('Submitting lead data:', data);
@@ -356,7 +371,7 @@ export function AddLeads() {
       company: '',
       probability: 1,
       industry: 'ADVERTISING',
-      skype_ID: '',
+      linkedin_id: '',
       file: null,
     })
     setErrors({})
@@ -650,8 +665,8 @@ export function AddLeads() {
                                   console.log('Industry option:', option);
                                   return (
                                     <MenuItem key={option[0]} value={option[0]}>
-                                      {option[1]}
-                                    </MenuItem>
+                                    {option[1]}
+                                  </MenuItem>
                                   );
                                 })
                               : [
@@ -720,6 +735,52 @@ export function AddLeads() {
                     </div>
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
+                        <div className="fieldTitle">Company</div>
+                        <FormControl sx={{ width: '70%' }}>
+                          <Select
+                            name="company"
+                            value={formData.company}
+                            open={companySelectOpen}
+                            onClick={() => setCompanySelectOpen(!companySelectOpen)}
+                            IconComponent={() => (
+                              <div
+                                onClick={() => setCompanySelectOpen(!companySelectOpen)}
+                                className="select-icon-background"
+                              >
+                                {companySelectOpen ? (
+                                  <FiChevronUp className="select-icon" />
+                                ) : (
+                                  <FiChevronDown className="select-icon" />
+                                )}
+                              </div>
+                            )}
+                            className={'select'}
+                            onChange={handleChange}
+                            error={!!errors?.company?.[0]}
+                            MenuProps={{
+                              PaperProps: {
+                                style: {
+                                  height: '200px',
+                                },
+                              },
+                            }}
+                          >
+                            {companies && companies.length > 0 ? (
+                              companies.map((company: any) => (
+                                <MenuItem key={company?.id || ''} value={company?.id || ''}>
+                                  {company?.name || 'Unknown Company'}
+                                </MenuItem>
+                              ))
+                            ) : (
+                              <MenuItem disabled>No companies available</MenuItem>
+                            )}
+                          </Select>
+                          <FormHelperText>
+                            {errors?.company?.[0] ? errors?.company[0] : ''}
+                          </FormHelperText>
+                        </FormControl>
+                      </div>
+                      <div className="fieldSubContainer">
                         <div className="fieldTitle">Status</div>
                         <FormControl sx={{ width: '70%' }}>
                           <Select
@@ -759,20 +820,6 @@ export function AddLeads() {
                             {errors?.status?.[0] ? errors?.status[0] : ''}
                           </FormHelperText>
                         </FormControl>
-                      </div>
-                      <div className="fieldSubContainer">
-                        <div className="fieldTitle">SkypeID</div>
-                        <TextField
-                          name="skype_ID"
-                          value={formData.skype_ID}
-                          onChange={handleChange}
-                          style={{ width: '70%' }}
-                          size="small"
-                          helperText={
-                            errors?.skype_ID?.[0] ? errors?.skype_ID[0] : ''
-                          }
-                          error={!!errors?.skype_ID?.[0]}
-                        />
                       </div>
                     </div>
                     <div className="fieldContainer2">
@@ -1110,23 +1157,34 @@ export function AddLeads() {
                         </Tooltip>
                       </div>
                     </div>
-                    <div
-                      className="fieldSubContainer"
-                      style={{ marginLeft: '5%', marginTop: '19px' }}
-                    >
-                      <div className="fieldTitle">Email Address</div>
-                      {/* <div style={{ width: '40%', display: 'flex', flexDirection: 'row', marginTop: '19px', marginLeft: '6.6%' }}>
-                      <div style={{ marginRight: '10px', fontSize: '13px', width: '22%', textAlign: 'right', fontWeight: 'bold' }}>Email Address</div> */}
-                      <TextField
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        style={{ width: '70%' }}
-                        size="small"
-                        helperText={errors?.email?.[0] ? errors?.email[0] : ''}
-                        error={!!errors?.email?.[0]}
-                      />
+                    <div className="fieldContainer2">
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Email Address</div>
+                        <TextField
+                          name="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={handleChange}
+                          style={{ width: '70%' }}
+                          size="small"
+                          helperText={errors?.email?.[0] ? errors?.email[0] : ''}
+                          error={!!errors?.email?.[0]}
+                        />
+                      </div>
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">LinkedIn ID</div>
+                        <TextField
+                          name="linkedin_id"
+                          value={formData.linkedin_id}
+                          onChange={handleChange}
+                          style={{ width: '70%' }}
+                          size="small"
+                          helperText={
+                            errors?.linkedin_id?.[0] ? errors?.linkedin_id[0] : ''
+                          }
+                          error={!!errors?.linkedin_id?.[0]}
+                        />
+                      </div>
                     </div>
                   </Box>
                 </AccordionDetails>
