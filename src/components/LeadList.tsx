@@ -23,8 +23,8 @@ interface Lead {
   company?: { id: string; name: string } | string
   source: string
   status: string
-  assigned_to: { id: string; user__email: string }[]
   created_by: { id: string; email: string; profile_pic: string }
+  created_at: string
 }
 
 interface LeadListProps {
@@ -62,7 +62,7 @@ export default function LeadList({
               Status
             </TableCell>
             <TableCell sx={{ width: '10%', textAlign: 'center' }}>
-              Assigned To
+              Created
             </TableCell>
             <TableCell sx={{ width: '10%', textAlign: 'center' }}>
               Owner
@@ -127,11 +127,9 @@ export default function LeadList({
                 {lead.status}
               </TableCell>
 
-              {/* Assigned To */}
+              {/* created at */}
               <TableCell sx={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                {lead.assigned_to.length > 0
-                  ? lead.assigned_to.map((u) => u.user__email).join(', ')
-                  : '-'}
+                {new Date(lead.created_at).toLocaleDateString()}
               </TableCell>
 
               {/* Owner */}
