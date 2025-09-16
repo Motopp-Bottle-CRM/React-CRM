@@ -68,6 +68,7 @@ import { StyledListItemButton, StyledListItemText } from '../styles/CssStyled'
 // import MyContext, { MyContextData } from '../context/Context';
 import MyContext from '../context/Context'
 
+import { hasAccess } from '../utils/permissions'
 // declare global {
 //     interface Window {
 //         drawer: any;
@@ -84,7 +85,7 @@ export default function Sidebar(props: any) {
   //  const [userDetail, setUserDetail] = useState({ role: 'USER' });
   const [organizationModal, setOrganizationModal] = useState(false)
   // ✅ Get email from localStorage
-  const email = localStorage.getItem("email") || "No email";
+  const email = localStorage.getItem('email') || 'No email'
   const organizationModalClose = () => {
     setOrganizationModal(false)
   }
@@ -112,8 +113,10 @@ export default function Sidebar(props: any) {
     if (
       location.pathname.split('/')[1] === '' ||
       location.pathname.split('/')[1] === undefined ||
-      location.pathname.split('/')[2] === 'leads'
+      location.pathname.split('/')[2] === 'dashboard'
     ) {
+      setScreen('dashboard')
+    } else if (location.pathname.split('/')[2] === 'leads') {
       setScreen('leads')
     } else if (location.pathname.split('/')[2] === 'contacts') {
       setScreen('contacts')
@@ -158,6 +161,7 @@ export default function Sidebar(props: any) {
   }, []);*/
 
   const navList = [
+    'dashboard',
     'leads',
     'contacts',
     'opportunities',
@@ -306,18 +310,26 @@ export default function Sidebar(props: any) {
             }}
           >
             {/* <IconButton onClick={userProfile} sx={{ mr: 2 }}><FaCog /></IconButton> */}
-                    <Typography
-  variant="body2"
-  sx={{ textAlign: 'left', mt: 0, fontWeight: 'bold', color: '#0f3389ff' ,lineHeight: 1 }}
->
-   {email.charAt(0).toUpperCase() + email.slice(1)}
-</Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                textAlign: 'left',
+                mt: 0,
+                fontWeight: 'bold',
+                color: '#0f3389ff',
+                lineHeight: 1,
+              }}
+            >
+              {email.charAt(0).toUpperCase() + email.slice(1)}
+            </Typography>
             <IconButton onClick={handleClick} sx={{ mr: 3 }}>
-               <Avatar sx={{ height: '27px', width: '27px',bgcolor: "#3e79f7" }}>
-      {email.charAt(0).toUpperCase()} {/* first letter only */}
-    </Avatar>
+              <Avatar
+                sx={{ height: '27px', width: '27px', bgcolor: '#3e79f7' }}
+              >
+                {email.charAt(0).toUpperCase()} {/* first letter only */}
+              </Avatar>
             </IconButton>
-    
+
             <Popover
               anchorOrigin={{
                 vertical: 'bottom',
@@ -365,8 +377,6 @@ export default function Sidebar(props: any) {
                   </StyledListItemButton>
                 </ListItem>
 
-    
-
                 <ListItem disablePadding>
                   <StyledListItemButton
                     onClick={() => {
@@ -385,7 +395,6 @@ export default function Sidebar(props: any) {
                     />
                   </StyledListItemButton>
                 </ListItem>
-
               </List>
               {/* <Tooltip title='logout' sx={{ ml: '15px' }}>
                                 <IconButton

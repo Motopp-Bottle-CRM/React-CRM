@@ -16,5 +16,10 @@
     "noEmit": true,
     "jsx": "preserve"
   },
-  "include": ["src"]
+  "include": ["src"],
+  "paths": {
+    "@constants/*": ["constants/*"],
+    "@utils/*": ["utils/*"],
+    "@components/*": ["components/*"]
+  }
 }

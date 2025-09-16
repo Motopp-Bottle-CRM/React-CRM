@@ -39,7 +39,7 @@ type FormErrors = {
   street?: string[]
   city?: string[]
   state?: string[]
-  pincode?: string[]
+  postcode?: string[]
   country?: string[]
   // profile_pic?: string[];
   // has_sales_access?: string[];
@@ -55,7 +55,7 @@ interface FormData {
   street: string
   city: string
   state: string
-  pincode: string
+  postcode: string
   country: string
   // profile_pic: string | null,
   // has_sales_access: boolean,
@@ -68,30 +68,56 @@ export function EditUser() {
 
   // Countries array with phone prefixes [code, name, phone_prefix]
   const countries = [
-    ['IN', 'India', '+91'], ['US', 'United States', '+1'], ['GB', 'United Kingdom', '+44'], ['CA', 'Canada', '+1'], ['AU', 'Australia', '+61'],
-    ['DE', 'Germany', '+49'], ['FR', 'France', '+33'], ['JP', 'Japan', '+81'], ['CN', 'China', '+86'], ['BR', 'Brazil', '+55'], ['MX', 'Mexico', '+52'], ['IT', 'Italy', '+39'],
-    ['ES', 'Spain', '+34'], ['NL', 'Netherlands', '+31'], ['CH', 'Switzerland', '+41'], ['SE', 'Sweden', '+46'], ['NO', 'Norway', '+47'], ['DK', 'Denmark', '+45'],
-    ['FI', 'Finland', '+358'], ['PL', 'Poland', '+48'], ['RU', 'Russian Federation', '+7'], ['KR', 'Korea, Republic of', '+82'], ['SG', 'Singapore', '+65'], ['TH', 'Thailand', '+66']
+    ['IN', 'India', '+91'],
+    ['US', 'United States', '+1'],
+    ['GB', 'United Kingdom', '+44'],
+    ['CA', 'Canada', '+1'],
+    ['AU', 'Australia', '+61'],
+    ['DE', 'Germany', '+49'],
+    ['FR', 'France', '+33'],
+    ['JP', 'Japan', '+81'],
+    ['CN', 'China', '+86'],
+    ['BR', 'Brazil', '+55'],
+    ['MX', 'Mexico', '+52'],
+    ['IT', 'Italy', '+39'],
+    ['ES', 'Spain', '+34'],
+    ['NL', 'Netherlands', '+31'],
+    ['CH', 'Switzerland', '+41'],
+    ['SE', 'Sweden', '+46'],
+    ['NO', 'Norway', '+47'],
+    ['DK', 'Denmark', '+45'],
+    ['FI', 'Finland', '+358'],
+    ['PL', 'Poland', '+48'],
+    ['RU', 'Russian Federation', '+7'],
+    ['KR', 'Korea, Republic of', '+82'],
+    ['SG', 'Singapore', '+65'],
+    ['TH', 'Thailand', '+66'],
   ]
 
   // Helper function to convert country name to country code
   const getCountryCodeFromName = (countryName: string) => {
     const countriesList = state?.countries?.length ? state.countries : countries
-    const country = countriesList.find((option: any) => option[1] === countryName)
+    const country = countriesList.find(
+      (option: any) => option[1] === countryName
+    )
     return country ? country[0] : countryName // Return the code if found, otherwise return the original value
   }
 
   // Helper function to convert country code to country name
   const getCountryNameFromCode = (countryCode: string) => {
     const countriesList = state?.countries?.length ? state.countries : countries
-    const country = countriesList.find((option: any) => option[0] === countryCode)
+    const country = countriesList.find(
+      (option: any) => option[0] === countryCode
+    )
     return country ? country[1] : countryCode // Return the name if found, otherwise return the original value
   }
 
   // Helper function to get phone prefix for a country
   const getPhonePrefixForCountry = (countryCode: string) => {
     const countriesList = state?.countries?.length ? state.countries : countries
-    const country = countriesList.find((option: any) => option[0] === countryCode)
+    const country = countriesList.find(
+      (option: any) => option[0] === countryCode
+    )
     return country && country[2] ? country[2] : '+91' // Return the prefix if found, otherwise default to +91
   }
 
@@ -112,7 +138,7 @@ export function EditUser() {
     street: '',
     city: '',
     state: '',
-    pincode: '',
+    postcode: '',
     country: '',
     // profile_pic: null,
     // has_sales_access: false,
@@ -131,7 +157,7 @@ export function EditUser() {
       setReset(false)
     }
   }, [reset])
-//
+  //
 
   useEffect(() => {
     async function load() {
@@ -160,7 +186,7 @@ export function EditUser() {
                 street: data?.address?.street || '',
                 city: data?.address?.city || '',
                 state: data?.address?.state || '',
-                pincode: data?.address?.pincode || '',
+                postcode: data?.address?.postcode || '',
                 country: getCountryCodeFromName(data?.address?.country || ''),
               })
             }
@@ -174,10 +200,9 @@ export function EditUser() {
 
     load()
   }, [state?.id])
-  
-  
-//new Somayeh code
-/*
+
+  //new Somayeh code
+  /*
 useEffect(() => {
     async function load() {
       try {
@@ -205,7 +230,7 @@ useEffect(() => {
                 street: data?.address?.street || '',
                 city: data?.address?.city || '',
                 state: data?.address?.state || '',
-                pincode: data?.address?.pincode || '',
+                postcode: data?.address?.postcode || '',
                 country: data?.address?.country || '',
               })
             }
@@ -220,7 +245,7 @@ useEffect(() => {
     load()
   }, [state?.id])
 */
-      //end of Somayeh new code
+  //end of Somayeh new code
 
   const handleChange = (e: any) => {
     const { name, value, files, type, checked } = e.target
@@ -237,8 +262,12 @@ useEffect(() => {
           ...formData,
           [name]: value,
           // Only update phone numbers if they already have a prefix
-          phone: formData.phone.startsWith('+') ? newPrefix + ' ' : formData.phone,
-          alternate_phone: formData.alternate_phone.startsWith('+') ? newPrefix + ' ' : formData.alternate_phone
+          phone: formData.phone.startsWith('+')
+            ? newPrefix + ' '
+            : formData.phone,
+          alternate_phone: formData.alternate_phone.startsWith('+')
+            ? newPrefix + ' '
+            : formData.alternate_phone,
         })
       } else {
         setFormData({ ...formData, [name]: value })
@@ -296,7 +325,7 @@ useEffect(() => {
   //                     street: data?.address?.street || '',
   //                     city: data?.address?.city || '',
   //                     state: data?.address?.state || '',
-  //                     pincode: data?.address?.pincode || '',
+  //                     postcode: data?.address?.postcode || '',
   //                     country: data?.address?.country || '',
   //                     profile_pic: data?.user_details?.profile_pic || null,
   //                     has_sales_access: data.has_sales_access || false,
@@ -322,13 +351,19 @@ useEffect(() => {
     const data = {
       email: formData.email,
       role: formData.role,
-      phone: formData.phone.startsWith('+') ? formData.phone : getPhonePrefixForCountry(formData.country) + ' ' + formData.phone,
-      alternate_phone: formData.alternate_phone.startsWith('+') ? formData.alternate_phone : getPhonePrefixForCountry(formData.country) + ' ' + formData.alternate_phone,
+      phone: formData.phone.startsWith('+')
+        ? formData.phone
+        : getPhonePrefixForCountry(formData.country) + ' ' + formData.phone,
+      alternate_phone: formData.alternate_phone.startsWith('+')
+        ? formData.alternate_phone
+        : getPhonePrefixForCountry(formData.country) +
+          ' ' +
+          formData.alternate_phone,
       address_line: formData.address_line,
       street: formData.street,
       city: formData.city,
       state: formData.state,
-      pincode: formData.pincode,
+      postcode: formData.postcode,
       country: getCountryNameFromCode(formData.country),
       // profile_pic: formData.profile_pic,
       // has_sales_access: formData.has_sales_access,
@@ -360,7 +395,7 @@ useEffect(() => {
       street: '',
       city: '',
       state: '',
-      pincode: '',
+      postcode: '',
       country: '',
       // profile_pic: null,
       // has_sales_access: false,
@@ -495,7 +530,7 @@ useEffect(() => {
                       </div>
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Alternate Phone</div>
-                        <Tooltip title= "Number must start with country code prefix">
+                        <Tooltip title="Number must start with country code prefix">
                           <TextField
                             name="alternate_phone"
                             value={formData.alternate_phone}
@@ -686,21 +721,21 @@ useEffect(() => {
                     </div>
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Pincode</div>
+                        <div className="fieldTitle">postcode</div>
                         <TextField
                           required
-                          name="pincode"
-                          value={formData.pincode}
+                          name="postcode"
+                          value={formData.postcode}
                           onChange={handleChange}
                           style={{ width: '70%' }}
                           size="small"
                           error={
-                            !!profileErrors?.pincode?.[0] ||
-                            !!userErrors?.pincode?.[0]
+                            !!profileErrors?.postcode?.[0] ||
+                            !!userErrors?.postcode?.[0]
                           }
                           helperText={
-                            profileErrors?.pincode?.[0] ||
-                            userErrors?.pincode?.[0] ||
+                            profileErrors?.postcode?.[0] ||
+                            userErrors?.postcode?.[0] ||
                             ''
                           }
                         />
@@ -733,7 +768,10 @@ useEffect(() => {
                             onChange={handleChange}
                             error={!!profileErrors?.country?.[0]}
                           >
-                            {(state?.countries?.length ? state.countries : countries).map((option: any) => (
+                            {(state?.countries?.length
+                              ? state.countries
+                              : countries
+                            ).map((option: any) => (
                               <MenuItem key={option[0]} value={option[0]}>
                                 {option[1]}
                               </MenuItem>

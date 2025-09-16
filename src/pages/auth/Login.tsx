@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react'
 import { Grid, Stack, Typography, Box, TextField, Button } from '@mui/material'
 import { useGoogleLogin } from '@react-oauth/google'
@@ -10,7 +9,7 @@ import { GoogleButton } from '../../styles/CssStyled'
 import { fetchData } from '../../components/FetchData'
 import { LoginUrl, AuthUrl } from '../../services/ApiUrls'
 import '../../styles/style.css'
-console.log("Login.tsx file is loaded")
+console.log('Login.tsx file is loaded')
 
 declare global {
   interface Window {
@@ -28,50 +27,49 @@ export default function Login() {
   const [success, setSuccess] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {
-    console.log("Form is being submitted")
+    console.log('Form is being submitted')
     e.preventDefault()
     console.log('Form submitted')
     submitForm()
   }
   const submitForm = () => {
-    console.log("submitForm is running")
-  console.log('submitForm is running', { email, password })
-  console.log("Email vefore sending to server : " , email)
+    console.log('submitForm is running')
+    console.log('submitForm is running', { email, password })
+    console.log('Email vefore sending to server : ', email)
 
-  const header = {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
+    const header = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    }
+
+    fetchData(
+      `${LoginUrl}/`,
+      'POST',
+      JSON.stringify({ email, password }),
+      header
+    )
+      .then((res: any) => {
+        console.log('Response from server:', res) // <--- Add this
+        localStorage.setItem('Token', `Bearer ${res.access}`)
+        localStorage.setItem('email', email)
+        console.log('Saving email to localStorage:', email)
+        setToken(true)
+        navigate('/app') // Redirect to app after successful login
+      })
+      .catch((err: any) => {
+        console.error('Login error :', err)
+        console.log('Login error details:', err)
+        if (err.email) {
+          setError(err.email) // user not found
+        } else if (err.non_field_errors) {
+          setError(err.non_field_errors[0]) // other general errors
+        } else if (err.password) {
+          setError(err.password[0]) // password validation errors
+        } else {
+          setError('An unexpected error occurred.')
+        }
+      })
   }
-
-  fetchData(
-    `${LoginUrl}/`,
-    'POST',
-    JSON.stringify({ email, password }),
-    header
-  )
-    .then((res: any) => {
-      console.log('Response from server:', res)   // <--- Add this
-      localStorage.setItem('Token', `Bearer ${res.access}`)
-      localStorage.setItem('email', email)
-      console.log("Saving email to localStorage:", email)
-      setToken(true)
-      navigate('/app') // Redirect to app after successful login
-    })
-    .catch((err: any) => {
-      console.error('Login error :', err)
-      console.log("Login error details:", err)
-      if (err.email) {
-        setError(err.email) // user not found
-      } else if (err.non_field_errors) {
-        setError(err.non_field_errors[0]) // other general errors
-      } else if (err.password) {
-        setError(err.password[0]) // password validation errors
-      } else {
-        setError('An unexpected error occurred.')
-      }
-    })
-}
-
 
   useEffect(() => {
     if (localStorage.getItem('Token')) {
@@ -89,9 +87,6 @@ export default function Login() {
       }
       fetchData(`${AuthUrl}/`, 'POST', JSON.stringify(apiToken), head)
         .then((res: any) => {
-
-
-
           if (res.access_token) {
             localStorage.setItem('Token', `Bearer ${res.access_token}`)
             localStorage.setItem('email', res.username)
@@ -101,7 +96,6 @@ export default function Login() {
           } else {
             setError('Failed to get access token from server')
           }
-
         })
         .catch((error: any) => {
           console.error('Google login error:', error)
