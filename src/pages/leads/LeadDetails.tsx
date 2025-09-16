@@ -1186,7 +1186,7 @@ export default LeadDetails
                                             fullWidth label='Add Note'
                                             id='fullWidth' style={{ marginBottom: '30px' }}
                                             InputProps={{ disableUnderline: true }}
-                                        /> 
+                                        />
                                         <Divider light style={{ marginTop: '30px' }} />
                                         <div className='bottom-box' style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '10px', paddingTop: '9px' }}>
                                             <div>
