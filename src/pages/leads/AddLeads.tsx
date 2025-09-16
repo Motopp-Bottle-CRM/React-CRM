@@ -304,6 +304,13 @@ export function AddLeads() {
       return;
     }
     
+    // Check if user has organization set
+    if (!localStorage.getItem('org')) {
+      setError(true);
+      setErrors({ general: ['Organization not set. Please login again.'] });
+      return;
+    }
+    
     
     // console.log('Form data:', formData.lead_attachment,'sfs', formData.file);
     const data = {
@@ -348,7 +355,17 @@ export function AddLeads() {
         console.error('Lead creation error:', error);
         console.error('Error details:', JSON.stringify(error, null, 2));
         setError(true)
-        setErrors(error?.errors || { general: ['Failed to create lead. Please try again.'] })
+        
+        // Handle different types of errors
+        if (error.message && error.message.includes('Session expired')) {
+          setErrors({ general: ['Your session has expired. Please login again.'] })
+        } else if (error.message && error.message.includes('Access denied')) {
+          setErrors({ general: ['Access denied. Please check your permissions.'] })
+        } else if (error.errors) {
+          setErrors(error.errors)
+        } else {
+          setErrors({ general: ['Failed to create lead. Please try again.'] })
+        }
       })
   }
 
