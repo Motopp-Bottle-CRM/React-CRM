@@ -52,6 +52,7 @@ export default function Login() {
         console.log('Response from server:', res) // <--- Add this
         localStorage.setItem('Token', `Bearer ${res.access}`)
         localStorage.setItem('email', email)
+        localStorage.setItem('role', res.role)
         console.log('Saving email to localStorage:', email)
         setToken(true)
         navigate('/app') // Redirect to app after successful login
@@ -90,6 +91,7 @@ export default function Login() {
           if (res.access_token) {
             localStorage.setItem('Token', `Bearer ${res.access_token}`)
             localStorage.setItem('email', res.username)
+            localStorage.setItem('role', res.role)
             setToken(true)
             setSuccess('Successfully logged in with Google!')
             setError('')

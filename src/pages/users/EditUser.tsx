@@ -29,6 +29,7 @@ import { AntSwitch, RequiredTextField } from '../../styles/CssStyled'
 import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
 import '../../styles/style.css'
+import  { ROLES } from '../../constants/roles' 
 
 type FormErrors = {
   email?: string[]
@@ -495,9 +496,9 @@ useEffect(() => {
                             onChange={handleChange}
                             error={!!errors?.role?.[0]}
                           >
-                            {['ADMIN', 'USER'].map((option) => (
-                              <MenuItem key={option} value={option}>
-                                {option}
+                            {ROLES.map((role) => (
+                              <MenuItem key={role.value} value={role.value}>
+                                  {role.label}
                               </MenuItem>
                             ))}
                           </Select>

@@ -65,15 +65,11 @@ import { CaseDetails } from '../pages/cases/CaseDetails'
 import { MyProfile } from '../pages/profile/MyProfile'
 import logo from '../assets/images/auth/img_logo.png'
 import { StyledListItemButton, StyledListItemText } from '../styles/CssStyled'
-// import MyContext, { MyContextData } from '../context/Context';
 import MyContext from '../context/Context'
-
+import Dashboard from '../pages/dashboard/Dashboard'
 import { hasAccess } from '../utils/permissions'
-// declare global {
-//     interface Window {
-//         drawer: any;
-//     }
-// }
+import { ROLE_PERMISSIONS } from '../constants/role_permissions'
+import { allNavList } from '../constants/navigation_modules'
 
 export default function Sidebar(props: any) {
   const navigate = useNavigate()
@@ -82,60 +78,45 @@ export default function Sidebar(props: any) {
   const [drawerWidth, setDrawerWidth] = useState(200)
   const [headerWidth, setHeaderWidth] = useState(drawerWidth)
   const [userDetail, setUserDetail] = useState('')
-  //  const [userDetail, setUserDetail] = useState({ role: 'USER' });
   const [organizationModal, setOrganizationModal] = useState(false)
-  // ✅ Get email from localStorage
+  
   const email = localStorage.getItem('email') || 'No email'
+  const role = localStorage.getItem('role') || 'SALES'
+  
   const organizationModalClose = () => {
     setOrganizationModal(false)
   }
 
-  useEffect(() => {
-    toggleScreen()
-  }, [navigate])
 
-  // useEffect(() => {
-  // navigate('/leads')
-  // if (localStorage.getItem('Token') && localStorage.getItem('org')) {
-  //     // setScreen('contacts')
-  //     navigate('/contacts')
-  // }
-  // if (!localStorage.getItem('Token')) {
-  //     navigate('/login')
-  // }
-  // if (!localStorage.getItem('org')) {
-  //     navigate('/organization')
-  // }
-  // toggleScreen()
-  // }, [])
-  const toggleScreen = () => {
-    // console.log(location.pathname.split('/'), 'll')
-    if (
-      location.pathname.split('/')[1] === '' ||
-      location.pathname.split('/')[1] === undefined ||
-      location.pathname.split('/')[2] === 'dashboard'
-    ) {
-      setScreen('dashboard')
-    } else if (location.pathname.split('/')[2] === 'leads') {
-      setScreen('leads')
-    } else if (location.pathname.split('/')[2] === 'contacts') {
-      setScreen('contacts')
-    } else if (location.pathname.split('/')[2] === 'opportunities') {
-      setScreen('opportunities')
-    } else if (location.pathname.split('/')[2] === 'accounts') {
-      setScreen('accounts')
-    } else if (location.pathname.split('/')[2] === 'companies') {
-      setScreen('companies')
-    } else if (location.pathname.split('/')[2] === 'users') {
-      setScreen('users')
-    } else if (location.pathname.split('/')[2] === 'cases') {
-      setScreen('cases')
-    }
+
+const toggleScreen = () => {
+  const path = location.pathname.split("/")[2] || "dashboard";
+
+  const PATH_MODULE_MAP: Record<string, string> = {
+    dashboard: "dashboard",
+    leads: "leads",
+    contacts: "contacts",
+    opportunities: "opportunities",
+    accounts: "accounts",
+    companies: "companies",
+    users: "users",
+    cases: "cases",
+  };
+
+  const module = PATH_MODULE_MAP[path];
+
+  if (module && hasAccess(role, module)) {
+    setScreen(module);
+  } else {
+    setScreen("dashboard");
   }
+};
 
-  // useEffect(() => {
-  //     userProfile()
-  // }, [])
+useEffect(() => {
+  toggleScreen();
+}, [navigate, location.pathname, role]); 
+
+
 
   const userProfile = () => {
     const Header1 = {
@@ -155,80 +136,32 @@ export default function Sidebar(props: any) {
         console.error('Error:', error)
       })
   }
-  //get user details on component mount
-  /*  useEffect(() => {
-   userProfile();
-  }, []);*/
 
-  const navList = [
-    'dashboard',
-    'leads',
-    'contacts',
-    'opportunities',
-    'accounts',
-    'companies',
-    'users',
-    'cases',
-  ]
 
-  //hiding users menu from not ADMIN
-  /*
-  const filteredNavList = navList.filter((text) => {
-  if (text === 'users' && userDetail.role !== 'ADMIN') {
-    return false; // hide Users menu for non-admin
+  // forming list of menu items with icons which are allowed for this role
+  // only include modules allowed for this role
+  const navList = allNavList.filter((module) => ROLE_PERMISSIONS[role]?.includes(module))
+
+  // Map module names to icons
+  const MODULE_ICONS: Record<string, JSX.Element> = {
+    leads: <FaUsers />,
+    contacts: <FaAddressBook />,
+    opportunities: <FaHandshake />,
+    accounts: <FaBuilding />,
+    companies: <FaIndustry />,
+    users: <FaUserFriends />,
+    cases: <FaBriefcase />,
   }
-  return true; // show everything else
-});
 
-*/
-  //
-
-  const navIcons = (text: any, screen: any): React.ReactNode => {
-    switch (text) {
-      case 'leads':
-        return screen === 'leads' ? <FaUsers fill="#1A3353" /> : <FaUsers />
-      case 'contacts':
-        return screen === 'contacts' ? (
-          <FaAddressBook fill="#3e79f7" />
-        ) : (
-          <FaAddressBook />
-        )
-      case 'opportunities':
-        return screen === 'opportunities' ? (
-          <FaHandshake fill="#3e79f7" />
-        ) : (
-          <FaHandshake />
-        )
-      case 'accounts':
-        return screen === 'accounts' ? (
-          <FaBuilding fill="#3e79f7" />
-        ) : (
-          <FaBuilding />
-        )
-      case 'companies':
-        return screen === 'companies' ? (
-          <FaIndustry fill="#3e79f7" />
-        ) : (
-          <FaIndustry />
-        )
-      // case 'analytics':
-      //     return screen === 'analytics' ? <FaChartLine fill='#3e79f7' /> : <FaChartLine />
-      case 'users':
-        return screen === 'users' ? (
-          <FaUserFriends fill="#3e79f7" />
-        ) : (
-          <FaUserFriends />
-        )
-      case 'cases':
-        return screen === 'cases' ? (
-          <FaBriefcase fill="#3e79f7" />
-        ) : (
-          <FaBriefcase />
-        )
-      default:
-        return <FaDiceD6 fill="#3e79f7" />
-    }
+  // Function to return icon, with highlight if active
+  const navIcons = (module: string, activeModule: string): JSX.Element => {
+    const Icon = MODULE_ICONS[module] || <FaDiceD6 />
+    // Clone the icon element and override fill color if active
+    return React.cloneElement(Icon, {
+      fill: module === activeModule ? '#3e79f7' : undefined,
+    })
   }
+
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
 
@@ -257,8 +190,6 @@ export default function Sidebar(props: any) {
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
-            // boxShadow: 'none',
-            // borderBottom: `0.5px solid #0000001f`
             boxShadow: '1px',
           }}
         >
@@ -396,15 +327,11 @@ export default function Sidebar(props: any) {
                   </StyledListItemButton>
                 </ListItem>
               </List>
-              {/* <Tooltip title='logout' sx={{ ml: '15px' }}>
-                                <IconButton
-                                    >
-                                </IconButton>
-                            </Tooltip> */}
             </Popover>
           </Box>
         </AppBar>
-
+        
+        {/*  Creating  of the  left-side menu */}
         <Drawer
           variant="permanent"
           sx={{
@@ -450,83 +377,49 @@ export default function Sidebar(props: any) {
               overflowX: 'hidden',
             }}
           >
-            {/* {location.pathname.split('/')[1] === '' && <Contacts />}
-                {location.pathname.split('/')[1] === 'contacts' && <Contacts />}
-                {location.pathname.split('/')[2] === 'add-leads' && <AddLeads />} */}
-            {/* {location.pathname === 'leads' && <LeadList />}
-                        {screen === 'contacts' && <Contacts />} */}
-            {/* <Routes>
-                            <Route index element={<Navigate to="/contacts" replace />} />
-                            </Routes> */}
+
             <Routes>
-              <Route index element={<Leads />} />
-              {/* <Route path='/' element={<Contacts />} /> */}
+              <Route index element={<Dashboard />} />
+              {/* Leads */}
               <Route path="/app/leads" element={<Leads />} />
               <Route path="/app/leads/add-leads" element={<AddLeads />} />
               <Route path="/app/leads/edit-lead" element={<EditLead />} />
               <Route path="/app/leads/lead-details" element={<LeadDetails />} />
+              {/* Companies */}
               <Route path="/app/companies" element={<Company />} />
-              <Route
-                path="/app/companies/add-company"
-                element={<AddCompany />}
-              />
-              <Route
-                path="/app/companies/edit-company"
-                element={<EditCompany />}
-              />
-              <Route
-                path="/app/companies/company-details"
-                element={<CompanyDetails />}
-              />
+              <Route path="/app/companies/add-company" element={<AddCompany />} />
+              <Route path="/app/companies/edit-company" element={<EditCompany />} />
+              <Route path="/app/companies/company-details" element={<CompanyDetails />} />
+              {/* Contacts */}
               <Route path="/app/contacts" element={<Contacts />} />
-              <Route
-                path="/app/contacts/add-contacts"
-                element={<AddContacts />}
-              />
-              <Route
-                path="/app/contacts/contact-details"
-                element={<ContactDetails />}
-              />
-              <Route
-                path="/app/contacts/edit-contact"
-                element={<EditContact />}
-              />
+              <Route path="/app/contacts/add-contacts" element={<AddContacts />} />
+              <Route path="/app/contacts/contact-details" element={<ContactDetails />} />
+              <Route path="/app/contacts/edit-contact" element={<EditContact />} />
+              {/* Accounts */}
               <Route path="/app/accounts" element={<Accounts />} />
-              <Route
-                path="/app/accounts/add-account"
-                element={<AddAccount />}
-              />
-              <Route
-                path="/app/accounts/account-details"
-                element={<AccountDetails />}
-              />
-              <Route
-                path="/app/accounts/edit-account"
-                element={<EditAccount />}
-              />
+              <Route path="/app/accounts/add-account" element={<AddAccount />} />
+              <Route path="/app/accounts/account-details" element={<AccountDetails />}/>
+              <Route path="/app/accounts/edit-account" element={<EditAccount />} />
+              {/* Users */}
               <Route path="/app/users" element={<Users />} />
               <Route path="/app/users/add-users" element={<AddUsers />} />
               <Route path="/app/users/edit-user" element={<EditUser />} />
               <Route path="/app/users/user-details" element={<UserDetails />} />
+              {/* Opportunities */}
               <Route path="/app/opportunities" element={<Opportunities />} />
-              <Route
-                path="/app/opportunities/add-opportunity"
-                element={<AddOpportunity />}
-              />
-              <Route
-                path="/app/opportunities/opportunity-details"
-                element={<OpportunityDetails />}
-              />
-              <Route
-                path="/app/opportunities/edit-opportunity"
-                element={<EditOpportunity />}
-              />
+              <Route path="/app/opportunities/add-opportunity" element={<AddOpportunity />}/>
+              <Route path="/app/opportunities/opportunity-details" element={<OpportunityDetails />}  />
+              <Route path="/app/opportunities/edit-opportunity" element={<EditOpportunity />}  />
+               {/* Cases */}
               <Route path="/app/cases" element={<Cases />} />
               <Route path="/app/cases/add-case" element={<AddCase />} />
               <Route path="/app/cases/edit-case" element={<EditCase />} />
               <Route path="/app/cases/case-details" element={<CaseDetails />} />
+              {/* My Profile */}
               <Route path="/app/profile" element={<MyProfile />}></Route>
-            </Routes>
+            </Routes> 
+          
+          
           </Box>
         </MyContext.Provider>
         <OrganizationModal

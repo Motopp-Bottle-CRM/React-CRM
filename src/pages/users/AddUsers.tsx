@@ -41,6 +41,7 @@ import {
 } from '../../styles/CssStyled'
 import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
+import  { ROLES } from '../../constants/roles'
 
 type FormErrors = {
   email?: string[]
@@ -380,9 +381,9 @@ export function AddUsers() {
                             onChange={handleChange}
                             error={!!errors?.role?.[0]}
                           >
-                            {['ADMIN', 'USER'].map((option) => (
-                              <MenuItem key={option} value={option}>
-                                {option}
+                            {ROLES.map((role) => (
+                              <MenuItem key={role.value} value={role.value}>
+                                  {role.label}
                               </MenuItem>
                             ))}
                           </Select>
