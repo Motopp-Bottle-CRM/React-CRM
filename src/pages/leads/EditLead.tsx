@@ -197,24 +197,20 @@ export function EditLead() {
   })
 
   useEffect(() => {
-    // Scroll to the top of the page when the component mounts
-    window.scrollTo(0, 0)
-    // Set focus to the page container after the Quill editor loads its content
-    if (quill && !hasInitialFocus) {
-      quill.on('editor-change', () => {
-        if (pageContainerRef.current) {
-          pageContainerRef.current.focus()
-          setHasInitialFocus(true) // Set the flag to true after the initial focus
-        }
-      })
+  if (quill && !hasInitialFocus) {
+    const handleEditorChange = () => {
+      // Add any logic you need on editor change
+      console.log("Editor changed")
     }
-    // Cleanup: Remove event listener when the component unmounts
+
+    quill.on('editor-change', handleEditorChange)
+
     return () => {
-      if (quill) {
-        quill.off('editor-change')
-      }
+      quill.off('editor-change', handleEditorChange)
     }
-  }, [quill, hasInitialFocus])
+  }
+}, [quill, hasInitialFocus])
+
 
   useEffect(() => {
     setFormData(state?.value)

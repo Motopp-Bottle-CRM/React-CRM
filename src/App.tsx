@@ -1,15 +1,12 @@
-
-import React, { useEffect, useState } from 'react'
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-  useLocation,
-} from 'react-router-dom'
+import React from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Login from './pages/auth/Login'
 import { Home } from './pages/home/Home'
 import SetPassword from './pages/auth/SetPassword'
+import RichTextEditor from './components/RichTextEditor';
+
+
+
 
 function App() {
   return (
@@ -17,23 +14,21 @@ function App() {
       <Router>
         <Routes>
           {/* <Route
-            path='/'
+            path="/"
             element={
-              isLoggedIn ? (hasSelectedCompany ? (<Home />) : (<Navigate to='/company' />)) : (<Login />)
+              isLoggedIn ? (hasSelectedCompany ? (<Home />) : (<Navigate to="/company" />)) : (<Login />)
             }
           /> */}
-          {/* <Route path='*' element={isLoggedIn ? <Home /> : <Login />} /> */}
+          {/* <Route path="*" element={isLoggedIn ? <Home /> : <Login />} /> */}
           <Route path="*" element={<Home />} />
           <Route path="/app" element={<Home />} />
           <Route path="/login" element={<Login />} />
-
           <Route path="/set-password/:token" element={<SetPassword />} />
-
           {/* <Route path="/" element={<Navigate to="/contacts" replace />} /> */}
           {/* <Route
-            path='/'
+            path="/"
             element={isLoggedIn ? <Home /> : <Login />
-            // <Navigate to='/login' />
+            // <Navigate to="/login" />
           }
           >
           </Route> */}

@@ -104,24 +104,21 @@ function EditContact() {
   const [countrySelectOpen, setCountrySelectOpen] = useState(false)
 
   useEffect(() => {
-    // Scroll to the top of the page when the component mounts
-    window.scrollTo(0, 0)
-    // Set focus to the page container after the Quill editor loads its content
-    if (quill && !hasInitialFocus) {
-      quill.on('editor-change', () => {
-        if (pageContainerRef.current) {
-          pageContainerRef.current.focus()
-          setHasInitialFocus(true) // Set the flag to true after the initial focus
-        }
-      })
-    }
-    // Cleanup: Remove event listener when the component unmounts
-    return () => {
-      if (quill) {
-        quill.off('editor-change')
+  if (quill && !hasInitialFocus) {
+    const handleEditorChange = () => {
+      if (pageContainerRef.current) {
+        pageContainerRef.current.focus()
+        setHasInitialFocus(true)
       }
     }
-  }, [quill, hasInitialFocus])
+
+    quill.on('editor-change', handleEditorChange)
+
+    return () => {
+      quill.off('editor-change', handleEditorChange)
+    }
+  }
+}, [quill, hasInitialFocus])
 
   useEffect(() => {
     setFormData(state?.value)

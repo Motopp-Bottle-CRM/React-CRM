@@ -80,21 +80,45 @@ export function AddUsers() {
 
   // Countries array with phone prefixes [code, name, phone_prefix]
   const countries = [
-    ['IN', 'India', '+91'], ['US', 'United States', '+1'], ['GB', 'United Kingdom', '+44'], ['CA', 'Canada', '+1'], ['AU', 'Australia', '+61'],
-    ['DE', 'Germany', '+49'], ['FR', 'France', '+33'], ['JP', 'Japan', '+81'], ['CN', 'China', '+86'], ['BR', 'Brazil', '+55'], ['MX', 'Mexico', '+52'], ['IT', 'Italy', '+39'],
-    ['ES', 'Spain', '+34'], ['NL', 'Netherlands', '+31'], ['CH', 'Switzerland', '+41'], ['SE', 'Sweden', '+46'], ['NO', 'Norway', '+47'], ['DK', 'Denmark', '+45'],
-    ['FI', 'Finland', '+358'], ['PL', 'Poland', '+48'], ['RU', 'Russian Federation', '+7'], ['KR', 'Korea, Republic of', '+82'], ['SG', 'Singapore', '+65'], ['TH', 'Thailand', '+66']
+    ['IN', 'India', '+91'],
+    ['US', 'United States', '+1'],
+    ['GB', 'United Kingdom', '+44'],
+    ['CA', 'Canada', '+1'],
+    ['AU', 'Australia', '+61'],
+    ['DE', 'Germany', '+49'],
+    ['FR', 'France', '+33'],
+    ['JP', 'Japan', '+81'],
+    ['CN', 'China', '+86'],
+    ['BR', 'Brazil', '+55'],
+    ['MX', 'Mexico', '+52'],
+    ['IT', 'Italy', '+39'],
+    ['ES', 'Spain', '+34'],
+    ['NL', 'Netherlands', '+31'],
+    ['CH', 'Switzerland', '+41'],
+    ['SE', 'Sweden', '+46'],
+    ['NO', 'Norway', '+47'],
+    ['DK', 'Denmark', '+45'],
+    ['FI', 'Finland', '+358'],
+    ['PL', 'Poland', '+48'],
+    ['RU', 'Russian Federation', '+7'],
+    ['KR', 'Korea, Republic of', '+82'],
+    ['SG', 'Singapore', '+65'],
+    ['TH', 'Thailand', '+66'],
   ]
 
   // Helper function to convert country code to country name
   const getCountryNameFromCode = (countryCode: string) => {
-    const country = countries.find(([code, name, prefix]) => code === countryCode)
+    const country = countries.find(
+      ([code, name, prefix]) => code === countryCode
+    )
     return country ? country[1] : countryCode // Return the name if found, otherwise return the original value
   }
 
   // Helper function to get phone prefix for a country
   const getPhonePrefixForCountry = (countryCode: string) => {
-    const country = countries.find(([code, name, prefix]) => code === countryCode)
+    const country = countries.find(
+      ([code, name, prefix]) => code === countryCode
+    )
     return country ? country[2] : '+91' // Return the prefix if found, otherwise default to +91
   }
 
@@ -119,8 +143,12 @@ export function AddUsers() {
           ...formData,
           [name]: value,
           // Only update phone numbers if they already have a prefix
-          phone: formData.phone.startsWith('+') ? newPrefix + ' ' : formData.phone,
-          alternate_phone: formData.alternate_phone.startsWith('+') ? newPrefix + ' ' : formData.alternate_phone
+          phone: formData.phone.startsWith('+')
+            ? newPrefix + ' '
+            : formData.phone,
+          alternate_phone: formData.alternate_phone.startsWith('+')
+            ? newPrefix + ' '
+            : formData.alternate_phone,
         })
       } else {
         setFormData({ ...formData, [name]: value })
@@ -182,8 +210,14 @@ export function AddUsers() {
     const data = {
       email: formData.email,
       role: formData.role,
-      phone: formData.phone.startsWith('+') ? formData.phone : getPhonePrefixForCountry(formData.country) + ' ' + formData.phone,
-      alternate_phone: formData.alternate_phone.startsWith('+') ? formData.alternate_phone : getPhonePrefixForCountry(formData.country) + ' ' + formData.alternate_phone,
+      phone: formData.phone.startsWith('+')
+        ? formData.phone
+        : getPhonePrefixForCountry(formData.country) + ' ' + formData.phone,
+      alternate_phone: formData.alternate_phone.startsWith('+')
+        ? formData.alternate_phone
+        : getPhonePrefixForCountry(formData.country) +
+          ' ' +
+          formData.alternate_phone,
       address_line: formData.address_line,
       street: formData.street,
       city: formData.city,
@@ -265,14 +299,16 @@ export function AddUsers() {
         {/* Success/Error Messages */}
         {msg && (
           <Box sx={{ mb: 2, px: 2 }}>
-            <div style={{
-              padding: '12px 16px',
-              borderRadius: '4px',
-              backgroundColor: error ? '#ffebee' : '#e8f5e8',
-              color: error ? '#c62828' : '#2e7d32',
-              border: `1px solid ${error ? '#ef9a9a' : '#a5d6a7'}`,
-              fontSize: '14px'
-            }}>
+            <div
+              style={{
+                padding: '12px 16px',
+                borderRadius: '4px',
+                backgroundColor: error ? '#ffebee' : '#e8f5e8',
+                color: error ? '#c62828' : '#2e7d32',
+                border: `1px solid ${error ? '#ef9a9a' : '#a5d6a7'}`,
+                fontSize: '14px',
+              }}
+            >
               {msg}
             </div>
           </Box>
