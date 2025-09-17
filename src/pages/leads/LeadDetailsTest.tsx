@@ -18,6 +18,7 @@ import { useLocation } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import {
+  FaDownload,
   FaEllipsisV,
   FaPaperclip,
   FaPlus,
@@ -37,6 +38,12 @@ export default function LeadDetailsTest() {
       email: string
     }
     lead: string
+  }
+  interface RecievedAttachments {
+    id: string
+    attachment: string
+    file_name: string
+    file_path: string
   }
   interface CreatedBy {
     id: string
@@ -132,9 +139,11 @@ export default function LeadDetailsTest() {
   const [recievedComments, setRecievedComments] = useState<RecievedComments[]>(
     []
   )
+  const [recievedAttachments, setRecievedAttachments] = useState<RecievedAttachments[]>([])
   useEffect(() => {
     getLeadDetails(state?.leadId)
     getComment(state?.leadId)
+    getAttachment(state?.leadId)
   }, [state.leadId])
 
   const getLeadDetails = async (id: any) => {
@@ -194,14 +203,14 @@ export default function LeadDetailsTest() {
   const backbtnHandle = () => {
     navigate('/app/leads/')
   }
-  const saveAttachment = async () => {
+  const saveAttachment = async (id: number) => {
+
     if (attachmens.length === 0) return
 
     const formData = new FormData()
     attachmens.forEach((file) => {
       formData.append('attachment', file)
       formData.append('file_name', file.name)
-      formData.append('lead', state?.leadId)
     })
     const Header = {
       Authorization: localStorage.getItem('Token'),
@@ -209,7 +218,7 @@ export default function LeadDetailsTest() {
     }
     try {
       const response = await fetchData(
-        'leads/attachments/',
+        `leads/attachment/${id}/`,
         'POST',
         formData,
         Header
@@ -217,9 +226,27 @@ export default function LeadDetailsTest() {
 
       console.log('Upload success:', response)
       setAttachments([])
+      getAttachment(id)
     } catch (error) {
       console.error('Upload failed:', error)
     }
+  }
+
+  const getAttachment = async(id:number)=>{
+    const Header = {
+      Authorization: localStorage.getItem('Token'),
+      org: localStorage.getItem('org'),
+    }
+    try {
+      const response = await fetchData(`leads/attachment/${id}/`, 'GET', null as any, Header )
+      setRecievedAttachments(response)
+      console.log("success")
+
+    } catch (error) {
+      console.log("faild to get all attachments", error)
+
+    }
+
   }
   const saveComment = async (id: string) => {
     const Header = {
@@ -514,7 +541,7 @@ export default function LeadDetailsTest() {
                   </Button>
                 </Box>
                 <Box sx={{ padding: 2 }}>
-                  <Box sx={{ height: 100 }}>
+                  <Box sx={{ minHeight:100 }}>
                     {attachmens.map((file, index) => {
                       const url = URL.createObjectURL(file)
                       return (
@@ -550,11 +577,21 @@ export default function LeadDetailsTest() {
                     <Button
                       variant="contained"
                       size="small"
-                      onClick={saveAttachment}
+                      onClick={()=>saveAttachment(state?.leadId)}
                     >
                       {' '}
                       Save
                     </Button>
+                  </Box>
+                  <Box sx={{mt:1}}>
+
+                      {recievedAttachments.map((attachment, index)=>(
+                        <ListItem key={attachment.id}>
+                          <a href={attachment.file_path} download={attachment.file_name}>{attachment.file_name}</a>
+                        </ListItem>
+
+                      ))}
+
                   </Box>
                 </Box>
               </Box>
