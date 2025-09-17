@@ -421,7 +421,7 @@ export function EditLead() {
       account_name: formData.account_name,
       phone: formData.phone,
       email: formData.email,
-      lead_attachment: formData.file || [],
+      lead_attachment: formData.file ? [formData.file] : [],
       opportunity_amount: formData.opportunity_amount ? parseFloat(formData.opportunity_amount.toString()) : null,
       website: formData.website,
       description: formData.description,

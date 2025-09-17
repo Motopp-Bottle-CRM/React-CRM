@@ -156,6 +156,7 @@ export function AddLeads() {
 
   const autocompleteRef = useRef<any>(null)
   const [error, setError] = useState(false)
+  const [success, setSuccess] = useState(false)
   const [selectedContacts, setSelectedContacts] = useState<any[]>([])
   const [selectedAssignTo, setSelectedAssignTo] = useState<any[]>([])
   const [selectedTags, setSelectedTags] = useState<any[]>([])
@@ -343,11 +344,17 @@ export function AddLeads() {
       .then((res: any) => {
         console.log('Form data response:', res);
         if (!res.error) {
+          setSuccess(true)
+          setError(false)
           resetForm()
-          navigate('/app/leads')
+          // Show success message for 2 seconds before navigating
+          setTimeout(() => {
+            navigate('/app/leads')
+          }, 2000)
         }
         if (res.error) {
           setError(true)
+          setSuccess(false)
           setErrors(res?.errors)
         }
       })
@@ -355,6 +362,7 @@ export function AddLeads() {
         console.error('Lead creation error:', error);
         console.error('Error details:', JSON.stringify(error, null, 2));
         setError(true)
+        setSuccess(false)
         
         // Handle different types of errors
         if (error.message && error.message.includes('Session expired')) {
@@ -401,6 +409,7 @@ export function AddLeads() {
       file: null,
     })
     setErrors({})
+    setSuccess(false)
     setSelectedContacts([])
     setSelectedAssignTo([])
     setSelectedTags([])
@@ -412,6 +421,7 @@ export function AddLeads() {
   }
   const onCancel = () => {
     resetForm()
+    setError(false)
   }
 
   const backbtnHandle = () => {
@@ -456,6 +466,11 @@ export function AddLeads() {
                     {error && errors?.general && (
                       <div style={{ color: 'red', marginBottom: '10px', padding: '10px', backgroundColor: '#ffebee', border: '1px solid #f44336', borderRadius: '4px' }}>
                         {errors.general[0]}
+                      </div>
+                    )}
+                    {success && (
+                      <div style={{ color: 'green', marginBottom: '10px', padding: '10px', backgroundColor: '#e8f5e8', border: '1px solid #4caf50', borderRadius: '4px' }}>
+                        ✅ Lead created successfully! Redirecting to leads list...
                       </div>
                     )}
                     <div className="fieldContainer">
