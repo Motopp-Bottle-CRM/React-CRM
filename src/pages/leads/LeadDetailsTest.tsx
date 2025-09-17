@@ -9,6 +9,7 @@ import {
   TextField,
   ListItem,
   IconButton,
+  Tooltip,
 } from '@mui/material'
 import { greenA100 } from 'material-ui/styles/colors'
 import { fetchData } from '../../components/FetchData'
@@ -25,7 +26,18 @@ import {
   FaTimes,
   FaTrash,
 } from 'react-icons/fa'
+import { json } from 'stream/consumers'
 export default function LeadDetailsTest() {
+  interface RecievedComments {
+    id: string
+    comment: string
+    commented_on: string
+    commented_by: {
+      id: string
+      email: string
+    }
+    lead: string
+  }
   interface CreatedBy {
     id: string
     email: string
@@ -117,8 +129,12 @@ export default function LeadDetailsTest() {
   )
   const [attachmens, setAttachments] = useState<File[]>([])
   const [comment, setComment] = useState<String>('')
+  const [recievedComments, setRecievedComments] = useState<RecievedComments[]>(
+    []
+  )
   useEffect(() => {
     getLeadDetails(state?.leadId)
+    getComment(state?.leadId)
   }, [state.leadId])
 
   const getLeadDetails = async (id: any) => {
@@ -146,6 +162,28 @@ export default function LeadDetailsTest() {
       </Alert>
     }
   }
+  const getComment = async (id: string) => {
+    const Header = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: localStorage.getItem('Token'),
+      org: localStorage.getItem('org'),
+    }
+
+    // Get all comments from backend
+    try {
+      const response = await fetchData(
+        `leads/comment/${id}`,
+        'GET',
+        null as any,
+        Header
+      )
+      setRecievedComments(response)
+      console.log('get all comments successfully')
+    } catch (error) {
+      console.log('faild to get all comments', error)
+    }
+  }
   const addAttachments = (e: any) => {
     const files = e.target.files
     if (files) {
@@ -155,6 +193,59 @@ export default function LeadDetailsTest() {
   }
   const backbtnHandle = () => {
     navigate('/app/leads/')
+  }
+  const saveAttachment = async () => {
+    if (attachmens.length === 0) return
+
+    const formData = new FormData()
+    attachmens.forEach((file) => {
+      formData.append('attachment', file)
+      formData.append('file_name', file.name)
+      formData.append('lead', state?.leadId)
+    })
+    const Header = {
+      Authorization: localStorage.getItem('Token'),
+      org: localStorage.getItem('org'),
+    }
+    try {
+      const response = await fetchData(
+        'leads/attachments/',
+        'POST',
+        formData,
+        Header
+      )
+
+      console.log('Upload success:', response)
+      setAttachments([])
+    } catch (error) {
+      console.error('Upload failed:', error)
+    }
+  }
+  const saveComment = async (id: string) => {
+    const Header = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: localStorage.getItem('Token'),
+      org: localStorage.getItem('org'),
+    }
+    const body = JSON.stringify({
+      comment: comment,
+    })
+
+    try {
+      if (comment.length === 0) return
+      const response = await fetchData(
+        `leads/comment/${id}/`,
+        'POST',
+        body,
+        Header
+      )
+      console.log('Comment saved:', response)
+      setComment('')
+      getComment(id)
+    } catch (error) {
+      console.log('failed to add Notes', error)
+    }
   }
   const editHandle = () => {
     navigate('/app/leads/edit-lead', {
@@ -423,7 +514,7 @@ export default function LeadDetailsTest() {
                   </Button>
                 </Box>
                 <Box sx={{ padding: 2 }}>
-                  <Box sx={{ height: 100}}>
+                  <Box sx={{ height: 100 }}>
                     {attachmens.map((file, index) => {
                       const url = URL.createObjectURL(file)
                       return (
@@ -439,6 +530,7 @@ export default function LeadDetailsTest() {
                       )
                     })}
                   </Box>
+
                   <Box
                     sx={{
                       display: 'flex',
@@ -455,7 +547,11 @@ export default function LeadDetailsTest() {
                       {' '}
                       Cancel
                     </Button>
-                    <Button variant="contained" size="small">
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={saveAttachment}
+                    >
                       {' '}
                       Save
                     </Button>
@@ -484,7 +580,7 @@ export default function LeadDetailsTest() {
                 >
                   <Typography>Notes</Typography>
                 </Box>
-                <Box sx={{ height: 200 }}>
+                <Box sx={{}}>
                   <Box sx={{ m: 2 }}>
                     <TextField
                       label="Add Notes here ..."
@@ -511,11 +607,42 @@ export default function LeadDetailsTest() {
                         {' '}
                         Cancel
                       </Button>
-                      <Button variant="contained" size="small">
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={() => saveComment(state.leadId)}
+                      >
                         {' '}
                         Save
                       </Button>
                     </Box>
+                  </Box>
+                  <Box>
+                    {recievedComments.map((comment, index) => (
+                      <ListItem sx={{display:'flex', flexDirection:'column', gap:2, alignItems:"flex-start"}}>
+                        <Box>
+                          <Box>
+                            <Avatar sx={{backgroundColor: "#1976d2"}}></Avatar>
+                            <Typography>{comment?.commented_by?.email}</Typography>
+                          </Box>
+                          <Box>
+                            {new Date(comment.commented_on).toLocaleString("nl-NL",{
+                              year:"numeric",
+                              month:"short",
+                              day:"numeric",
+                              hour:"2-digit",
+                              minute:"2-digit"
+                            })}
+                          </Box>
+                        </Box>
+                        <Box sx={{padding:2, border:1, borderColor:"#c0b8b8ff", borderRadius:4, width:'90%'}}>{comment.comment}</Box>
+
+
+
+
+                        {/* <Typography>{comment?.commented_by?.email}</Typography> */}
+                      </ListItem>
+                    ))}
                   </Box>
                 </Box>
               </Box>
