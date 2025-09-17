@@ -240,7 +240,7 @@ useEffect(() => {
               alignItems: 'center',
             }}
           >
-            {/* <IconButton onClick={userProfile} sx={{ mr: 2 }}><FaCog /></IconButton> */}
+
             <Typography
               variant="body2"
               sx={{
@@ -380,6 +380,7 @@ useEffect(() => {
 
             <Routes>
               <Route index element={<Dashboard />} />
+              <Route path="/app/dashboard" element={<Dashboard />} />
               {/* Leads */}
               <Route path="/app/leads" element={<Leads />} />
               <Route path="/app/leads/add-leads" element={<AddLeads />} />

@@ -30,3 +30,6 @@ export const UserUrl = 'user'
 // PROFILE
 export const ProfileUrl = 'profile'
 //
+// Dashboard
+export const DashboardUrl = 'dashboard'
+//
