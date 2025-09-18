@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { fetchData } from '../../components/FetchData'
 import { DashboardUrl } from '../../services/ApiUrls'
-import { Box, Paper, Typography } from '@mui/material'
+import { Box, Paper, Stack, Typography } from '@mui/material'
 import { FaBuilding, FaAddressBook, FaUsers, FaHandshake } from 'react-icons/fa'
 import { ROLE_PERMISSIONS } from '../../constants/role_permissions'
 import { hasAccess } from '../../utils/permissions'
@@ -41,14 +41,14 @@ export default function Dashboard() {
   const role = localStorage.getItem('role') || 'SALES'  
 
   const AllDash_data = [
-    { label: 'leads', value: dash_data?.leads_count ?? 0, icon: <FaUsers size={30} /> },
-    { label: 'opportunities', value: dash_data?.opportunities_count ?? 0, icon: <FaHandshake size={30} /> },
-    { label: 'accounts', value: dash_data?.accounts_count ?? 0, icon: <FaBuilding size={30} /> },
-    { label: 'contacts', value: dash_data?.contacts_count ?? 0, icon: <FaAddressBook size={30} /> },
+    { label: 'leads', value: dash_data?.leads_count ?? 0, icon: <FaUsers size={80} /> },
+    { label: 'opportunities', value: dash_data?.opportunities_count ?? 0, icon: <FaHandshake size={80} /> },
+    { label: 'accounts', value: dash_data?.accounts_count ?? 0, icon: <FaBuilding size={80} /> },
+    { label: 'contacts', value: dash_data?.contacts_count ?? 0, icon: <FaAddressBook size={80} /> },
    ]
    
    const AllRecent_data = [
-    { key: 'leads', title: 'Recent Leads', data: dash_data?.leads, path: '/app/leads' },
+    { key: 'leads', title: 'Recent Leads', data: dash_data?.leads, path: 'leads/lead-details' },
     { key: 'opportunities', title: 'Recent Opportunities', data: dash_data?.opportunities, path: '/app/opportunities' },
     { key: 'accounts', title: 'Recent Accounts', data: dash_data?.accounts, path: '/app/accounts' },
     { key: 'contacts', title: 'Recent Contacts', data: dash_data?.contacts, path: '/app/contacts' }, 
@@ -56,83 +56,119 @@ export default function Dashboard() {
   const Dash_data = AllDash_data.filter((stat) => hasAccess(role, stat.label));
   const colors = ['#e3f2fd', '#fce4ec', '#e8f5e9', '#fff3e0']
 
+
+  
   return (
     <div style={{ padding: '20px' }}>
       <Typography variant="h4" sx={{ mb: 3 }}>
         Dashboard
       </Typography>
 
-      <Box sx={{ display: 'flex', gap: 2, p: 2 }}>
+        <Box sx={{ display: "flex", gap: 2, p: 2 }}>
         {Dash_data.map((stat, index) => (
-          <Paper
+            <Paper
             key={stat.label}
             sx={{
-              flex: 1,
-              p: 3,
-              textAlign: 'center',
-              backgroundColor: colors[index],
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'transform 0.2s, box-shadow 0.2s',
-              '&:hover': {
-                transform: 'translateY(-5px)',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
-              },
+                flex: 1,
+                p: 3,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                borderRadius: "20px", // oval effect
+                backgroundColor: colors[index],
+                transition: "transform 0.2s, box-shadow 0.2s",
+                "&:hover": {
+                transform: "translateY(-5px)",
+                boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
+                },
             }}
-          >
-            <Box sx={{ mb: 1 }}>{stat.icon}</Box>
-            <Typography variant="h6">{stat.label}</Typography>
-            <Typography variant="h4">{stat.value}</Typography>
-          </Paper>
+            >
+            {/* Left side: icon + label */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            {stat.icon}
+
+            <Box sx={{ display: "flex", flexDirection: "column" }}>
+                <Typography variant="h5">{stat.label}</Typography>
+                <Typography variant="h6" color="text.secondary">total</Typography>
+            </Box>
+            </Box>
+
+            {/* Right side: value */}
+            <Typography variant="h3" sx={{ fontWeight: "bold" }}>
+                {stat.value}
+            </Typography>
+            </Paper>
         ))}
-      </Box>
+        </Box>
       
 
         <Box sx={{ display: 'flex', gap: 2, mt: 4, flexWrap: 'wrap' }}>
         {AllRecent_data.map((item, index) => {
             if (!hasAccess(role, item.key)) return null; // роль не має доступу
-            const colorPalette = ['#e3f2fd', '#fce4ec', '#e8f5e9', '#fff3e0'];
+
             return (
-            <Paper
-                key={item.key}
+           <Box key={item.key} sx={{ flex: 1, minWidth: 220 }}>
+            {/* Title above card */}
+            <Box
                 sx={{
-                flex: 1,
-                minWidth: 220,
-                p: 3,
-                textAlign: 'center',
-                backgroundColor: colorPalette[index],
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
+                textAlign: "center",
                 }}
             >
-                <Typography variant="h6" sx={{ mb: 1 }}>{item.title}</Typography>
+                <Typography variant="h5">{item.title}</Typography>
+            </Box>
+
+            {/* Card */}
+            <Paper
+                sx={{
+                p: 3,
+                backgroundColor: "#f5f5f5", // light grey background
+                border: `1px solid #1A3353`, // colorful border
+                borderRadius: "20px", // oval border
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                textAlign: "center",
+                transition: "transform 0.2s, box-shadow 0.2s",
+                }}
+            >
                 <Box sx={{ mb: 1 }}>
                 {item.data?.slice(-3).map((entry: any, idx: number) => (
-                    <Typography key={idx} variant="body2">
-                    {entry.name || entry.title || `#${entry.id ?? idx}`}
+                    <Typography
+                    key={idx}
+                    variant="body2"
+                    sx={{ fontWeight: "bold", textAlign: "left", display: "block" }}
+                    >
+                    <div
+                        style={{
+                        color: "#1A3353",
+                        fontSize: "16px",
+                        marginBottom: 0,
+                        }}
+                    >
+                        {entry.name || entry.title || `#${entry.id ?? idx}`}
+                    </div>
+                    <div style={{
+                              color: 'gray',
+                              fontSize: '10px',
+                              marginTop: 0,
+                        }}
+                    >
+                        <ul>
+                            <li> country - <span style={{ color: '#1a3353' }}> {entry?.country || ''}</span></li>
+                            <li> source - 
+                            <span style={{ color: '#1a3353', fontWeight: 700 }}>
+                              {entry?.source || '--'}</span></li>
+                            <li>status - 
+                            <span style={{ color: '#1a3353', fontWeight: 700 }}>
+                              {entry?.status || '--'}</span></li>
+                        </ul>
+                            
+                    </div>
                     </Typography>
                 ))}
                 </Box>
-                    <Box sx={{ mb: 1 }}>
-                    {item.data?.slice(-3).map((entry: any, idx: number) => (
-                        <Typography
-                        key={idx}
-                        variant="body2"
-                        sx={{ fontWeight: 'bold', textAlign: 'left', display: 'block' }}
-                        >
-                        <Link 
-                            to={`/app/${item.key}/${entry.id}`} 
-                            style={{ textDecoration: 'none', color: '#1e88e5' }}
-                        >
-                            {entry.name || entry.title || `#${entry.id ?? idx}`}
-                        </Link>
-                        </Typography>
-                    ))}
-                    </Box>
             </Paper>
+            </Box>
             )
         })}
         </Box>
