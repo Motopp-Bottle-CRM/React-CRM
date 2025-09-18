@@ -70,6 +70,8 @@ import Dashboard from '../pages/dashboard/Dashboard'
 import { hasAccess } from '../utils/permissions'
 import { ROLE_PERMISSIONS } from '../constants/role_permissions'
 import { allNavList } from '../constants/navigation_modules'
+import NotFounded from  '../pages/NotFounded'
+import ProtectedRoute from "../components/ProtectedRoute";
 
 export default function Sidebar(props: any) {
   const navigate = useNavigate()
@@ -379,45 +381,254 @@ useEffect(() => {
           >
 
             <Routes>
+              {/* Dashboard */}
               <Route index element={<Dashboard />} />
               <Route path="/app/dashboard" element={<Dashboard />} />
+
               {/* Leads */}
-              <Route path="/app/leads" element={<Leads />} />
-              <Route path="/app/leads/add-leads" element={<AddLeads />} />
-              <Route path="/app/leads/edit-lead" element={<EditLead />} />
-              <Route path="/app/leads/lead-details" element={<LeadDetails />} />
+              <Route
+                path="/app/leads"
+                element={
+                  <ProtectedRoute role={role} module="leads">
+                    <Leads />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/leads/add-leads"
+                element={
+                  <ProtectedRoute role={role} module="leads">
+                    <AddLeads />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/leads/edit-lead"
+                element={
+                  <ProtectedRoute role={role} module="leads">
+                    <EditLead />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/leads/lead-details"
+                element={
+                  <ProtectedRoute role={role} module="leads">
+                    <LeadDetails />
+                  </ProtectedRoute>
+                }
+              />
+
               {/* Companies */}
-              <Route path="/app/companies" element={<Company />} />
-              <Route path="/app/companies/add-company" element={<AddCompany />} />
-              <Route path="/app/companies/edit-company" element={<EditCompany />} />
-              <Route path="/app/companies/company-details" element={<CompanyDetails />} />
+              <Route
+                path="/app/companies"
+                element={
+                  <ProtectedRoute role={role} module="companies">
+                    <Company />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/companies/add-company"
+                element={
+                  <ProtectedRoute role={role} module="companies">
+                    <AddCompany />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/companies/edit-company"
+                element={
+                  <ProtectedRoute role={role} module="companies">
+                    <EditCompany />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/companies/company-details"
+                element={
+                  <ProtectedRoute role={role} module="companies">
+                    <CompanyDetails />
+                  </ProtectedRoute>
+                }
+              />
+
               {/* Contacts */}
-              <Route path="/app/contacts" element={<Contacts />} />
-              <Route path="/app/contacts/add-contacts" element={<AddContacts />} />
-              <Route path="/app/contacts/contact-details" element={<ContactDetails />} />
-              <Route path="/app/contacts/edit-contact" element={<EditContact />} />
+              <Route
+                path="/app/contacts"
+                element={
+                  <ProtectedRoute role={role} module="contacts">
+                    <Contacts />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/contacts/add-contacts"
+                element={
+                  <ProtectedRoute role={role} module="contacts">
+                    <AddContacts />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/contacts/contact-details"
+                element={
+                  <ProtectedRoute role={role} module="contacts">
+                    <ContactDetails />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/contacts/edit-contact"
+                element={
+                  <ProtectedRoute role={role} module="contacts">
+                    <EditContact />
+                  </ProtectedRoute>
+                }
+              />
+
               {/* Accounts */}
-              <Route path="/app/accounts" element={<Accounts />} />
-              <Route path="/app/accounts/add-account" element={<AddAccount />} />
-              <Route path="/app/accounts/account-details" element={<AccountDetails />}/>
-              <Route path="/app/accounts/edit-account" element={<EditAccount />} />
+              <Route
+                path="/app/accounts"
+                element={
+                  <ProtectedRoute role={role} module="accounts">
+                    <Accounts />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/accounts/add-account"
+                element={
+                  <ProtectedRoute role={role} module="accounts">
+                    <AddAccount />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/accounts/edit-account"
+                element={
+                  <ProtectedRoute role={role} module="accounts">
+                    <EditAccount />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/accounts/account-details"
+                element={
+                  <ProtectedRoute role={role} module="accounts">
+                    <AccountDetails />
+                  </ProtectedRoute>
+                }
+              />
+
               {/* Users */}
-              <Route path="/app/users" element={<Users />} />
-              <Route path="/app/users/add-users" element={<AddUsers />} />
-              <Route path="/app/users/edit-user" element={<EditUser />} />
-              <Route path="/app/users/user-details" element={<UserDetails />} />
+              <Route
+                path="/app/users"
+                element={
+                  <ProtectedRoute role={role} module="users">
+                    <Users />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/users/add-users"
+                element={
+                  <ProtectedRoute role={role} module="users">
+                    <AddUsers />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/users/edit-user"
+                element={
+                  <ProtectedRoute role={role} module="users">
+                    <EditUser />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/users/user-details"
+                element={
+                  <ProtectedRoute role={role} module="users">
+                    <UserDetails />
+                  </ProtectedRoute>
+                }
+              />
+
               {/* Opportunities */}
-              <Route path="/app/opportunities" element={<Opportunities />} />
-              <Route path="/app/opportunities/add-opportunity" element={<AddOpportunity />}/>
-              <Route path="/app/opportunities/opportunity-details" element={<OpportunityDetails />}  />
-              <Route path="/app/opportunities/edit-opportunity" element={<EditOpportunity />}  />
-               {/* Cases */}
-              <Route path="/app/cases" element={<Cases />} />
-              <Route path="/app/cases/add-case" element={<AddCase />} />
-              <Route path="/app/cases/edit-case" element={<EditCase />} />
-              <Route path="/app/cases/case-details" element={<CaseDetails />} />
+              <Route
+                path="/app/opportunities"
+                element={
+                  <ProtectedRoute role={role} module="opportunities">
+                    <Opportunities />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/opportunities/add-opportunity"
+                element={
+                  <ProtectedRoute role={role} module="opportunities">
+                    <AddOpportunity />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/opportunities/opportunity-details"
+                element={
+                  <ProtectedRoute role={role} module="opportunities">
+                    <OpportunityDetails />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/opportunities/edit-opportunity"
+                element={
+                  <ProtectedRoute role={role} module="opportunities">
+                    <EditOpportunity />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Cases */}
+              <Route
+                path="/app/cases"
+                element={
+                  <ProtectedRoute role={role} module="cases">
+                    <Cases />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/cases/add-case"
+                element={
+                  <ProtectedRoute role={role} module="cases">
+                    <AddCase />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/cases/edit-case"
+                element={
+                  <ProtectedRoute role={role} module="cases">
+                    <EditCase />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/cases/case-details"
+                element={
+                  <ProtectedRoute role={role} module="cases">
+                    <CaseDetails />
+                  </ProtectedRoute>
+                }
+              />
+
               {/* My Profile */}
-              <Route path="/app/profile" element={<MyProfile />}></Route>
+              <Route path="/app/profile" element={<MyProfile />} />
+
+              {/* Not Found */}
+              <Route path="/not-found" element={<NotFounded />} />
+              <Route path="*" element={<NotFounded />} />
             </Routes> 
           
           
