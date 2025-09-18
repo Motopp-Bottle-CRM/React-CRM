@@ -40,14 +40,20 @@ export default function Dashboard() {
     const navigate = useNavigate();
   const role = localStorage.getItem('role') || 'SALES'  
 
-  const Allstats = [
+  const AllDash_data = [
     { label: 'leads', value: dash_data?.leads_count ?? 0, icon: <FaUsers size={30} /> },
     { label: 'opportunities', value: dash_data?.opportunities_count ?? 0, icon: <FaHandshake size={30} /> },
     { label: 'accounts', value: dash_data?.accounts_count ?? 0, icon: <FaBuilding size={30} /> },
     { label: 'contacts', value: dash_data?.contacts_count ?? 0, icon: <FaAddressBook size={30} /> },
    ]
-
-  const stats = Allstats.filter((stat) => hasAccess(role, stat.label));
+   
+   const AllRecent_data = [
+    { key: 'leads', title: 'Recent Leads', data: dash_data?.leads, path: '/app/leads' },
+    { key: 'opportunities', title: 'Recent Opportunities', data: dash_data?.opportunities, path: '/app/opportunities' },
+    { key: 'accounts', title: 'Recent Accounts', data: dash_data?.accounts, path: '/app/accounts' },
+    { key: 'contacts', title: 'Recent Contacts', data: dash_data?.contacts, path: '/app/contacts' }, 
+   ]
+  const Dash_data = AllDash_data.filter((stat) => hasAccess(role, stat.label));
   const colors = ['#e3f2fd', '#fce4ec', '#e8f5e9', '#fff3e0']
 
   return (
@@ -57,7 +63,7 @@ export default function Dashboard() {
       </Typography>
 
       <Box sx={{ display: 'flex', gap: 2, p: 2 }}>
-        {stats.map((stat, index) => (
+        {Dash_data.map((stat, index) => (
           <Paper
             key={stat.label}
             sx={{
@@ -84,62 +90,52 @@ export default function Dashboard() {
       </Box>
       
 
- <Box sx={{ display: 'flex', gap: 2, mt: 4, flexWrap: 'wrap' }}>
-  {[
-    { key: 'leads', title: 'Last Leads', data: dash_data?.leads, path: '/app/leads' },
-    { key: 'contacts', title: 'Last Contacts', data: dash_data?.contacts, path: '/app/contacts' },
-    { key: 'opportunities', title: 'Last Opportunities', data: dash_data?.opportunities, path: '/app/opportunities' },
-    { key: 'accounts', title: 'Last Accounts', data: dash_data?.accounts, path: '/app/accounts' },
-  ].map((item, index) => {
-    if (!hasAccess(role, item.key)) return null; // роль не має доступу
-    const colorPalette = ['#e3f2fd', '#fce4ec', '#e8f5e9', '#fff3e0'];
-    return (
-      <Paper
-        key={item.key}
-        sx={{
-          flex: 1,
-          minWidth: 220,
-          p: 3,
-          textAlign: 'center',
-          backgroundColor: colorPalette[index],
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          transition: 'transform 0.2s, box-shadow 0.2s',
-          '&:hover': {
-            transform: 'translateY(-5px)',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
-          },
-        }}
-      >
-        <Typography variant="h6" sx={{ mb: 1 }}>{item.title}</Typography>
-        <Box sx={{ mb: 1 }}>
-          {item.data?.slice(-3).map((entry: any, idx: number) => (
-            <Typography key={idx} variant="body2">
-              {entry.name || entry.title || `#${entry.id ?? idx}`}
-            </Typography>
-          ))}
-        </Box>
-            <Box sx={{ mb: 1 }}>
-            {item.data?.slice(-3).map((entry: any, idx: number) => (
-                <Typography
-                key={idx}
-                variant="body2"
-                sx={{ fontWeight: 'bold', textAlign: 'left', display: 'block' }}
-                >
-                <Link 
-                    to={`/app/${item.key}/${entry.id}`} 
-                    style={{ textDecoration: 'none', color: '#1e88e5' }}
-                >
+        <Box sx={{ display: 'flex', gap: 2, mt: 4, flexWrap: 'wrap' }}>
+        {AllRecent_data.map((item, index) => {
+            if (!hasAccess(role, item.key)) return null; // роль не має доступу
+            const colorPalette = ['#e3f2fd', '#fce4ec', '#e8f5e9', '#fff3e0'];
+            return (
+            <Paper
+                key={item.key}
+                sx={{
+                flex: 1,
+                minWidth: 220,
+                p: 3,
+                textAlign: 'center',
+                backgroundColor: colorPalette[index],
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                }}
+            >
+                <Typography variant="h6" sx={{ mb: 1 }}>{item.title}</Typography>
+                <Box sx={{ mb: 1 }}>
+                {item.data?.slice(-3).map((entry: any, idx: number) => (
+                    <Typography key={idx} variant="body2">
                     {entry.name || entry.title || `#${entry.id ?? idx}`}
-                </Link>
-                </Typography>
-            ))}
-            </Box>
-      </Paper>
-    )
-  })}
-</Box>
+                    </Typography>
+                ))}
+                </Box>
+                    <Box sx={{ mb: 1 }}>
+                    {item.data?.slice(-3).map((entry: any, idx: number) => (
+                        <Typography
+                        key={idx}
+                        variant="body2"
+                        sx={{ fontWeight: 'bold', textAlign: 'left', display: 'block' }}
+                        >
+                        <Link 
+                            to={`/app/${item.key}/${entry.id}`} 
+                            style={{ textDecoration: 'none', color: '#1e88e5' }}
+                        >
+                            {entry.name || entry.title || `#${entry.id ?? idx}`}
+                        </Link>
+                        </Typography>
+                    ))}
+                    </Box>
+            </Paper>
+            )
+        })}
+        </Box>
 
     </div>
   )
