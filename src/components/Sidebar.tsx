@@ -89,6 +89,7 @@ export default function Sidebar(props: any) {
     setOrganizationModal(false)
   }
 
+
   useEffect(() => {
     toggleScreen()
   }, [navigate])
@@ -317,7 +318,7 @@ export default function Sidebar(props: any) {
       {email.charAt(0).toUpperCase()} {/* first letter only */}
     </Avatar>
             </IconButton>
-    
+
             <Popover
               anchorOrigin={{
                 vertical: 'bottom',
@@ -365,7 +366,7 @@ export default function Sidebar(props: any) {
                   </StyledListItemButton>
                 </ListItem>
 
-    
+
 
                 <ListItem disablePadding>
                   <StyledListItemButton
@@ -453,6 +454,8 @@ export default function Sidebar(props: any) {
               <Route index element={<Leads />} />
               {/* <Route path='/' element={<Contacts />} /> */}
               <Route path="/app/leads" element={<Leads />} />
+
+
               <Route path="/app/leads/add-leads" element={<AddLeads />} />
               <Route path="/app/leads/edit-lead" element={<EditLead />} />
               <Route path="/app/leads/lead-details" element={<LeadDetails />} />
