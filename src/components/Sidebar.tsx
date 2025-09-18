@@ -42,7 +42,6 @@ import Leads from '../pages/leads/Leads'
 import AddContacts from '../pages/contacts/AddContacts'
 import { EditLead } from '../pages/leads/EditLead'
 import LeadDetails from '../pages/leads/LeadDetails'
-import LeadDetailsTest from '../pages/leads/LeadDetailsTest'
 import Contacts from '../pages/contacts/Contacts'
 import EditContact from '../pages/contacts/EditContacts'
 import ContactDetails from '../pages/contacts/ContactDetails'
@@ -461,7 +460,7 @@ export default function Sidebar(props: any) {
               <Route path="/app/leads/edit-lead" element={<EditLead />} />
               <Route path="/app/leads/lead-details" element={<LeadDetails />} />
               <Route path="/app/companies" element={<Company />} />
-              <Route path="/app/leads/lead_details_test" element={<LeadDetailsTest />} />
+
               <Route
                 path="/app/companies/add-company"
                 element={<AddCompany />}

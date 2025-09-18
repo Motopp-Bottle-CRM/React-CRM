@@ -130,7 +130,7 @@ export default function LeadsTest() {
     }
   }
   const handleSelectedLead = (leadId: string) => {
-    navigate(`/app/leads/lead_details_test`, {
+    navigate(`/app/leads/lead-details`, {
       state: {
         leadId,
         detail: true,
