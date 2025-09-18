@@ -40,6 +40,7 @@ import {
   CustomPopupIcon,
   CustomSelectField,
   RequiredTextField,
+  RequiredSelect,
   StyledSelect,
 } from '../../styles/CssStyled'
 import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
@@ -299,6 +300,12 @@ export function AddLeads() {
       return;
     }
     
+    if (!formData.company || formData.company.trim() === '') {
+      setError(true);
+      setErrors({ general: ['Company is required'] });
+      return;
+    }
+    
     if (!formData.first_name && !formData.last_name) {
       setError(true);
       setErrors({ general: ['Please provide at least first name or last name'] });
@@ -346,9 +353,9 @@ export function AddLeads() {
         if (!res.error) {
           setSuccess(true)
           setError(false)
-          resetForm()
           // Show success message for 2 seconds before navigating
           setTimeout(() => {
+            resetForm()
             navigate('/app/leads')
           }, 2000)
         }
@@ -469,7 +476,18 @@ export function AddLeads() {
                       </div>
                     )}
                     {success && (
-                      <div style={{ color: 'green', marginBottom: '10px', padding: '10px', backgroundColor: '#e8f5e8', border: '1px solid #4caf50', borderRadius: '4px' }}>
+                      <div style={{ 
+                        color: '#2e7d32', 
+                        marginBottom: '15px', 
+                        padding: '15px', 
+                        backgroundColor: '#e8f5e8', 
+                        border: '2px solid #4caf50', 
+                        borderRadius: '8px',
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        textAlign: 'center',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                      }}>
                         ✅ Lead created successfully! Redirecting to leads list...
                       </div>
                     )}
@@ -690,7 +708,7 @@ export function AddLeads() {
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Company</div>
                         <FormControl sx={{ width: '70%' }}>
-                          <Select
+                          <RequiredSelect
                             name="company"
                             value={formData.company}
                             open={companySelectOpen}
@@ -710,6 +728,7 @@ export function AddLeads() {
                             className={'select'}
                             onChange={handleChange}
                             error={!!errors?.company?.[0]}
+                            required
                             MenuProps={{
                               PaperProps: {
                                 style: {
@@ -727,7 +746,7 @@ export function AddLeads() {
                             ) : (
                               <MenuItem disabled>No companies available</MenuItem>
                             )}
-                          </Select>
+                          </RequiredSelect>
                           <FormHelperText>
                             {errors?.company?.[0] ? errors?.company[0] : ''}
                           </FormHelperText>
