@@ -42,10 +42,6 @@ type FormErrors = {
   state?: string[]
   postcode?: string[]
   country?: string[]
-  // profile_pic?: string[];
-  // has_sales_access?: string[];
-  // has_marketing_access?: string[];
-  // is_organization_admin?: string[];
 }
 interface FormData {
   email: string
@@ -58,10 +54,6 @@ interface FormData {
   state: string
   postcode: string
   country: string
-  // profile_pic: string | null,
-  // has_sales_access: boolean,
-  // has_marketing_access: boolean,
-  // is_organization_admin: boolean
 }
 export function EditUser() {
   const { state } = useLocation()
@@ -141,10 +133,6 @@ export function EditUser() {
     state: '',
     postcode: '',
     country: '',
-    // profile_pic: null,
-    // has_sales_access: false,
-    // has_marketing_access: false,
-    // is_organization_admin: false
   })
   useEffect(() => {
     setFormData(state?.value)
@@ -209,14 +197,14 @@ useEffect(() => {
       try {
         setLoading(true)
         setError(false)
- 
+
         const Header = {
           Accept: 'application/json',
           'Content-Type': 'application/json',
           Authorization: localStorage.getItem('Token'),
           org: localStorage.getItem('org'),
         }
- 
+
         fetchData(`${UserUrl}/${state?.id}/`, 'GET', null as any, Header).then(
           (res: any) => {
             if (!res.error) {
@@ -300,47 +288,6 @@ useEffect(() => {
     submitForm()
   }
 
-  // const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-  //     const file = event.target.files?.[0] || null;
-  //     if (file) {
-  //         const reader = new FileReader();
-  //         reader.onload = () => {
-  //             setFormData({ ...formData, profile_pic: reader.result as string });
-  //         };
-  //         reader.readAsDataURL(file);
-  //     }
-  // };
-
-  // const getEditDetail = (id: any) => {
-  //     fetchData(`${UserUrl}/${id}/`, 'GET', null as any, headers)
-  //         .then((res: any) => {
-  //             console.log('edit detail Form data:', res);
-  //             if (!res.error) {
-  //                 const data = res?.data?.profile_obj
-  //                 setFormData({
-  //                     email: data?.user_details?.email || '',
-  //                     role: data.role || 'ADMIN',
-  //                     phone: data.phone || '',
-  //                     alternate_phone: data.alternate_phone || '',
-  //                     address_line: data?.address?.address_line || '',
-  //                     street: data?.address?.street || '',
-  //                     city: data?.address?.city || '',
-  //                     state: data?.address?.state || '',
-  //                     postcode: data?.address?.postcode || '',
-  //                     country: data?.address?.country || '',
-  //                     profile_pic: data?.user_details?.profile_pic || null,
-  //                     has_sales_access: data.has_sales_access || false,
-  //                     has_marketing_access: data.has_marketing_access || false,
-  //                     is_organization_admin: data.is_organization_admin || false
-  //                 })
-  //             }
-  //             if (res.error) {
-  //                 setError(true)
-  //             }
-  //         })
-  //         .catch(() => {
-  //         })
-  // }
   const submitForm = () => {
     const Header = {
       Accept: 'application/json',
@@ -366,10 +313,6 @@ useEffect(() => {
       state: formData.state,
       postcode: formData.postcode,
       country: getCountryNameFromCode(formData.country),
-      // profile_pic: formData.profile_pic,
-      // has_sales_access: formData.has_sales_access,
-      // has_marketing_access: formData.has_marketing_access,
-      // is_organization_admin: formData.is_organization_admin
     }
 
     fetchData(`${UserUrl}/${state?.id}/`, 'PUT', JSON.stringify(data), Header)
@@ -551,71 +494,6 @@ useEffect(() => {
                         </Tooltip>
                       </div>
                     </div>
-                    {/* <div className='fieldContainer2'>
-                                            <div className='fieldSubContainer'>
-                                                <div className='fieldTitle'>Profile picture</div>
-                                                <Stack sx={{ display: 'flex', flexDirection: 'column' }}>
-                                                    <Stack sx={{ display: 'flex', flexDirection: 'row' }}>
-                                                        <label htmlFor="avatar-input">
-                                                            <input
-                                                                id="avatar-input"
-                                                                name="profile_pic"
-                                                                type="file"
-                                                                accept="image/*"
-                                                                onChange={(e: any) => {
-                                                                    handleFileChange(e);
-                                                                    handleChange(e);
-                                                                }}
-                                                                style={inputStyles}
-                                                            />
-                                                            <IconButton
-                                                                component="span"
-                                                                color="primary"
-                                                                aria-label="upload avatar"
-                                                            >
-                                                                <FaUpload fill='lightgrey' />
-                                                            </IconButton>
-                                                        </label>
-                                                        <Box>  {formData.profile_pic !== null ?
-                                                            <Box sx={{ position: 'relative' }}>
-                                                                <Avatar src={formData.profile_pic || ''} />
-                                                                <FaTimes style={{ position: 'absolute', marginTop: '-45px', marginLeft: '25px', fill: 'lightgray', cursor: 'pointer' }}
-                                                                    onClick={() => setFormData({ ...formData, profile_pic: null })} />
-                                                            </Box> : ''}
-                                                        </Box>
-                                                        {formData.profile_pic && <Typography sx={{ color: '#d32f2f', fontSize: '12px', ml: '-70px', mt: '40px' }}>{profileErrors?.profile_pic?.[0] || userErrors?.profile_pic?.[0] || ''}</Typography>}
-                                                    </Stack>
-                                                </Stack>
-
-
-                                            </div>
-                                            <div className='fieldSubContainer'>
-                                                <div className='fieldTitle'>Sales Access</div>
-                                                <AntSwitch
-                                                    name='has_sales_access'
-                                                    checked={formData.has_sales_access}
-                                                    onChange={handleChange}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className='fieldContainer2'>
-                                            <div className='fieldSubContainer'>
-                                                <div className='fieldTitle'>Marketing Access</div>
-                                                <AntSwitch
-                                                    name='has_marketing_access'
-                                                    checked={formData.has_marketing_access}
-                                                    onChange={handleChange}
-                                                />
-                                            </div>
-                                            <div className='fieldSubContainer'>
-                                                <div className='fieldTitle'>Organization Admin</div>
-                                                <AntSwitch
-                                                    name='is_organization_admin'
-                                                    checked={formData.is_organization_admin}
-                                                    onChange={handleChange}
-                                                />
-                                            </div>
-                                        </div> */}
                   </Box>
                 </AccordionDetails>
               </Accordion>
