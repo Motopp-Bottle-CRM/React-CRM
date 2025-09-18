@@ -31,6 +31,10 @@ export function EditProfile(props: any) {
     alternate_phone: '',
   })
   const [localProfile, setLocalProfile] = useState(props.profileData)
+  // const [errorMessage, setErrorMessage] = useState({
+  //   phone: '',
+  //   alternate_phone: '',
+  // })
 
   // Countries array with phone prefixes [code, name, phone_prefix] - same format as other components
   const countries = [
@@ -60,33 +64,34 @@ export function EditProfile(props: any) {
     ['TH', 'Thailand', '+66'],
   ]
 
-  // Ensure address object is properly initialized
-  // const initializeAddress = () => {
-  //   if (!props.profileData.address) {
-  //     props.setProfileData({
-  //       ...props.profileData,
-  //       address: {
-  //         address_line: '',
-  //         street: '',
-  //         city: '',
-  //         state: '',
-  //         postcode: '',
-  //         country: '',
-  //       },
-  //     })
-  //   }
-  // }
-
   // Initialize address on component mount
   useEffect(() => {
     setLocalProfile(props.profileData)
   }, [props.profileData])
 
   const handleEditClick = () => {
-    // Logic to save profile changes
-    props.setProfileData(localProfile)
-    props.setEditMode(false)
+    const isValid = handleError()
+    if (!isValid) return
+
     submitForm(localProfile)
+  }
+  const handleError = () => {
+    setProfileErrors({ phone: '', alternate_phone: '' })
+    if (localProfile.phone === '') {
+      setProfileErrors((prev: any) => ({
+        ...prev,
+        phone: 'phone number is required!',
+      }))
+      return false
+    } else if (localProfile.phone === localProfile.alternate_phone) {
+      setProfileErrors((prev: any) => ({
+        ...prev,
+        alternate_phone:
+          'phone number and alternative phone must be different!',
+      }))
+      return false
+    }
+    return true
   }
 
   const handleCancelClick = () => {
@@ -94,7 +99,7 @@ export function EditProfile(props: any) {
     props.setEditMode(false)
   }
 
-  const submitForm = (data: any) => {
+  const submitForm = async (data: any) => {
     const Header = {
       Accept: 'application/json',
       'Content-Type': 'application/json',
@@ -105,18 +110,17 @@ export function EditProfile(props: any) {
     fetchData(`${ProfileUrl}/`, 'PUT', JSON.stringify(data), Header)
       .then((res: any) => {
         if (!res.error) {
-          alert('Profile updated successfully')
+          props.setProfileData(localProfile)
           props.setEditMode(false)
-        } else {
-          setError(true)
+          alert('Profile updated successfully')
         }
       })
-      .catch(async (err: any) => {
+      .catch((err: any) => {
         setError(true)
-        profileErrors.phone = err?.profile_errors?.phone || {}
+        profileErrors.phone = err?.profile_errors?.phone || ''
         setProfileErrors({ ...profileErrors, phone: profileErrors.phone })
         profileErrors.alternate_phone =
-          err?.profile_errors?.alternate_phone || {}
+          err?.profile_errors?.alternate_phone || ''
         setProfileErrors({
           ...profileErrors,
           alternate_phone: profileErrors.alternate_phone,
@@ -159,7 +163,7 @@ export function EditProfile(props: any) {
               justifyContent: 'flex-start',
               alignItems: 'center',
               gap: '10px',
-              width: '150px',
+              width: '200px',
             }}
           >
             <FaEnvelope />
@@ -187,7 +191,7 @@ export function EditProfile(props: any) {
               justifyContent: 'flex-start',
               alignItems: 'center',
               gap: '10px',
-              width: '150px',
+              width: '200px',
             }}
           >
             <FaPhone />
@@ -195,6 +199,7 @@ export function EditProfile(props: any) {
               Phone number
             </Typography>
           </Box>
+
           <Tooltip title="phone must starts with + and country code">
             <RequiredTextField
               id="outlined-basic"
@@ -203,9 +208,11 @@ export function EditProfile(props: any) {
               onChange={(e) =>
                 setLocalProfile({
                   ...localProfile,
-                  phone: e.target.value,
+                  phone: e.target.value.replace(/(?!^\+)\D/g, ''),
                 })
               }
+              error={!!profileErrors.phone}
+              helperText={profileErrors.phone}
               variant="outlined"
               size="small"
               required
@@ -213,6 +220,53 @@ export function EditProfile(props: any) {
             />
           </Tooltip>
         </Box>
+
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            gap: '10px',
+            mb: 2,
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              gap: '10px',
+              width: '200px',
+            }}
+          >
+            <FaPhone />
+            <Typography variant="body1" sx={{ mr: 2 }}>
+              Alternative phone
+            </Typography>
+          </Box>
+
+          <Tooltip title="phone must starts with + and country code">
+            <TextField
+              id="outlined-basic"
+              label="Alternate Phone"
+              value={localProfile.alternate_phone}
+              onChange={(e) =>
+                setLocalProfile({
+                  ...localProfile,
+                  alternate_phone: e.target.value.replace(/(?!^\+)\D/g, ''),
+                })
+              }
+              error={!!profileErrors.alternate_phone}
+              helperText={profileErrors.alternate_phone}
+              variant="outlined"
+              size="small"
+              sx={{ width: 250 }}
+            />
+          </Tooltip>
+        </Box>
+
         <Box
           sx={{
             display: 'flex',
@@ -256,7 +310,7 @@ export function EditProfile(props: any) {
               justifyContent: 'flex-start',
               alignItems: 'center',
               gap: '10px',
-              width: '150px',
+              width: '200px',
             }}
           >
             <FaGlobe />
@@ -302,7 +356,7 @@ export function EditProfile(props: any) {
               justifyContent: 'flex-start',
               alignItems: 'center',
               gap: '10px',
-              width: '150px',
+              width: '200px',
             }}
           >
             <FaMailBulk />
@@ -342,7 +396,7 @@ export function EditProfile(props: any) {
               justifyContent: 'flex-start',
               alignItems: 'center',
               gap: '10px',
-              width: '150px',
+              width: '200px',
             }}
           >
             <FaMap />
@@ -382,7 +436,7 @@ export function EditProfile(props: any) {
               justifyContent: 'flex-start',
               alignItems: 'center',
               gap: '10px',
-              width: '150px',
+              width: '200px',
             }}
           >
             <FaCity />
@@ -422,7 +476,7 @@ export function EditProfile(props: any) {
               justifyContent: 'flex-start',
               alignItems: 'center',
               gap: '10px',
-              width: '150px',
+              width: '200px',
             }}
           >
             <FaHome />
@@ -462,7 +516,7 @@ export function EditProfile(props: any) {
               justifyContent: 'flex-start',
               alignItems: 'center',
               gap: '10px',
-              width: '150px',
+              width: '200px',
             }}
           >
             <FaBuilding />
