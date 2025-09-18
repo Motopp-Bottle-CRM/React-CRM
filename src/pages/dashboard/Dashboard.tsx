@@ -41,10 +41,10 @@ export default function Dashboard() {
   const role = localStorage.getItem('role') || 'SALES'  
 
   const AllDash_data = [
-    { label: 'leads', value: dash_data?.leads_count ?? 0, icon: <FaUsers size={80} /> },
-    { label: 'opportunities', value: dash_data?.opportunities_count ?? 0, icon: <FaHandshake size={80} /> },
-    { label: 'accounts', value: dash_data?.accounts_count ?? 0, icon: <FaBuilding size={80} /> },
-    { label: 'contacts', value: dash_data?.contacts_count ?? 0, icon: <FaAddressBook size={80} /> },
+    { label: 'leads', value: dash_data?.leads_count ?? 0, icon: <FaUsers size={60} /> },
+    { label: 'opportunities', value: dash_data?.opportunities_count ?? 0, icon: <FaHandshake size={60} /> },
+    { label: 'accounts', value: dash_data?.accounts_count ?? 0, icon: <FaBuilding size={60} /> },
+    { label: 'contacts', value: dash_data?.contacts_count ?? 0, icon: <FaAddressBook size={60} /> },
    ]
    
    const AllRecent_data = [
