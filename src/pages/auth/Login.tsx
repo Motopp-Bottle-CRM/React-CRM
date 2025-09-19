@@ -59,6 +59,7 @@ export default function Login() {
         console.log("Saving org to localStorage:", res.org_id)
       }
       localStorage.setItem('email', email)
+      localStorage.setItem('role', res.role)
       console.log("Saving email to localStorage:", email)
       setToken(true)
       navigate('/app') // Redirect to app after successful login
