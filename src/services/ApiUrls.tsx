@@ -1,5 +1,6 @@
 // authurl
-export const SERVER = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api'
+export const SERVER =
+  process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api'
 export const LoginUrl = 'auth/login'
 export const RegisterUrl = 'auth/register'
 export const ForgotPasswordUrl = 'auth/forgot-password'
@@ -28,4 +29,7 @@ export const UsersUrl = 'users'
 export const UserUrl = 'user'
 // PROFILE
 export const ProfileUrl = 'profile'
+//
+// Dashboard
+export const DashboardUrl = 'dashboard'
 //
