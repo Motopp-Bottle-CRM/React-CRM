@@ -82,7 +82,7 @@ export default function LeadDetailsTest() {
     teams: any[]
     skype_ID: string
     industry: string
-    company: string
+    company_name: string
     organization: string | null
     probability: number
     close_date: string | null
@@ -300,7 +300,7 @@ export default function LeadDetailsTest() {
           postcode: leadDetails?.lead_obj?.postcode,
           country: leadDetails?.countries?.[0],
           tags: leadDetails?.lead_obj?.tags,
-          company: leadDetails?.lead_obj?.company,
+          company: leadDetails?.lead_obj?.company_name,
           probability: leadDetails?.lead_obj?.probability,
           industry: leadDetails?.lead_obj?.industry,
           skype_ID: leadDetails?.lead_obj?.skype_ID,
@@ -444,7 +444,7 @@ export default function LeadDetailsTest() {
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       Company
                     </Typography>
-                    <Typography> {leadDetails?.lead_obj?.company}</Typography>
+                    <Typography> {leadDetails?.lead_obj?.company_name}</Typography>
                   </Grid>
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>

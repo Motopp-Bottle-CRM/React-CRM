@@ -20,7 +20,7 @@ interface Lead {
   title: string
   email: string
   phone: string
-  company?: { id: string; name: string } | string
+  company_name?: string
   source: string
   status: string
   created_by: { id: string; email: string; profile_pic: string }
@@ -91,9 +91,7 @@ export default function LeadList({
 
               {/* Company */}
               <TableCell sx={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                {typeof lead.company === 'string'
-                  ? lead.company
-                  : lead.company?.name}
+                {lead?.company_name}
               </TableCell>
 
               {/* Contact */}
