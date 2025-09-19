@@ -142,17 +142,27 @@ export function MyProfile() {
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
             {profileData.email}
           </Typography>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, backgroundColor: '#95ddf0ff', pr: 2,pl: 2,pt: 1, pb:1, borderRadius: 10 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 1,
+              backgroundColor: '#95ddf0ff',
+              pr: 2,
+              pl: 2,
+              pt: 1,
+              pb: 1,
+              borderRadius: 10,
+            }}
+          >
             <Typography variant="h6">
-            {' '}
-            {profileData.role
-              ? profileData.role.charAt(0).toUpperCase() +
-                profileData.role.slice(1).toLowerCase()
-              : ''}
-          </Typography>
-
+              {' '}
+              {profileData.role
+                ? profileData.role.charAt(0).toUpperCase() +
+                  profileData.role.slice(1).toLowerCase()
+                : ''}
+            </Typography>
           </Box>
-
         </Box>
         {!editMode ? (
           <ViewProfile

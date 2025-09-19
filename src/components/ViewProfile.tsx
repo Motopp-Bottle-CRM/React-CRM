@@ -75,9 +75,18 @@ export function ViewProfile(props: any) {
         textAlign: 'center',
       }}
     >
-
-        <Typography variant="h5">User Information</Typography>
-        <Box sx={{ mt: 3, mb: 3 }}>
+      <Typography variant="h5">User Information</Typography>
+      <Box sx={{ mt: 3, mb: 3 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            gap: '10px',
+            mb: 2,
+          }}
+        >
           <Box
             sx={{
               display: 'flex',
@@ -85,86 +94,27 @@ export function ViewProfile(props: any) {
               justifyContent: 'flex-start',
               alignItems: 'center',
               gap: '10px',
-              mb: 2,
+              width: '150px',
             }}
           >
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                gap: '10px',
-                width: '150px',
-              }}
-            >
-              <FaEnvelope />
-              <Typography variant="body1" sx={{ mr: 2 }}>
-                Email Address
-              </Typography>
-            </Box>
-
-            <Typography variant="body1">{props.profileData.email}</Typography>
-          </Box>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              gap: '10px',
-              mb: 2,
-            }}
-          >
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                gap: '10px',
-                width: '150px',
-              }}
-            >
-              <FaPhone />
-              <Typography variant="body1" sx={{ mr: 2 }}>
-                Phone number
-              </Typography>
-            </Box>
-            <Typography variant="body1">{props.profileData.phone}</Typography>
-          </Box>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              gap: '10px',
-              mb: 2,
-            }}
-          >
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                gap: '10px',
-                width: '150px',
-              }}
-            >
-              <FaMapMarkerAlt />
-              <Typography variant="body1" sx={{ mr: 2 }}>
-                Address
-              </Typography>
-            </Box>
-            <Typography variant="body1">
-
-                {props.profileData.street || ''} {props.profileData.city || ''} {props.profileData.state || ''} {props.profileData.postcode || ''} {props.profileData.country || ''}
-
-
+            <FaEnvelope />
+            <Typography variant="body1" sx={{ mr: 2 }}>
+              Email Address
             </Typography>
           </Box>
+
+          <Typography variant="body1">{props.profileData.email}</Typography>
+        </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            gap: '10px',
+            mb: 2,
+          }}
+        >
           <Box
             sx={{
               display: 'flex',
@@ -172,27 +122,77 @@ export function ViewProfile(props: any) {
               justifyContent: 'flex-start',
               alignItems: 'center',
               gap: '10px',
-              mb: 2,
+              width: '150px',
             }}
           >
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                gap: '10px',
-                width: '150px',
-              }}
-            >
-              <FaRegCalendarAlt />
-              <Typography variant="body1" sx={{ mr: 2 }}>
-                Member Since
-              </Typography>
-            </Box>
-            <Typography variant="body1">{props.profileData.date_of_joining}</Typography>
+            <FaPhone />
+            <Typography variant="body1" sx={{ mr: 2 }}>
+              Phone number
+            </Typography>
           </Box>
+          <Typography variant="body1">{props.profileData.phone}</Typography>
         </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            gap: '10px',
+            mb: 2,
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              gap: '10px',
+              width: '150px',
+            }}
+          >
+            <FaMapMarkerAlt />
+            <Typography variant="body1" sx={{ mr: 2 }}>
+              Address
+            </Typography>
+          </Box>
+          <Typography variant="body1">
+            {props.profileData.street || ''} {props.profileData.city || ''}{' '}
+            {props.profileData.state || ''} {props.profileData.postcode || ''}{' '}
+            {props.profileData.country || ''}
+          </Typography>
+        </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            gap: '10px',
+            mb: 2,
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              gap: '10px',
+              width: '150px',
+            }}
+          >
+            <FaRegCalendarAlt />
+            <Typography variant="body1" sx={{ mr: 2 }}>
+              Member Since
+            </Typography>
+          </Box>
+          <Typography variant="body1">
+            {props.profileData.date_of_joining}
+          </Typography>
+        </Box>
+      </Box>
 
       <Button variant="contained" onClick={() => handleEditClick()}>
         Edit My Profile

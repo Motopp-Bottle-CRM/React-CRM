@@ -121,7 +121,7 @@ export default function UserDetails() {
           street: userDetails?.address?.street,
           city: userDetails?.address?.city,
           state: userDetails?.address?.state,
-          pincode: userDetails?.address?.postcode,
+          postcode: userDetails?.address?.postcode,
           country: userDetails?.address?.country,
           profile_pic: userDetails?.user_details?.profile_pic,
           has_sales_access: userDetails?.has_sales_access,

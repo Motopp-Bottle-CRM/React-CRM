@@ -161,7 +161,9 @@ export default function Users() {
     const tabParam = urlParams.get('tab')
     if (tabParam === 'inactive') {
       setTab('inactive')
-      setSuccessMessage('User created successfully! New user is now in the inactive tab.')
+      setSuccessMessage(
+        'User created successfully! New user is now in the inactive tab.'
+      )
       // Clear success message after 5 seconds
       setTimeout(() => setSuccessMessage(''), 5000)
     }
@@ -507,7 +509,7 @@ export default function Users() {
           </Alert>
         </Box>
       )}
-      
+
       <CustomToolbar>
         <Tabs value={tab} onChange={handleChangeTab} sx={{ mt: '26px' }}>
           <CustomTab
