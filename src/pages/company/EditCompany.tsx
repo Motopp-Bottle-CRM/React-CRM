@@ -9,7 +9,6 @@ import {
 } from '@mui/material'
 
 import React, { useEffect, useState } from 'react'
-import { FaArrowDown } from 'react-icons/fa'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { CompanyUrl } from '../../services/ApiUrls'
 import { CustomAppBar } from '../../components/CustomAppBar'
@@ -19,6 +18,8 @@ import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 
 type FormErrors = {
   name?: string[]
+  address?: string[]
+  telephone?: string[]
 }
 
 function EditCompany() {
@@ -28,20 +29,31 @@ function EditCompany() {
   const [error, setError] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
+    address: '',
+    telephone: '',
   })
   const [errors, setErrors] = useState<FormErrors>({})
+
   useEffect(() => {
-    setFormData(location?.state?.value)
+    setFormData({
+      name: location?.state?.value?.name || '',
+      address: location?.state?.value?.address || '',
+      telephone: location?.state?.value?.telephone || '',
+    })
   }, [location?.state?.id])
 
   useEffect(() => {
     if (reset) {
-      setFormData(location?.state?.value)
+      setFormData({
+        name: location?.state?.value?.name || '',
+        address: location?.state?.value?.address || '',
+        telephone: location?.state?.value?.telephone || '',
+      })
     }
     return () => {
       setReset(false)
     }
-  }, [reset])
+  }, [reset, location?.state?.value])
 
   const handleChange = (e: any) => {
     const { name, value } = e.target
@@ -60,9 +72,11 @@ function EditCompany() {
       Authorization: localStorage.getItem('Token'),
       org: localStorage.getItem('org'),
     }
-    // console.log('Form data:', data);
-    const data = { name: formData.name }
-    // console.log(data, 'edit')
+    const data = {
+      name: formData.name,
+      address: formData.address,
+      telephone: formData.telephone,
+    }
     fetchData(
       `${CompanyUrl}/${location?.state?.id}`,
       'PUT',
@@ -70,7 +84,6 @@ function EditCompany() {
       Header
     )
       .then((res: any) => {
-        console.log('Form data:', res)
         if (!res.error) {
           backbtnHandle()
         }
@@ -83,7 +96,7 @@ function EditCompany() {
   }
 
   const resetForm = () => {
-    setFormData({ name: '' })
+    setFormData({ name: '', address: '', telephone: '' })
     setErrors({})
   }
 
@@ -92,6 +105,7 @@ function EditCompany() {
       state: { companyId: { id: location?.state?.id }, detail: true },
     })
   }
+
   const module = 'Companies'
   const crntPage = 'Edit Company'
   const backBtn = 'Back To Company Detail'
@@ -99,7 +113,7 @@ function EditCompany() {
   const onCancel = () => {
     setReset(true)
   }
-  // console.log(formData, 'editform')
+
   return (
     <Box sx={{ mt: '60px' }}>
       <CustomAppBar
@@ -119,7 +133,7 @@ function EditCompany() {
                   expandIcon={<FiChevronDown style={{ fontSize: '25px' }} />}
                 >
                   <Typography className="accordion-header">
-                    Account Information
+                    Company Information
                   </Typography>
                 </AccordionSummary>
                 <Divider className="divider" />
@@ -127,12 +141,12 @@ function EditCompany() {
                   <Box
                     sx={{ width: '98%', color: '#1A3353', mb: 1 }}
                     component="form"
-                    // noValidate
                     autoComplete="off"
                   >
+                    {/* Name */}
                     <div className="fieldContainer">
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Salutation</div>
+                        <div className="fieldTitle">Name</div>
                         <TextField
                           name="name"
                           value={formData.name}
@@ -141,6 +155,36 @@ function EditCompany() {
                           size="small"
                           helperText={errors?.name?.[0] ? errors?.name[0] : ''}
                           error={!!errors?.name?.[0]}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Address */}
+                    <div className="fieldContainer">
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Address</div>
+                        <TextField
+                          name="address"
+                          value={formData.address}
+                          onChange={handleChange}
+                          style={{ width: '70%' }}
+                          size="small"
+                          placeholder="Street, City, Country"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Telephone */}
+                    <div className="fieldContainer">
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Telephone</div>
+                        <TextField
+                          name="telephone"
+                          value={formData.telephone}
+                          onChange={handleChange}
+                          style={{ width: '70%' }}
+                          size="small"
+                          placeholder="+31 6 1234 5678"
                         />
                       </div>
                     </div>
