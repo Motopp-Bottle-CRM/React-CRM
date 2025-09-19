@@ -122,6 +122,15 @@ export function EditUser() {
   const [roleSelectOpen, setRoleSelectOpen] = useState(false)
   const [countrySelectOpen, setCountrySelectOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [isActivating, setIsActivating] = useState(false)
+  const [isDeactivating, setIsDeactivating] = useState(false)
+  const [msg, setMsg] = useState('')
+  const [userStatus, setUserStatus] = useState<'Active' | 'Inactive' | 'Unknown'>('Unknown')
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+  const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null)
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
+  const [confirmAction, setConfirmAction] = useState<'activate' | 'deactivate' | null>(null)
+  const [confirmMessage, setConfirmMessage] = useState('')
   const [formData, setFormData] = useState<FormData>({
     email: '',
     role: 'ADMIN',
@@ -134,9 +143,69 @@ export function EditUser() {
     postcode: '',
     country: '',
   })
+  
+  // Check if current user is trying to deactivate themselves
+  const isSelfDeactivation = (currentUserId && state?.id && currentUserId === state.id) || 
+                            (currentUserEmail && formData.email && currentUserEmail === formData.email)
+  
+  // Debug logging
+  console.log('Debug - currentUserId:', currentUserId)
+  console.log('Debug - currentUserEmail:', currentUserEmail)
+  console.log('Debug - state?.id:', state?.id)
+  console.log('Debug - formData.email:', formData.email)
+  console.log('Debug - isSelfDeactivation:', isSelfDeactivation)
+  
   useEffect(() => {
     setFormData(state?.value)
+    // Set user status from state if available
+    if (state?.value?.is_active !== undefined) {
+      setUserStatus(state.value.is_active ? 'Active' : 'Inactive')
+    }
   }, [state?.id])
+
+  // Get current user's ID to prevent self-deactivation
+  useEffect(() => {
+    const getCurrentUserId = async () => {
+      try {
+        const Header = {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: localStorage.getItem('Token'),
+          org: localStorage.getItem('org'),
+        }
+        
+        // Get current user profile
+        const response = await fetchData('profile/', 'GET', null, Header)
+        console.log('Current user profile response:', response)
+        if (!response.error && response.data) {
+          const userId = response.data.id || response.data.user_id
+          const userEmail = response.data.email || response.data.user_details?.email
+          console.log('Setting current user ID:', userId)
+          console.log('Setting current user email:', userEmail)
+          setCurrentUserId(userId)
+          setCurrentUserEmail(userEmail)
+        }
+      } catch (error) {
+        console.error('Error fetching current user ID:', error)
+        // Fallback: try to get user info from token
+        try {
+          const token = localStorage.getItem('Token')
+          if (token) {
+            // Decode JWT token to get user info (basic decode, no verification)
+            const payload = JSON.parse(atob(token.split('.')[1]))
+            console.log('Token payload:', payload)
+            if (payload.user_id) {
+              setCurrentUserId(payload.user_id)
+            }
+          }
+        } catch (tokenError) {
+          console.error('Error decoding token:', tokenError)
+        }
+      }
+    }
+    
+    getCurrentUserId()
+  }, [])
 
   useEffect(() => {
     if (reset) {
@@ -178,6 +247,8 @@ export function EditUser() {
                 postcode: data?.address?.postcode || '',
                 country: getCountryCodeFromName(data?.address?.country || ''),
               })
+              // Set user status based on is_active field
+              setUserStatus(data?.is_active ? 'Active' : 'Inactive')
             }
           }
         )
@@ -353,6 +424,107 @@ useEffect(() => {
     setReset(true)
     // resetForm()
   }
+
+  const handleActivateUser = () => {
+    if (isSelfDeactivation) {
+      setMsg('You cannot change your own account status')
+      setError(true)
+      return
+    }
+    
+    setConfirmAction('activate')
+    setConfirmMessage(`Are you sure you want to activate user "${formData.email}"?`)
+    setShowConfirmDialog(true)
+  }
+
+  const handleDeactivateUser = () => {
+    if (isSelfDeactivation) {
+      setMsg('You cannot change your own account status')
+      setError(true)
+      return
+    }
+    
+    setConfirmAction('deactivate')
+    setConfirmMessage(`Are you sure you want to deactivate user "${formData.email}"?`)
+    setShowConfirmDialog(true)
+  }
+
+  const handleConfirmAction = async () => {
+    if (!confirmAction) return
+
+    if (confirmAction === 'activate') {
+      setIsActivating(true)
+    } else {
+      setIsDeactivating(true)
+    }
+    
+    setError(false)
+    setMsg('')
+    setShowConfirmDialog(false)
+    
+    const Header = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: localStorage.getItem('Token'),
+      org: localStorage.getItem('org'),
+    }
+
+    try {
+      const response = await fetchData(`${UserUrl}/${state?.id}/status/`, 'POST', JSON.stringify({ status: confirmAction === 'activate' ? 'Active' : 'Inactive' }), Header)
+      
+      if (!response.error) {
+        setMsg(`User ${confirmAction === 'activate' ? 'activated' : 'deactivated'} successfully!`)
+        setError(false)
+        setUserStatus(confirmAction === 'activate' ? 'Active' : 'Inactive')
+        // Optionally refresh the page or update the UI
+        setTimeout(() => {
+          navigate(confirmAction === 'activate' ? '/app/users?tab=inactive' : '/app/users')
+        }, 1500)
+      } else {
+        setError(true)
+        // Handle different error response formats
+        const errorMessage = response.errors || response.message || response.error || `Failed to ${confirmAction} user`
+        setMsg(errorMessage)
+      }
+    } catch (error) {
+      console.error(`Error ${confirmAction}ing user:`, error)
+      console.log('Error object keys:', error ? Object.keys(error) : 'No error object')
+      console.log('Error type:', typeof error)
+      setError(true)
+      
+      // Handle error response from fetchData (which throws the JSON response)
+      if (error && typeof error === 'object') {
+        // Check for different error message formats with proper type checking
+        const errorObj = error as any
+        let errorMessage = errorObj.errors || errorObj.message || errorObj.error
+        
+        // If it's an array of errors, join them
+        if (Array.isArray(errorMessage)) {
+          errorMessage = errorMessage.join(', ')
+        }
+        
+        // If no specific error message, use generic one
+        if (!errorMessage) {
+          errorMessage = `An error occurred while ${confirmAction}ing the user`
+        }
+        
+        console.log('Extracted error message:', errorMessage)
+        setMsg(errorMessage)
+      } else {
+        setMsg(`An error occurred while ${confirmAction}ing the user`)
+      }
+    } finally {
+      setIsActivating(false)
+      setIsDeactivating(false)
+      setConfirmAction(null)
+    }
+  }
+
+  const handleCancelAction = () => {
+    setShowConfirmDialog(false)
+    setConfirmAction(null)
+    setConfirmMessage('')
+  }
   const module = 'Users'
   const crntPage = 'Edit User'
   const backBtn = state?.edit ? 'Back To Users' : 'Back To UserDetails'
@@ -373,6 +545,84 @@ useEffect(() => {
         onSubmit={handleSubmit}
       />
       <Box sx={{ mt: '120px' }}>
+        {/* Success/Error Messages */}
+        {msg && (
+          <Box sx={{ mb: 2, px: 2 }}>
+            <div style={{
+              padding: '12px 16px',
+              borderRadius: '4px',
+              backgroundColor: error ? '#ffebee' : '#e8f5e8',
+              color: error ? '#c62828' : '#2e7d32',
+              border: `1px solid ${error ? '#ef9a9a' : '#a5d6a7'}`,
+              fontSize: '14px'
+            }}>
+              {msg}
+            </div>
+          </Box>
+        )}
+
+        {/* Confirmation Dialog */}
+        {showConfirmDialog && (
+          <Box sx={{ 
+            position: 'fixed', 
+            top: 0, 
+            left: 0, 
+            right: 0, 
+            bottom: 0, 
+            backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            zIndex: 9999 
+          }}>
+            <Box sx={{ 
+              backgroundColor: 'white', 
+              padding: '24px', 
+              borderRadius: '8px', 
+              maxWidth: '400px', 
+              width: '90%',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)'
+            }}>
+              <Typography variant="h6" sx={{ mb: 2, color: '#1A3353', fontWeight: 'bold' }}>
+                Confirm Action
+              </Typography>
+              <Typography sx={{ mb: 3, color: '#666', fontSize: '14px' }}>
+                {confirmMessage}
+              </Typography>
+              <Box sx={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                <Button
+                  variant="outlined"
+                  onClick={handleCancelAction}
+                  disabled={isActivating || isDeactivating}
+                  sx={{ 
+                    borderColor: '#ccc', 
+                    color: '#666',
+                    textTransform: 'none',
+                    minWidth: '80px'
+                  }}
+                >
+                  No
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={handleConfirmAction}
+                  disabled={isActivating || isDeactivating}
+                  sx={{ 
+                    backgroundColor: confirmAction === 'activate' ? '#4caf50' : '#f44336',
+                    '&:hover': {
+                      backgroundColor: confirmAction === 'activate' ? '#45a049' : '#d32f2f'
+                    },
+                    textTransform: 'none',
+                    minWidth: '80px'
+                  }}
+                >
+                  {isActivating ? 'Activating...' : isDeactivating ? 'Deactivating...' : 'Yes'}
+                </Button>
+              </Box>
+            </Box>
+          </Box>
+        )}
+
         <form onSubmit={handleSubmit}>
           <div style={{ padding: '10px' }}>
             <div className="leadContainer">
@@ -447,6 +697,80 @@ useEffect(() => {
                           </Select>
                           {/* <FormHelperText>{errors?.[0] ? errors[0] : ''}</FormHelperText> */}
                         </FormControl>
+                      </div>
+                    </div>
+                    {/* User Status Management Buttons - Integrated in two-column layout */}
+                    <div className="fieldContainer2">
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">User Status</div>
+                        <div style={{ fontSize: '12px', color: '#666', paddingTop: '8px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ 
+                              color: userStatus === 'Active' ? '#4caf50' : userStatus === 'Inactive' ? '#f44336' : '#666',
+                              fontWeight: 'bold',
+                              fontSize: '14px'
+                            }}>
+                              {userStatus}
+                            </span>
+                            {isSelfDeactivation && (
+                              <span style={{ 
+                                fontSize: '10px', 
+                                color: '#ff9800', 
+                                backgroundColor: '#fff3e0', 
+                                padding: '2px 6px', 
+                                borderRadius: '4px',
+                                border: '1px solid #ffb74d'
+                              }}>
+                                Your Account
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Action</div>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <Tooltip title={isSelfDeactivation ? "You cannot change your own account status" : "Activate user account"}>
+                            <span>
+                              <Button
+                                variant="outlined"
+                                color="success"
+                                onClick={handleActivateUser}
+                                disabled={isActivating || isDeactivating || isSelfDeactivation}
+                                size="small"
+                                style={{ 
+                                  borderColor: isSelfDeactivation ? '#ccc' : '#4caf50',
+                                  color: isSelfDeactivation ? '#999' : '#4caf50',
+                                  textTransform: 'none',
+                                  minWidth: '100px',
+                                  fontSize: '12px'
+                                }}
+                              >
+                                {isActivating ? 'Activating...' : 'Activate'}
+                              </Button>
+                            </span>
+                          </Tooltip>
+                          <Tooltip title={isSelfDeactivation ? "You cannot change your own account status" : "Deactivate user account"}>
+                            <span>
+                              <Button
+                                variant="outlined"
+                                color="error"
+                                onClick={handleDeactivateUser}
+                                disabled={isActivating || isDeactivating || isSelfDeactivation}
+                                size="small"
+                                style={{ 
+                                  borderColor: isSelfDeactivation ? '#ccc' : '#f44336',
+                                  color: isSelfDeactivation ? '#999' : '#f44336',
+                                  textTransform: 'none',
+                                  minWidth: '100px',
+                                  fontSize: '12px'
+                                }}
+                              >
+                                {isDeactivating ? 'Deactivating...' : 'Deactivate'}
+                              </Button>
+                            </span>
+                          </Tooltip>
+                        </div>
                       </div>
                     </div>
                     <div className="fieldContainer2">
