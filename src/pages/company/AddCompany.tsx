@@ -25,12 +25,20 @@ type FormErrors = {
   name?: string[]
 }
 
+type CompanyForm = {
+  name: string
+  address: string
+  telephone: string
+}
+
 function AddCompany() {
   const navigate = useNavigate()
   const { state } = useLocation()
   const [error, setError] = useState(false)
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CompanyForm>({
     name: '',
+    address: '',
+    telephone: '',
   })
   const [errors, setErrors] = useState<FormErrors>({})
 
@@ -51,26 +59,28 @@ function AddCompany() {
       Authorization: localStorage.getItem('Token'),
       org: localStorage.getItem('org'),
     }
-    // console.log('Form data:', data);
-    const data = { name: formData.name }
+    // include address and telephone in payload
+    const data = {
+      name: formData.name,
+      address: formData.address,
+      telephone: formData.telephone,
+    }
     fetchData(`${CompaniesUrl}`, 'POST', JSON.stringify(data), Header)
       .then((res: any) => {
-        // console.log('Form data:', res);
         if (!res.error) {
           resetForm()
           navigate('/app/companies')
         }
         if (res.error) {
-          // console.log(res);
           setError(true)
-          //   setErrors(res?.errors?.contact_errors)
+          // setErrors(res?.errors?.contact_errors) // if you have server errors format
         }
       })
       .catch(() => {})
   }
 
   const resetForm = () => {
-    setFormData({ name: '' })
+    setFormData({ name: '', address: '', telephone: '' })
     setErrors({})
   }
   const backbtnHandle = () => {
@@ -83,7 +93,6 @@ function AddCompany() {
   const onCancel = () => {
     resetForm()
   }
-  // console.log(errors, 'err')
   return (
     <Box sx={{ mt: '60px' }}>
       <CustomAppBar
@@ -111,10 +120,10 @@ function AddCompany() {
                   <Box
                     sx={{ width: '98%', color: '#1A3353', mb: 1 }}
                     component="form"
-                    // noValidate
                     autoComplete="off"
                   >
                     <div className="fieldContainer">
+                      {/* Name */}
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Name</div>
                         <RequiredTextField
@@ -125,6 +134,32 @@ function AddCompany() {
                           size="small"
                           helperText={errors?.name?.[0] ? errors?.name[0] : ''}
                           error={!!errors?.name?.[0]}
+                        />
+                      </div>
+
+                      {/* Address */}
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Address</div>
+                        <RequiredTextField
+                          name="address"
+                          value={formData.address}
+                          onChange={handleChange}
+                          style={{ width: '70%' }}
+                          size="small"
+                          placeholder="Street, City, Country"
+                        />
+                      </div>
+
+                      {/* Telephone */}
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Telephone</div>
+                        <RequiredTextField
+                          name="telephone"
+                          value={formData.telephone}
+                          onChange={handleChange}
+                          style={{ width: '70%' }}
+                          size="small"
+                          placeholder="+31 6 1234 5678"
                         />
                       </div>
                     </div>
