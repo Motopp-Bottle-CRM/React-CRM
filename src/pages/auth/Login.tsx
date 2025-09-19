@@ -52,6 +52,13 @@ export default function Login() {
     .then((res: any) => {
       console.log('Response from server:', res)   // <--- Add this
       localStorage.setItem('Token', `Bearer ${res.access}`)
+      if (res.refresh) {
+        localStorage.setItem('refreshToken', res.refresh)
+      }
+      if (res.org_id) {
+        localStorage.setItem('org', res.org_id)
+        console.log("Saving org to localStorage:", res.org_id)
+      }
       localStorage.setItem('email', email)
       console.log("Saving email to localStorage:", email)
       setToken(true)
@@ -94,6 +101,13 @@ export default function Login() {
 
           if (res.access_token) {
             localStorage.setItem('Token', `Bearer ${res.access_token}`)
+            if (res.refresh_token) {
+              localStorage.setItem('refreshToken', res.refresh_token)
+            }
+            if (res.org_id) {
+              localStorage.setItem('org', res.org_id)
+              console.log("Saving org to localStorage:", res.org_id)
+            }
             localStorage.setItem('email', res.username)
             setToken(true)
             setSuccess('Successfully logged in with Google!')
