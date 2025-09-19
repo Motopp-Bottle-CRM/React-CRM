@@ -223,10 +223,10 @@ export function EditLead() {
   useEffect(() => {
     console.log('Setting form data from state:', state?.value);
     console.log('Phone value:', state?.value?.phone);
-    
+
     // Sanitize all string fields to remove JSX code
     const sanitizedData = { ...state?.value };
-    
+
     // Function to sanitize string fields
     const sanitizeString = (str: string) => {
       if (typeof str === 'string') {
@@ -234,14 +234,14 @@ export function EditLead() {
       }
       return str;
     };
-    
+
     // Sanitize all string fields
     Object.keys(sanitizedData).forEach(key => {
       if (typeof sanitizedData[key] === 'string') {
         sanitizedData[key] = sanitizeString(sanitizedData[key]);
       }
     });
-    
+
     console.log('Sanitized data:', sanitizedData);
     setFormData({
       ...sanitizedData,
@@ -253,7 +253,7 @@ export function EditLead() {
     if (reset) {
       // Sanitize all string fields to remove JSX code
       const sanitizedData = { ...state?.value };
-      
+
       // Function to sanitize string fields
       const sanitizeString = (str: string) => {
         if (typeof str === 'string') {
@@ -261,14 +261,14 @@ export function EditLead() {
         }
         return str;
       };
-      
+
       // Sanitize all string fields
       Object.keys(sanitizedData).forEach(key => {
         if (typeof sanitizedData[key] === 'string') {
           sanitizedData[key] = sanitizeString(sanitizedData[key]);
         }
       });
-      
+
       setFormData({
         ...sanitizedData,
         job_title: sanitizedData.job_title || ''
@@ -405,14 +405,14 @@ export function EditLead() {
       setErrors({ general: ['Lead Name is required'] });
       return;
     }
-    
+
     if (!formData.first_name && !formData.last_name) {
       setError(true);
       setErrors({ general: ['Please provide at least first name or last name'] });
       return;
     }
-    
-    
+
+
     const data: any = {
       title: formData.title,
       job_title: formData.job_title,
@@ -441,12 +441,12 @@ export function EditLead() {
       industry: formData.industry,
       linkedin_id: formData.linkedin_id || '',
     }
-    
+
     // Only include contacts if there are any
     if (formData.contacts && formData.contacts.length > 0) {
       data.contacts = formData.contacts;
     }
-    
+
     console.log('EditLead - Submitting data:', data);
     console.log('EditLead - Industry value:', formData.industry);
     console.log('EditLead - Company field:', formData.company, 'Company name:', companies.find(c => c.id === formData.company)?.name);
@@ -1233,7 +1233,7 @@ export function EditLead() {
                             }
                             error={!!errors?.phone?.[0]}
                             inputProps={{
-                              style: { 
+                              style: {
                                 fontSize: '14px',
                                 color: '#333'
                               }

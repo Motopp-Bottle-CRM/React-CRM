@@ -310,6 +310,8 @@ export default function LeadDetailsTest() {
         },
         id: state?.leadId,
         users: leadDetails?.users,
+        status: leadDetails?.status,
+        countries: leadDetails?.countries,
         comment,
       },
     })
