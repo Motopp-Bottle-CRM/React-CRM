@@ -6,12 +6,20 @@ import { FaBuilding, FaAddressBook, FaUsers, FaHandshake } from 'react-icons/fa'
 import { ROLE_PERMISSIONS } from '../../constants/role_permissions'
 import { hasAccess } from '../../utils/permissions'
 import { Link, useNavigate } from 'react-router-dom';
+import { FunnelChart, Funnel, LabelList, Tooltip } from "recharts";
 
 interface DashboardData {
   accounts_count: number
   contacts_count: number
   leads_count: number
   opportunities_count: number
+  leads_this_month: number
+  kpi_leads: number
+  leads_assigned: number
+  leads_inprocess: number
+  leads_converted: number
+  leads_recycled: number
+  leads_closed: number
   accounts: any[]
   contacts: any[]
   leads: any[]
@@ -39,24 +47,38 @@ export default function Dashboard() {
   }
     const navigate = useNavigate();
   const role = localStorage.getItem('role') || 'SALES'  
+  
+  const kpi_leads = ((dash_data?.kpi_leads ?? 0) * 100).toFixed(2) + "%";
 
   const AllDash_data = [
-    { label: 'leads', value: dash_data?.leads_count ?? 0, icon: <FaUsers size={40} /> },
-    { label: 'opportunities', value: dash_data?.opportunities_count ?? 0, icon: <FaHandshake size={40} /> },
-    { label: 'accounts', value: dash_data?.accounts_count ?? 0, icon: <FaBuilding size={40} /> },
-    { label: 'contacts', value: dash_data?.contacts_count ?? 0, icon: <FaAddressBook size={40} /> },
+    { label: 'leads', value: dash_data?.leads_count ?? 0, extraText:'Total',icon: <FaUsers size={20} /> },
+    { label: 'leads', value: dash_data?.leads_this_month ?? 0, extraText:'This month',icon: <FaUsers size={20} /> },
+    { label: 'leads', value: kpi_leads ?? 0, extraText:'KPI ',icon: <FaUsers size={20} /> },
+  
+    // { label: 'opportunities', value: dash_data?.opportunities_count ?? 0, extraText:'Total',icon: <FaHandshake size={20} /> },
+    // { label: 'accounts', value: dash_data?.accounts_count ?? 0, extraText:'total', icon: <FaBuilding size={20} /> },
+    
+    { label: 'contacts', value: dash_data?.contacts_count ?? 0, extraText:'Total', icon: <FaAddressBook size={20} /> },
    ]
    
    const AllRecent_data = [
     { key: 'leads', title: 'Recent Leads', data: dash_data?.leads, path: 'leads/lead-details' },
-    { key: 'opportunities', title: 'Recent Opportunities', data: dash_data?.opportunities, path: '/app/opportunities' },
-    { key: 'accounts', title: 'Recent Accounts', data: dash_data?.accounts, path: '/app/accounts' },
-    { key: 'contacts', title: 'Recent Contacts', data: dash_data?.contacts, path: '/app/contacts' }, 
+    // { key: 'opportunities', title: 'Recent Opportunities', data: dash_data?.opportunities, path: '/app/opportunities' },
+    // { key: 'accounts', title: 'Recent Accounts', data: dash_data?.accounts, path: '/app/accounts' },
+    //
+     { key: 'contacts', title: 'Recent Contacts', data: dash_data?.contacts, path: '/app/contacts' }, 
    ]
   const Dash_data = AllDash_data.filter((stat) => hasAccess(role, stat.label));
   const colors = ['#e3f2fd', '#fce4ec', '#e8f5e9', '#fff3e0']
 
-
+  {/* for chart */}
+  const Chart_leads = [
+    { stage: "Assigned", value: dash_data?.leads_assigned ?? 0, fill: "#04702fff"},
+    { stage: "In process", value: dash_data?.leads_inprocess ?? 0, fill: "#42a878ff"},
+    { stage: "Converted", value: dash_data?.leads_converted ?? 0, fill: "#cff37cff"},
+    { stage: "Recycled", value:   dash_data?.leads_recycled ?? 0, fill: "#db8616ff"},
+    { stage: "Closed", value: dash_data?.leads_closed ?? 0, fill: "#f01010ff"},
+  ];
   
   return (
     <div style={{ padding: '20px' }}>
@@ -81,15 +103,15 @@ export default function Dashboard() {
                 transform: "translateY(-5px)",
                 boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
                 },
-            }}
+            }} 
             >
             {/* Left side: icon + label */}
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             {stat.icon}
 
             <Box sx={{ display: "flex", flexDirection: "column" }}>
-                <Typography variant="h5">{stat.label}</Typography>
-                <Typography variant="h6" color="text.secondary">total</Typography>
+                <Typography>{stat.label}</Typography>
+                <Typography variant="h6" color="text.secondary"> {stat.extraText}</Typography>
             </Box>
             </Box>
 
@@ -114,8 +136,10 @@ export default function Dashboard() {
                 textAlign: "center",
                 }}
             >
-                <Typography variant="h5">{item.title}</Typography>
+                <Typography >{item.title}</Typography>
             </Box>
+
+
 
             {/* Card */}
             <Paper
@@ -153,7 +177,7 @@ export default function Dashboard() {
                               marginTop: 0,
                         }}
                     >
-                        <ul>
+                        {/* <ul>
                             <li> country - <span style={{ color: '#1a3353' }}> {entry?.country || ''}</span></li>
                             <li> source - 
                             <span style={{ color: '#1a3353', fontWeight: 700 }}>
@@ -161,7 +185,7 @@ export default function Dashboard() {
                             <li>status - 
                             <span style={{ color: '#1a3353', fontWeight: 700 }}>
                               {entry?.status || '--'}</span></li>
-                        </ul>
+                        </ul> */}
                             
                     </div>
                     </Typography>
@@ -172,7 +196,31 @@ export default function Dashboard() {
             )
         })}
         </Box>
-
+          {/* chart */}
+          <FunnelChart width={300} height={300}>
+                <Tooltip />
+                <Funnel
+                  dataKey="value"
+                  data={Chart_leads}
+                  isAnimationActive
+                >
+                 {/* Labels with stage names */}
+                <LabelList
+                  position="right"
+                  dataKey="stage"
+                  fill="#000"
+                  stroke="none"
+                />
+                {/* Labels with numbers */}
+                <LabelList
+                  position="insideRight"
+                  dataKey="value"
+                  fill="#000"
+                  stroke="none"
+                  
+                />
+                </Funnel>
+              </FunnelChart>
     </div>
   )
 }
