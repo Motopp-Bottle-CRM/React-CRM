@@ -106,7 +106,7 @@ type FormErrors = {
   postcode?: string[]
   country?: string[]
   tags?: string[]
-  company?: string[]
+  company_name?: string[]
   probability?: number[]
   industry?: string[]
   linkedin_id?: string[]
@@ -137,7 +137,7 @@ interface FormData {
   postcode: string
   country: string
   tags: string[]
-  company: string
+  company_name: string
   probability: number
   industry: string
   linkedin_id: string
@@ -167,9 +167,6 @@ export function EditLead() {
   const [statusSelectOpen, setStatusSelectOpen] = useState(false)
   const [countrySelectOpen, setCountrySelectOpen] = useState(false)
   const [industrySelectOpen, setIndustrySelectOpen] = useState(false)
-  const [companySelectOpen, setCompanySelectOpen] = useState(false)
-  const [companies, setCompanies] = useState<any[]>([])
-  const [companiesLoading, setCompaniesLoading] = useState(true)
   const [errors, setErrors] = useState<FormErrors>({})
   const [formData, setFormData] = useState<FormData>({
     title: '',
@@ -195,7 +192,7 @@ export function EditLead() {
     postcode: '',
     country: '',
     tags: [],
-    company: '',
+    company_name: '',
     probability: 1,
     industry: 'ADVERTISING',
     linkedin_id: '',
@@ -292,25 +289,6 @@ export function EditLead() {
     }
   }, [quill, formData.description])
 
-  // Fetch companies on component mount
-  useEffect(() => {
-    setCompaniesLoading(true)
-    fetchData('leads/companies', 'GET', null, Header)
-      .then((res: any) => {
-        if (!res.error && res.data) {
-          setCompanies(Array.isArray(res.data) ? res.data : [])
-        } else {
-          setCompanies([])
-        }
-      })
-      .catch((error) => {
-        console.log('Error fetching companies:', error)
-        setCompanies([])
-      })
-      .finally(() => {
-        setCompaniesLoading(false)
-      })
-  }, [])
 
   // useEffect(() => {
   //     if (quill && initialContentRef.current === null) {
@@ -437,8 +415,8 @@ export function EditLead() {
       state: formData.state,
       postcode: formData.postcode,
       country: formData.country,
+      company: formData.company_name,
       tags: formData.tags || [],
-      company: formData.company || null,
       probability: formData.probability ? Math.round(Math.min(formData.probability, 100)) : 0,
       industry: formData.industry,
       linkedin_id: formData.linkedin_id || '',
@@ -451,8 +429,7 @@ export function EditLead() {
 
     console.log('EditLead - Submitting data:', data);
     console.log('EditLead - Industry value:', formData.industry);
-    console.log('EditLead - Company field:', formData.company, 'Company name:', companies.find(c => c.id === formData.company)?.name);
-    console.log('EditLead - Company UUID being sent:', data.company);
+    console.log('EditLead - Company name:', formData.company_name);
     fetchData(`${LeadUrl}/${state?.id}/`, 'PUT', JSON.stringify(data), Header)
       .then((res: any) => {
         console.log('EditLead - API Response:', res);
@@ -504,7 +481,7 @@ export function EditLead() {
       postcode: '',
       country: '',
       tags: [],
-      company: '',
+      company_name: '',
       probability: 1,
       industry: 'ADVERTISING',
       linkedin_id: '',
@@ -812,52 +789,18 @@ export function EditLead() {
                     </div>
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Company</div>
-                        <FormControl sx={{ width: '70%' }}>
-                          <Select
-                            name="company"
-                            value={formData.company}
-                            open={companySelectOpen}
-                            onClick={() => setCompanySelectOpen(!companySelectOpen)}
-                            IconComponent={() => (
-                              <div
-                                onClick={() => setCompanySelectOpen(!companySelectOpen)}
-                                className="select-icon-background"
-                              >
-                                {companySelectOpen ? (
-                                  <FiChevronUp className="select-icon" />
-                                ) : (
-                                  <FiChevronDown className="select-icon" />
-                                )}
-                              </div>
-                            )}
-                            className={'select'}
-                            onChange={handleChange}
-                            error={!!errors?.company?.[0]}
-                            MenuProps={{
-                              PaperProps: {
-                                style: {
-                                  height: '200px',
-                                },
-                              },
-                            }}
-                          >
-                            {companiesLoading ? (
-                              <MenuItem disabled>Loading companies...</MenuItem>
-                            ) : companies && companies.length > 0 ? (
-                              companies.map((company: any) => (
-                                <MenuItem key={company?.id || ''} value={company?.id || ''}>
-                                  {company?.name || 'Unknown Company'}
-                              </MenuItem>
-                              ))
-                            ) : (
-                              <MenuItem disabled>No companies available</MenuItem>
-                            )}
-                          </Select>
-                          <FormHelperText>
-                            {errors?.company?.[0] ? errors?.company[0] : ''}
-                          </FormHelperText>
-                        </FormControl>
+                        <div className="fieldTitle">Company Name</div>
+                        <TextField
+                          name="company_name"
+                          value={formData.company_name}
+                          onChange={handleChange}
+                          style={{ width: '70%' }}
+                          size="small"
+                          error={!!errors?.company_name?.[0]}
+                          helperText={
+                            errors?.company_name?.[0] ? errors?.company_name[0] : ''
+                          }
+                        />
                       </div>
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Status</div>

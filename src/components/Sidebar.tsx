@@ -34,10 +34,6 @@ import { fetchData } from './FetchData'
 import { ProfileUrl } from '../services/ApiUrls'
 import { Header1 } from './FetchData'
 import OrganizationModal from '../pages/organization/OrganizationModal'
-import Company from '../pages/company/Company'
-import AddCompany from '../pages/company/AddCompany'
-import CompanyDetails from '../pages/company/CompanyDetails'
-import EditCompany from '../pages/company/EditCompany'
 import Leads from '../pages/leads/Leads'
 import AddContacts from '../pages/contacts/AddContacts'
 import { EditLead } from '../pages/leads/EditLead'
@@ -100,7 +96,6 @@ const toggleScreen = () => {
     contacts: "contacts",
     opportunities: "opportunities",
     accounts: "accounts",
-    companies: "companies",
     users: "users",
     cases: "cases",
   };
@@ -150,7 +145,6 @@ useEffect(() => {
     contacts: <FaAddressBook />,
     opportunities: <FaHandshake />,
     accounts: <FaBuilding />,
-    companies: <FaIndustry />,
     users: <FaUserFriends />,
     cases: <FaBriefcase />,
   }
@@ -421,38 +415,6 @@ useEffect(() => {
               />
 
               {/* Companies */}
-              <Route
-                path="/app/companies"
-                element={
-                  <ProtectedRoute role={role} module="companies">
-                    <Company />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/app/companies/add-company"
-                element={
-                  <ProtectedRoute role={role} module="companies">
-                    <AddCompany />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/app/companies/edit-company"
-                element={
-                  <ProtectedRoute role={role} module="companies">
-                    <EditCompany />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/app/companies/company-details"
-                element={
-                  <ProtectedRoute role={role} module="companies">
-                    <CompanyDetails />
-                  </ProtectedRoute>
-                }
-              />
 
               {/* Contacts */}
               <Route

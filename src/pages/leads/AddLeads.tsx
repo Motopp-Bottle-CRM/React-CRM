@@ -108,7 +108,7 @@ type FormErrors = {
   postcode?: string[]
   country?: string[]
   tags?: string[]
-  company?: string[]
+  company_name?: string[]
   probability?: number[]
   industry?: string[]
   linkedin_id?: string[]
@@ -139,7 +139,7 @@ interface FormData {
   postcode: string
   country: string
   tags: string[]
-  company: string
+  company_name: string
   probability: number
   industry: string
   linkedin_id: string
@@ -167,8 +167,6 @@ export function AddLeads() {
   const [statusSelectOpen, setStatusSelectOpen] = useState(false)
   const [countrySelectOpen, setCountrySelectOpen] = useState(false)
   const [industrySelectOpen, setIndustrySelectOpen] = useState(false)
-  const [companySelectOpen, setCompanySelectOpen] = useState(false)
-  const [companies, setCompanies] = useState<any[]>([])
   const [errors, setErrors] = useState<FormErrors>({})
   const [formData, setFormData] = useState<FormData>({
     title: '',
@@ -194,7 +192,7 @@ export function AddLeads() {
     postcode: '',
     country: '',
     tags: [],
-    company: '',
+    company_name: '',
     probability: 1,
     industry: 'ADVERTISING',
     linkedin_id: '',
@@ -208,18 +206,6 @@ export function AddLeads() {
     }
   }, [quill])
 
-  // Fetch companies on component mount
-  useEffect(() => {
-    fetchData('leads/companies', 'GET', null, Header)
-      .then((res: any) => {
-        if (!res.error) {
-          setCompanies(res.data || [])
-        }
-      })
-      .catch((error) => {
-        console.log('Error fetching companies:', error)
-      })
-  }, [])
 
   const handleChange2 = (title: any, val: any) => {
     // const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -301,9 +287,9 @@ export function AddLeads() {
       return;
     }
     
-    if (!formData.company || formData.company.trim() === '') {
+    if (!formData.company_name || formData.company_name.trim() === '') {
       setError(true);
-      setErrors({ general: ['Company is required'] });
+      setErrors({ general: ['Company name is required'] });
       return;
     }
     
@@ -341,8 +327,7 @@ export function AddLeads() {
       state: formData.state,
       postcode: formData.postcode,
       country: formData.country,
-      company: formData.company,
-      organization: formData.company ? companies.find(c => c.id === formData.company)?.name || 'Unknown Organization' : 'Unknown Organization', 
+      company: formData.company_name, 
       probability: Math.round(Math.min(formData.probability, 100)), 
       industry: formData.industry,
       linkedin_id: formData.linkedin_id,
@@ -410,7 +395,7 @@ export function AddLeads() {
       postcode: '',
       country: '',
       tags: [],
-      company: '',
+      company_name: '',
       probability: 1,
       industry: 'ADVERTISING',
       linkedin_id: '',
@@ -699,51 +684,19 @@ export function AddLeads() {
                     </div>
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Company</div>
-                        <FormControl sx={{ width: '70%' }}>
-                          <RequiredSelect
-                            name="company"
-                            value={formData.company}
-                            open={companySelectOpen}
-                            onClick={() => setCompanySelectOpen(!companySelectOpen)}
-                            IconComponent={() => (
-                              <div
-                                onClick={() => setCompanySelectOpen(!companySelectOpen)}
-                                className="select-icon-background"
-                              >
-                                {companySelectOpen ? (
-                                  <FiChevronUp className="select-icon" />
-                                ) : (
-                                  <FiChevronDown className="select-icon" />
-                                )}
-                              </div>
-                            )}
-                            className={'select'}
-                            onChange={handleChange}
-                            error={!!errors?.company?.[0]}
-                            required
-                            MenuProps={{
-                              PaperProps: {
-                                style: {
-                                  height: '200px',
-                                },
-                              },
-                            }}
-                          >
-                            {companies && companies.length > 0 ? (
-                              companies.map((company: any) => (
-                                <MenuItem key={company?.id || ''} value={company?.id || ''}>
-                                  {company?.name || 'Unknown Company'}
-                                </MenuItem>
-                              ))
-                            ) : (
-                              <MenuItem disabled>No companies available</MenuItem>
-                            )}
-                          </RequiredSelect>
-                          <FormHelperText>
-                            {errors?.company?.[0] ? errors?.company[0] : ''}
-                          </FormHelperText>
-                        </FormControl>
+                        <div className="fieldTitle">Company Name</div>
+                        <RequiredTextField
+                          name="company_name"
+                          value={formData.company_name}
+                          onChange={handleChange}
+                          style={{ width: '70%' }}
+                          size="small"
+                          required
+                          error={!!errors?.company_name?.[0]}
+                          helperText={
+                            errors?.company_name?.[0] ? errors?.company_name[0] : ''
+                          }
+                        />
                       </div>
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Status</div>
