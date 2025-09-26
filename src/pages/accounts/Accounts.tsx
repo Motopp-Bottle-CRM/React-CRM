@@ -717,9 +717,9 @@ export default function Accounts() {
                                     alignItems: 'center',
                                   }}
                                 >
-                                  <Avatar
-                                    src={item?.lead?.created_by?.profile_pic}
-                                    alt={item?.lead?.created_by?.email}
+                                  <Avatar sx={{ width: 40, height: 40, backgroundColor: '#3f51b5' }}
+                                    src={item?.lead?.first_name.charAt(0)}
+                                    alt={item?.lead?.first_name.charAt(0)}
                                   />
                                   <Stack sx={{ ml: 1 }}>
                                     {item?.lead?.first_name && item?.lead?.last_name
