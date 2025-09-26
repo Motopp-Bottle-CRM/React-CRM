@@ -29,6 +29,7 @@ import {
 } from 'react-icons/fa'
 import { json } from 'stream/consumers'
 import { ConvertModel } from '../../components/ConvertModel'
+import zIndex from 'material-ui/styles/zIndex'
 export default function LeadDetails() {
   interface RecievedComments {
     id: string
@@ -147,6 +148,7 @@ export default function LeadDetails() {
   const [convertedLead, setConvertedLead] = useState(false)
   const [open, setOpen] = useState(false)
   const [selectedLeadId, setSelectedLeadId] = useState('')
+  const [success, setSuccess] = useState(false)
   useEffect(() => {
     getLeadDetails(state?.leadId)
     getComment(state?.leadId)
@@ -338,8 +340,11 @@ export default function LeadDetails() {
     setSelectedLeadId(state?.leadId)
     setOpen(false)
     postConveredLead(selectedLeadId)
-    alert('Lead Converted Successfully')
-
+    setSuccess(true)
+    setTimeout(() => {
+      navigate('/app/accounts/')
+    }, 3000)
+    // alert('Lead Converted Successfully')
   }
   const postConveredLead = async (id: string) => {
     const Header = {
@@ -347,14 +352,22 @@ export default function LeadDetails() {
       'Content-Type': 'application/json',
       Authorization: localStorage.getItem('Token'),
       org: localStorage.getItem('org'),
-  }
-  const body = JSON.stringify({
+    }
+    const body = JSON.stringify({
       status: 'Converted',
     })
-  const response = await fetchData(`leads/status/${id}/`, 'PUT', body, Header)
-    setConvertedLead(true)
-
-}
+    try {
+      const response = await fetchData(
+        `leads/status/${id}/`,
+        'PUT',
+        body,
+        Header
+      )
+      setConvertedLead(true)
+    } catch (error) {
+      console.log('failed to convert lead', error)
+    }
+  }
   const module = 'Leads'
   const crntPage = 'Lead Details'
   const backBtn = 'Back To Leads'
@@ -371,7 +384,7 @@ export default function LeadDetails() {
         crntPage={crntPage}
         editHandle={editHandle}
       />
-      <Box sx={{ mt: 15 }}>
+      <Box sx={{ mt: 15, position: 'relative' }}>
         <Box sx={{ display: 'flex' }}>
           <Box
             sx={{
@@ -773,6 +786,7 @@ export default function LeadDetails() {
               </Box>
             </Box>
           </Box>
+
         </Box>
         <ConvertModel
           onClose={closeConvertedLead}
@@ -782,6 +796,28 @@ export default function LeadDetails() {
           id={leadId}
           ConvertLead={handleConvert}
         />
+        {success && (
+            <Box sx={{ display: 'flex', justifyContent: 'center' , alignItems: 'center', position: 'absolute',
+                  top: 8,
+                  right: 700,
+                  zIndex: 1000,
+                  }}>
+              <Box
+                sx={{
+
+                  padding: 2,
+                  borderRadius: 2,
+                  display: 'flex',
+                  alignItems: 'center',
+                  backgroundColor: '#82e6edff',
+                  boxShadow: 3,
+                  gap: 1,
+                }}
+              >
+                <Typography variant='h6'> lead converted successfully!</Typography>
+              </Box>
+            </Box>
+          )}
       </Box>
     </Box>
   )
