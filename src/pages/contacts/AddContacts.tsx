@@ -217,7 +217,16 @@ function AddContacts() {
           setErrors(res?.errors?.contact_errors)
         }
       })
-      .catch(() => {})
+      .catch((err: any) => {
+        // Merge contact and address errors (backend returns address_errors as a tuple)
+        console.error('Create contact failed with errors:', err)
+        setError(true)
+        const contactErrors = err?.errors?.contact_errors || {}
+        const addressErrors = Array.isArray(err?.errors?.address_errors)
+          ? err?.errors?.address_errors?.[0] || {}
+          : err?.errors?.address_errors || {}
+        setErrors({ ...(contactErrors as any), ...(addressErrors as any) })
+      })
   }
 
   const resetForm = () => {
