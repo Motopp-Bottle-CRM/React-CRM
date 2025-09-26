@@ -75,7 +75,7 @@ const headCells: readonly HeadCell[] = [
     id: 'created_by',
     numeric: true,
     disablePadding: false,
-    label: 'Created By',
+    label: 'Contact Person',
   },
   {
     id: 'country',
@@ -722,8 +722,8 @@ export default function Accounts() {
                                     alt={item?.lead?.created_by?.email}
                                   />
                                   <Stack sx={{ ml: 1 }}>
-                                    {item?.lead?.account_name
-                                      ? item?.lead?.account_name
+                                    {item?.lead?.first_name && item?.lead?.last_name
+                                      ? `${item?.lead?.first_name} ${item?.lead?.last_name}`
                                       : '---'}
                                   </Stack>
                                 </Stack>
