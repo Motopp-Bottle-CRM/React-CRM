@@ -386,6 +386,12 @@ export function EditLead() {
       return;
     }
 
+    if (!formData.company_name || formData.company_name.trim() === '') {
+      setError(true);
+      setErrors({ general: ['Company name is required'] });
+      return;
+    }
+
     if (!formData.first_name && !formData.last_name) {
       setError(true);
       setErrors({ general: ['Please provide at least first name or last name'] });
@@ -414,7 +420,6 @@ export function EditLead() {
       city: formData.city,
       state: formData.state,
       postcode: formData.postcode,
-      country: formData.country,
       company: formData.company_name,
       tags: formData.tags || [],
       probability: formData.probability ? Math.round(Math.min(formData.probability, 100)) : 0,
@@ -425,6 +430,11 @@ export function EditLead() {
     // Only include contacts if there are any
     if (formData.contacts && formData.contacts.length > 0) {
       data.contacts = formData.contacts;
+    }
+
+    // Only include country if it has a value
+    if (formData.country && typeof formData.country === 'string' && formData.country.trim() !== '') {
+      data.country = formData.country;
     }
 
     console.log('EditLead - Submitting data:', data);
@@ -790,12 +800,13 @@ export function EditLead() {
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Company Name</div>
-                        <TextField
+                        <RequiredTextField
                           name="company_name"
                           value={formData.company_name}
                           onChange={handleChange}
                           style={{ width: '70%' }}
                           size="small"
+                          required
                           error={!!errors?.company_name?.[0]}
                           helperText={
                             errors?.company_name?.[0] ? errors?.company_name[0] : ''

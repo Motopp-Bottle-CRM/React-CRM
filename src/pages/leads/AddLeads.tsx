@@ -308,7 +308,7 @@ export function AddLeads() {
     
     
     // console.log('Form data:', formData.lead_attachment,'sfs', formData.file);
-    const data = {
+    const data: any = {
       title: formData.title || `New Lead ${Date.now()}`, 
       job_title: formData.job_title,
       first_name: formData.first_name,
@@ -326,11 +326,11 @@ export function AddLeads() {
       city: formData.city,
       state: formData.state,
       postcode: formData.postcode,
-      country: formData.country,
       company: formData.company_name, 
       probability: Math.round(Math.min(formData.probability, 100)), 
       industry: formData.industry,
       linkedin_id: formData.linkedin_id,
+      ...(formData.country && typeof formData.country === 'string' && formData.country.trim() !== '' && { country: formData.country })
     }
     
     fetchData(`${LeadUrl}/`, 'POST', JSON.stringify(data), Header)
