@@ -19,6 +19,7 @@ import {
   Divider,
   Select,
   Button,
+  Alert,
 } from '@mui/material'
 import { useQuill } from 'react-quilljs'
 import 'quill/dist/quill.snow.css'
@@ -157,6 +158,7 @@ export function EditLead() {
   const autocompleteRef = useRef<any>(null)
   const [reset, setReset] = useState(false)
   const [error, setError] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
   const [selectedContacts, setSelectedContacts] = useState<any[]>([])
   const [selectedAssignTo, setSelectedAssignTo] = useState<any[]>([])
   const [selectedTags, setSelectedTags] = useState<any[]>([])
@@ -455,14 +457,17 @@ export function EditLead() {
       .then((res: any) => {
         console.log('EditLead - API Response:', res);
         if (!res.error) {
-          backbtnHandle()
-          // setResponceError(data.error)
-          // navigate('/contacts')
-          // resetForm()
+          setSuccessMessage('Lead updated successfully!')
+          setError(false)
+          // Show success message for 1 second before navigating
+          setTimeout(() => {
+            backbtnHandle()
+          }, 1000)
         }
         if (res.error) {
           console.log('EditLead - API Error:', res.errors);
           setError(true)
+          setSuccessMessage('')
           setErrors(res?.errors)
         }
       })
@@ -470,6 +475,7 @@ export function EditLead() {
         console.log('EditLead - Fetch Error:', error);
         console.log('EditLead - Error details:', JSON.stringify(error, null, 2));
         setError(true)
+        setSuccessMessage('')
         setErrors(error?.errors || { general: ['An error occurred while saving the lead.'] })
       })
   }
@@ -574,6 +580,14 @@ export function EditLead() {
         onSubmit={handleSubmit}
       />
       <Box sx={{ mt: '120px' }}>
+        {/* Success Message Alert */}
+        {successMessage && (
+          <Box sx={{ mb: 2, px: 2 }}>
+            <Alert severity="success" onClose={() => setSuccessMessage('')}>
+              {successMessage}
+            </Alert>
+          </Box>
+        )}
         <form onSubmit={handleSubmit}>
           <div style={{ padding: '10px' }}>
             <div className="leadContainer">

@@ -19,6 +19,7 @@ import {
   Divider,
   Select,
   Button,
+  Alert,
 } from '@mui/material'
 import { useQuill } from 'react-quilljs'
 import 'quill/dist/quill.snow.css'
@@ -157,7 +158,7 @@ export function AddLeads() {
 
   const autocompleteRef = useRef<any>(null)
   const [error, setError] = useState(false)
-  const [success, setSuccess] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
   const [selectedContacts, setSelectedContacts] = useState<any[]>([])
   const [selectedAssignTo, setSelectedAssignTo] = useState<any[]>([])
   const [selectedTags, setSelectedTags] = useState<any[]>([])
@@ -351,17 +352,17 @@ export function AddLeads() {
       .then((res: any) => {
         console.log('Form data response:', res);
         if (!res.error) {
-          setSuccess(true)
+          setSuccessMessage('Lead created successfully!')
           setError(false)
-          // Show success message for 2 seconds before navigating
+          // Show success message for 1 second before navigating
           setTimeout(() => {
             resetForm()
             navigate('/app/leads')
-          }, 2000)
+          }, 1000)
         }
         if (res.error) {
           setError(true)
-          setSuccess(false)
+          setSuccessMessage('')
           setErrors(res?.errors)
         }
       })
@@ -369,7 +370,7 @@ export function AddLeads() {
         console.error('Lead creation error:', error);
         console.error('Error details:', JSON.stringify(error, null, 2));
         setError(true)
-        setSuccess(false)
+        setSuccessMessage('')
         
         // Handle different types of errors
         if (error.message && error.message.includes('Session expired')) {
@@ -416,7 +417,7 @@ export function AddLeads() {
       file: null,
     })
     setErrors({})
-    setSuccess(false)
+    setSuccessMessage('')
     setSelectedContacts([])
     setSelectedAssignTo([])
     setSelectedTags([])
@@ -451,6 +452,14 @@ export function AddLeads() {
         onSubmit={handleSubmit}
       />
       <Box sx={{ mt: '120px' }}>
+        {/* Success Message Alert */}
+        {successMessage && (
+          <Box sx={{ mb: 2, px: 2 }}>
+            <Alert severity="success" onClose={() => setSuccessMessage('')}>
+              {successMessage}
+            </Alert>
+          </Box>
+        )}
         <form onSubmit={handleSubmit}>
           <div style={{ padding: '10px' }}>
             <div className="leadContainer">
@@ -473,22 +482,6 @@ export function AddLeads() {
                     {error && errors?.general && (
                       <div style={{ color: 'red', marginBottom: '10px', padding: '10px', backgroundColor: '#ffebee', border: '1px solid #f44336', borderRadius: '4px' }}>
                         {errors.general[0]}
-                      </div>
-                    )}
-                    {success && (
-                      <div style={{ 
-                        color: '#2e7d32', 
-                        marginBottom: '15px', 
-                        padding: '15px', 
-                        backgroundColor: '#e8f5e8', 
-                        border: '2px solid #4caf50', 
-                        borderRadius: '8px',
-                        fontSize: '16px',
-                        fontWeight: 'bold',
-                        textAlign: 'center',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                      }}>
-                        ✅ Lead created successfully! Redirecting to leads list...
                       </div>
                     )}
                     <div className="fieldContainer">

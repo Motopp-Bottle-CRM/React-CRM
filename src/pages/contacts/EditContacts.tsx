@@ -14,6 +14,7 @@ import {
   Divider,
   FormHelperText,
   Button,
+  Alert,
 } from '@mui/material'
 import { useQuill } from 'react-quilljs'
 import 'quill/dist/quill.snow.css'
@@ -75,6 +76,7 @@ function EditContact() {
 
   const [reset, setReset] = useState(false)
   const [error, setError] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
   const [formData, setFormData] = useState({
     salutation: '',
     first_name: '',
@@ -224,17 +226,25 @@ function EditContact() {
       .then((res: any) => {
         console.log('Form data:', res)
         if (!res.error) {
-          backbtnHandle()
-          // setResponceError(data.error)
-          // navigate('/contacts')
-          // resetForm()
+          setSuccessMessage('Contact updated successfully!')
+          setError(false)
+          // Show success message for 1 second before navigating
+          setTimeout(() => {
+            backbtnHandle()
+          }, 1000)
         }
         if (res.error) {
           setError(true)
+          setSuccessMessage('')
           setErrors(res?.errors?.contact_errors)
         }
       })
-      .catch(() => {})
+      .catch((err: any) => {
+        console.error('Edit contact failed with errors:', err)
+        setError(true)
+        setSuccessMessage('')
+        setErrors(err?.errors?.contact_errors || {})
+      })
   }
 
   const backbtnHandle = () => {
@@ -262,6 +272,14 @@ function EditContact() {
         onSubmit={handleSubmit}
       />
       <Box sx={{ mt: '120px' }}>
+        {/* Success Message Alert */}
+        {successMessage && (
+          <Box sx={{ mb: 2, px: 2 }}>
+            <Alert severity="success" onClose={() => setSuccessMessage('')}>
+              {successMessage}
+            </Alert>
+          </Box>
+        )}
         <form onSubmit={handleSubmit}>
           {/* lead details */}
           <div style={{ padding: '10px' }}>
@@ -283,21 +301,6 @@ function EditContact() {
                   >
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Last Name</div>
-                        <RequiredTextField
-                          name="last_name"
-                          value={formData.last_name}
-                          onChange={handleChange}
-                          style={{ width: '70%' }}
-                          size="small"
-                          required
-                          error={!!errors?.last_name?.[0]}
-                          helperText={
-                            errors?.last_name?.[0] ? errors?.last_name[0] : ''
-                          }
-                        />
-                      </div>
-                      <div className="fieldSubContainer">
                         <div className="fieldTitle">First Name</div>
                         <RequiredTextField
                           name="first_name"
@@ -309,6 +312,21 @@ function EditContact() {
                           error={!!errors?.first_name?.[0]}
                           helperText={
                             errors?.first_name?.[0] ? errors?.first_name[0] : ''
+                          }
+                        />
+                      </div>
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Last Name</div>
+                        <RequiredTextField
+                          name="last_name"
+                          value={formData.last_name}
+                          onChange={handleChange}
+                          style={{ width: '70%' }}
+                          size="small"
+                          required
+                          error={!!errors?.last_name?.[0]}
+                          helperText={
+                            errors?.last_name?.[0] ? errors?.last_name[0] : ''
                           }
                         />
                       </div>

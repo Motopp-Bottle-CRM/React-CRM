@@ -14,6 +14,7 @@ import {
   Select,
   FormHelperText,
   Button,
+  Alert,
 } from '@mui/material'
 import { useQuill } from 'react-quilljs'
 import 'quill/dist/quill.snow.css'
@@ -71,6 +72,7 @@ function AddContacts() {
   // }, [location.pathname]);
 
   const [error, setError] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
   const [formData, setFormData] = useState({
     salutation: '',
     first_name: '',
@@ -208,12 +210,17 @@ function AddContacts() {
       .then((res: any) => {
         // console.log('Form data:', res);
         if (!res.error) {
-          // setResponceError(data.error)
-          navigate('/app/contacts')
-          resetForm()
+          setSuccessMessage('Contact created successfully!')
+          setError(false)
+          // Show success message for 1 second before navigating
+          setTimeout(() => {
+            resetForm()
+            navigate('/app/contacts')
+          }, 1000)
         }
         if (res.error) {
           setError(true)
+          setSuccessMessage('')
           setErrors(res?.errors?.contact_errors)
         }
       })
@@ -221,6 +228,7 @@ function AddContacts() {
         // Merge contact and address errors (backend returns address_errors as a tuple)
         console.error('Create contact failed with errors:', err)
         setError(true)
+        setSuccessMessage('')
         const contactErrors = err?.errors?.contact_errors || {}
         const addressErrors = Array.isArray(err?.errors?.address_errors)
           ? err?.errors?.address_errors?.[0] || {}
@@ -280,6 +288,14 @@ function AddContacts() {
         onSubmit={handleSubmit}
       />
       <Box sx={{ mt: '120px' }}>
+        {/* Success Message Alert */}
+        {successMessage && (
+          <Box sx={{ mb: 2, px: 2 }}>
+            <Alert severity="success" onClose={() => setSuccessMessage('')}>
+              {successMessage}
+            </Alert>
+          </Box>
+        )}
         <form onSubmit={handleSubmit}>
           {/* contact details */}
           <div style={{ padding: '10px' }}>
@@ -301,21 +317,6 @@ function AddContacts() {
                   >
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Last Name</div>
-                        <RequiredTextField
-                          name="last_name"
-                          value={formData.last_name}
-                          onChange={handleChange}
-                          style={{ width: '70%' }}
-                          size="small"
-                          required
-                          error={!!errors?.last_name?.[0]}
-                          helperText={
-                            errors?.last_name?.[0] ? errors?.last_name[0] : ''
-                          }
-                        />
-                      </div>
-                      <div className="fieldSubContainer">
                         <div className="fieldTitle">First Name</div>
                         <RequiredTextField
                           name="first_name"
@@ -327,6 +328,21 @@ function AddContacts() {
                           error={!!errors?.first_name?.[0]}
                           helperText={
                             errors?.first_name?.[0] ? errors?.first_name[0] : ''
+                          }
+                        />
+                      </div>
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Last Name</div>
+                        <RequiredTextField
+                          name="last_name"
+                          value={formData.last_name}
+                          onChange={handleChange}
+                          style={{ width: '70%' }}
+                          size="small"
+                          required
+                          error={!!errors?.last_name?.[0]}
+                          helperText={
+                            errors?.last_name?.[0] ? errors?.last_name[0] : ''
                           }
                         />
                       </div>
