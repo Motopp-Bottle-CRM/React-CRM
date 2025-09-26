@@ -29,6 +29,7 @@ import { AntSwitch, RequiredTextField } from '../../styles/CssStyled'
 import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
 import '../../styles/style.css'
+import  { ROLES } from '../../constants/roles' 
 
 type FormErrors = {
   email?: string[]
@@ -39,12 +40,8 @@ type FormErrors = {
   street?: string[]
   city?: string[]
   state?: string[]
-  pincode?: string[]
+  postcode?: string[]
   country?: string[]
-  // profile_pic?: string[];
-  // has_sales_access?: string[];
-  // has_marketing_access?: string[];
-  // is_organization_admin?: string[];
 }
 interface FormData {
   email: string
@@ -55,12 +52,8 @@ interface FormData {
   street: string
   city: string
   state: string
-  pincode: string
+  postcode: string
   country: string
-  // profile_pic: string | null,
-  // has_sales_access: boolean,
-  // has_marketing_access: boolean,
-  // is_organization_admin: boolean
 }
 export function EditUser() {
   const { state } = useLocation()
@@ -68,30 +61,56 @@ export function EditUser() {
 
   // Countries array with phone prefixes [code, name, phone_prefix]
   const countries = [
-    ['IN', 'India', '+91'], ['US', 'United States', '+1'], ['GB', 'United Kingdom', '+44'], ['CA', 'Canada', '+1'], ['AU', 'Australia', '+61'],
-    ['DE', 'Germany', '+49'], ['FR', 'France', '+33'], ['JP', 'Japan', '+81'], ['CN', 'China', '+86'], ['BR', 'Brazil', '+55'], ['MX', 'Mexico', '+52'], ['IT', 'Italy', '+39'],
-    ['ES', 'Spain', '+34'], ['NL', 'Netherlands', '+31'], ['CH', 'Switzerland', '+41'], ['SE', 'Sweden', '+46'], ['NO', 'Norway', '+47'], ['DK', 'Denmark', '+45'],
-    ['FI', 'Finland', '+358'], ['PL', 'Poland', '+48'], ['RU', 'Russian Federation', '+7'], ['KR', 'Korea, Republic of', '+82'], ['SG', 'Singapore', '+65'], ['TH', 'Thailand', '+66']
+    ['IN', 'India', '+91'],
+    ['US', 'United States', '+1'],
+    ['GB', 'United Kingdom', '+44'],
+    ['CA', 'Canada', '+1'],
+    ['AU', 'Australia', '+61'],
+    ['DE', 'Germany', '+49'],
+    ['FR', 'France', '+33'],
+    ['JP', 'Japan', '+81'],
+    ['CN', 'China', '+86'],
+    ['BR', 'Brazil', '+55'],
+    ['MX', 'Mexico', '+52'],
+    ['IT', 'Italy', '+39'],
+    ['ES', 'Spain', '+34'],
+    ['NL', 'Netherlands', '+31'],
+    ['CH', 'Switzerland', '+41'],
+    ['SE', 'Sweden', '+46'],
+    ['NO', 'Norway', '+47'],
+    ['DK', 'Denmark', '+45'],
+    ['FI', 'Finland', '+358'],
+    ['PL', 'Poland', '+48'],
+    ['RU', 'Russian Federation', '+7'],
+    ['KR', 'Korea, Republic of', '+82'],
+    ['SG', 'Singapore', '+65'],
+    ['TH', 'Thailand', '+66'],
   ]
 
   // Helper function to convert country name to country code
   const getCountryCodeFromName = (countryName: string) => {
     const countriesList = state?.countries?.length ? state.countries : countries
-    const country = countriesList.find((option: any) => option[1] === countryName)
+    const country = countriesList.find(
+      (option: any) => option[1] === countryName
+    )
     return country ? country[0] : countryName // Return the code if found, otherwise return the original value
   }
 
   // Helper function to convert country code to country name
   const getCountryNameFromCode = (countryCode: string) => {
     const countriesList = state?.countries?.length ? state.countries : countries
-    const country = countriesList.find((option: any) => option[0] === countryCode)
+    const country = countriesList.find(
+      (option: any) => option[0] === countryCode
+    )
     return country ? country[1] : countryCode // Return the name if found, otherwise return the original value
   }
 
   // Helper function to get phone prefix for a country
   const getPhonePrefixForCountry = (countryCode: string) => {
     const countriesList = state?.countries?.length ? state.countries : countries
-    const country = countriesList.find((option: any) => option[0] === countryCode)
+    const country = countriesList.find(
+      (option: any) => option[0] === countryCode
+    )
     return country && country[2] ? country[2] : '+91' // Return the prefix if found, otherwise default to +91
   }
 
@@ -103,6 +122,15 @@ export function EditUser() {
   const [roleSelectOpen, setRoleSelectOpen] = useState(false)
   const [countrySelectOpen, setCountrySelectOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [isActivating, setIsActivating] = useState(false)
+  const [isDeactivating, setIsDeactivating] = useState(false)
+  const [msg, setMsg] = useState('')
+  const [userStatus, setUserStatus] = useState<'Active' | 'Inactive' | 'Unknown'>('Unknown')
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+  const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null)
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
+  const [confirmAction, setConfirmAction] = useState<'activate' | 'deactivate' | null>(null)
+  const [confirmMessage, setConfirmMessage] = useState('')
   const [formData, setFormData] = useState<FormData>({
     email: '',
     role: 'ADMIN',
@@ -112,16 +140,72 @@ export function EditUser() {
     street: '',
     city: '',
     state: '',
-    pincode: '',
+    postcode: '',
     country: '',
-    // profile_pic: null,
-    // has_sales_access: false,
-    // has_marketing_access: false,
-    // is_organization_admin: false
   })
+  
+  // Check if current user is trying to deactivate themselves
+  const isSelfDeactivation = (currentUserId && state?.id && currentUserId === state.id) || 
+                            (currentUserEmail && formData.email && currentUserEmail === formData.email)
+  
+  // Debug logging
+  console.log('Debug - currentUserId:', currentUserId)
+  console.log('Debug - currentUserEmail:', currentUserEmail)
+  console.log('Debug - state?.id:', state?.id)
+  console.log('Debug - formData.email:', formData.email)
+  console.log('Debug - isSelfDeactivation:', isSelfDeactivation)
+  
   useEffect(() => {
     setFormData(state?.value)
+    // Set user status from state if available
+    if (state?.value?.is_active !== undefined) {
+      setUserStatus(state.value.is_active ? 'Active' : 'Inactive')
+    }
   }, [state?.id])
+
+  // Get current user's ID to prevent self-deactivation
+  useEffect(() => {
+    const getCurrentUserId = async () => {
+      try {
+        const Header = {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: localStorage.getItem('Token'),
+          org: localStorage.getItem('org'),
+        }
+        
+        // Get current user profile
+        const response = await fetchData('profile/', 'GET', null, Header)
+        console.log('Current user profile response:', response)
+        if (!response.error && response.data) {
+          const userId = response.data.id || response.data.user_id
+          const userEmail = response.data.email || response.data.user_details?.email
+          console.log('Setting current user ID:', userId)
+          console.log('Setting current user email:', userEmail)
+          setCurrentUserId(userId)
+          setCurrentUserEmail(userEmail)
+        }
+      } catch (error) {
+        console.error('Error fetching current user ID:', error)
+        // Fallback: try to get user info from token
+        try {
+          const token = localStorage.getItem('Token')
+          if (token) {
+            // Decode JWT token to get user info (basic decode, no verification)
+            const payload = JSON.parse(atob(token.split('.')[1]))
+            console.log('Token payload:', payload)
+            if (payload.user_id) {
+              setCurrentUserId(payload.user_id)
+            }
+          }
+        } catch (tokenError) {
+          console.error('Error decoding token:', tokenError)
+        }
+      }
+    }
+    
+    getCurrentUserId()
+  }, [])
 
   useEffect(() => {
     if (reset) {
@@ -131,7 +215,7 @@ export function EditUser() {
       setReset(false)
     }
   }, [reset])
-//
+  //
 
   useEffect(() => {
     async function load() {
@@ -160,9 +244,11 @@ export function EditUser() {
                 street: data?.address?.street || '',
                 city: data?.address?.city || '',
                 state: data?.address?.state || '',
-                pincode: data?.address?.pincode || '',
+                postcode: data?.address?.postcode || '',
                 country: getCountryCodeFromName(data?.address?.country || ''),
               })
+              // Set user status based on is_active field
+              setUserStatus(data?.is_active ? 'Active' : 'Inactive')
             }
           }
         )
@@ -174,23 +260,22 @@ export function EditUser() {
 
     load()
   }, [state?.id])
-  
-  
-//new Somayeh code
-/*
+
+  //new Somayeh code
+  /*
 useEffect(() => {
     async function load() {
       try {
         setLoading(true)
         setError(false)
- 
+
         const Header = {
           Accept: 'application/json',
           'Content-Type': 'application/json',
           Authorization: localStorage.getItem('Token'),
           org: localStorage.getItem('org'),
         }
- 
+
         fetchData(`${UserUrl}/${state?.id}/`, 'GET', null as any, Header).then(
           (res: any) => {
             if (!res.error) {
@@ -205,7 +290,7 @@ useEffect(() => {
                 street: data?.address?.street || '',
                 city: data?.address?.city || '',
                 state: data?.address?.state || '',
-                pincode: data?.address?.pincode || '',
+                postcode: data?.address?.postcode || '',
                 country: data?.address?.country || '',
               })
             }
@@ -220,7 +305,7 @@ useEffect(() => {
     load()
   }, [state?.id])
 */
-      //end of Somayeh new code
+  //end of Somayeh new code
 
   const handleChange = (e: any) => {
     const { name, value, files, type, checked } = e.target
@@ -237,8 +322,12 @@ useEffect(() => {
           ...formData,
           [name]: value,
           // Only update phone numbers if they already have a prefix
-          phone: formData.phone.startsWith('+') ? newPrefix + ' ' : formData.phone,
-          alternate_phone: formData.alternate_phone.startsWith('+') ? newPrefix + ' ' : formData.alternate_phone
+          phone: formData.phone.startsWith('+')
+            ? newPrefix + ' '
+            : formData.phone,
+          alternate_phone: formData.alternate_phone.startsWith('+')
+            ? newPrefix + ' '
+            : formData.alternate_phone,
         })
       } else {
         setFormData({ ...formData, [name]: value })
@@ -270,47 +359,6 @@ useEffect(() => {
     submitForm()
   }
 
-  // const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-  //     const file = event.target.files?.[0] || null;
-  //     if (file) {
-  //         const reader = new FileReader();
-  //         reader.onload = () => {
-  //             setFormData({ ...formData, profile_pic: reader.result as string });
-  //         };
-  //         reader.readAsDataURL(file);
-  //     }
-  // };
-
-  // const getEditDetail = (id: any) => {
-  //     fetchData(`${UserUrl}/${id}/`, 'GET', null as any, headers)
-  //         .then((res: any) => {
-  //             console.log('edit detail Form data:', res);
-  //             if (!res.error) {
-  //                 const data = res?.data?.profile_obj
-  //                 setFormData({
-  //                     email: data?.user_details?.email || '',
-  //                     role: data.role || 'ADMIN',
-  //                     phone: data.phone || '',
-  //                     alternate_phone: data.alternate_phone || '',
-  //                     address_line: data?.address?.address_line || '',
-  //                     street: data?.address?.street || '',
-  //                     city: data?.address?.city || '',
-  //                     state: data?.address?.state || '',
-  //                     pincode: data?.address?.pincode || '',
-  //                     country: data?.address?.country || '',
-  //                     profile_pic: data?.user_details?.profile_pic || null,
-  //                     has_sales_access: data.has_sales_access || false,
-  //                     has_marketing_access: data.has_marketing_access || false,
-  //                     is_organization_admin: data.is_organization_admin || false
-  //                 })
-  //             }
-  //             if (res.error) {
-  //                 setError(true)
-  //             }
-  //         })
-  //         .catch(() => {
-  //         })
-  // }
   const submitForm = () => {
     const Header = {
       Accept: 'application/json',
@@ -322,18 +370,20 @@ useEffect(() => {
     const data = {
       email: formData.email,
       role: formData.role,
-      phone: formData.phone.startsWith('+') ? formData.phone : getPhonePrefixForCountry(formData.country) + ' ' + formData.phone,
-      alternate_phone: formData.alternate_phone.startsWith('+') ? formData.alternate_phone : getPhonePrefixForCountry(formData.country) + ' ' + formData.alternate_phone,
+      phone: formData.phone.startsWith('+')
+        ? formData.phone
+        : getPhonePrefixForCountry(formData.country) + ' ' + formData.phone,
+      alternate_phone: formData.alternate_phone.startsWith('+')
+        ? formData.alternate_phone
+        : getPhonePrefixForCountry(formData.country) +
+          ' ' +
+          formData.alternate_phone,
       address_line: formData.address_line,
       street: formData.street,
       city: formData.city,
       state: formData.state,
-      pincode: formData.pincode,
+      postcode: formData.postcode,
       country: getCountryNameFromCode(formData.country),
-      // profile_pic: formData.profile_pic,
-      // has_sales_access: formData.has_sales_access,
-      // has_marketing_access: formData.has_marketing_access,
-      // is_organization_admin: formData.is_organization_admin
     }
 
     fetchData(`${UserUrl}/${state?.id}/`, 'PUT', JSON.stringify(data), Header)
@@ -360,7 +410,7 @@ useEffect(() => {
       street: '',
       city: '',
       state: '',
-      pincode: '',
+      postcode: '',
       country: '',
       // profile_pic: null,
       // has_sales_access: false,
@@ -373,6 +423,107 @@ useEffect(() => {
   const onCancel = () => {
     setReset(true)
     // resetForm()
+  }
+
+  const handleActivateUser = () => {
+    if (isSelfDeactivation) {
+      setMsg('You cannot change your own account status')
+      setError(true)
+      return
+    }
+    
+    setConfirmAction('activate')
+    setConfirmMessage(`Are you sure you want to activate user "${formData.email}"?`)
+    setShowConfirmDialog(true)
+  }
+
+  const handleDeactivateUser = () => {
+    if (isSelfDeactivation) {
+      setMsg('You cannot change your own account status')
+      setError(true)
+      return
+    }
+    
+    setConfirmAction('deactivate')
+    setConfirmMessage(`Are you sure you want to deactivate user "${formData.email}"?`)
+    setShowConfirmDialog(true)
+  }
+
+  const handleConfirmAction = async () => {
+    if (!confirmAction) return
+
+    if (confirmAction === 'activate') {
+      setIsActivating(true)
+    } else {
+      setIsDeactivating(true)
+    }
+    
+    setError(false)
+    setMsg('')
+    setShowConfirmDialog(false)
+    
+    const Header = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: localStorage.getItem('Token'),
+      org: localStorage.getItem('org'),
+    }
+
+    try {
+      const response = await fetchData(`${UserUrl}/${state?.id}/status/`, 'POST', JSON.stringify({ status: confirmAction === 'activate' ? 'Active' : 'Inactive' }), Header)
+      
+      if (!response.error) {
+        setMsg(`User ${confirmAction === 'activate' ? 'activated' : 'deactivated'} successfully!`)
+        setError(false)
+        setUserStatus(confirmAction === 'activate' ? 'Active' : 'Inactive')
+        // Optionally refresh the page or update the UI
+        setTimeout(() => {
+          navigate(confirmAction === 'activate' ? '/app/users?tab=inactive' : '/app/users')
+        }, 1500)
+      } else {
+        setError(true)
+        // Handle different error response formats
+        const errorMessage = response.errors || response.message || response.error || `Failed to ${confirmAction} user`
+        setMsg(errorMessage)
+      }
+    } catch (error) {
+      console.error(`Error ${confirmAction}ing user:`, error)
+      console.log('Error object keys:', error ? Object.keys(error) : 'No error object')
+      console.log('Error type:', typeof error)
+      setError(true)
+      
+      // Handle error response from fetchData (which throws the JSON response)
+      if (error && typeof error === 'object') {
+        // Check for different error message formats with proper type checking
+        const errorObj = error as any
+        let errorMessage = errorObj.errors || errorObj.message || errorObj.error
+        
+        // If it's an array of errors, join them
+        if (Array.isArray(errorMessage)) {
+          errorMessage = errorMessage.join(', ')
+        }
+        
+        // If no specific error message, use generic one
+        if (!errorMessage) {
+          errorMessage = `An error occurred while ${confirmAction}ing the user`
+        }
+        
+        console.log('Extracted error message:', errorMessage)
+        setMsg(errorMessage)
+      } else {
+        setMsg(`An error occurred while ${confirmAction}ing the user`)
+      }
+    } finally {
+      setIsActivating(false)
+      setIsDeactivating(false)
+      setConfirmAction(null)
+    }
+  }
+
+  const handleCancelAction = () => {
+    setShowConfirmDialog(false)
+    setConfirmAction(null)
+    setConfirmMessage('')
   }
   const module = 'Users'
   const crntPage = 'Edit User'
@@ -394,6 +545,84 @@ useEffect(() => {
         onSubmit={handleSubmit}
       />
       <Box sx={{ mt: '120px' }}>
+        {/* Success/Error Messages */}
+        {msg && (
+          <Box sx={{ mb: 2, px: 2 }}>
+            <div style={{
+              padding: '12px 16px',
+              borderRadius: '4px',
+              backgroundColor: error ? '#ffebee' : '#e8f5e8',
+              color: error ? '#c62828' : '#2e7d32',
+              border: `1px solid ${error ? '#ef9a9a' : '#a5d6a7'}`,
+              fontSize: '14px'
+            }}>
+              {msg}
+            </div>
+          </Box>
+        )}
+
+        {/* Confirmation Dialog */}
+        {showConfirmDialog && (
+          <Box sx={{ 
+            position: 'fixed', 
+            top: 0, 
+            left: 0, 
+            right: 0, 
+            bottom: 0, 
+            backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            zIndex: 9999 
+          }}>
+            <Box sx={{ 
+              backgroundColor: 'white', 
+              padding: '24px', 
+              borderRadius: '8px', 
+              maxWidth: '400px', 
+              width: '90%',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)'
+            }}>
+              <Typography variant="h6" sx={{ mb: 2, color: '#1A3353', fontWeight: 'bold' }}>
+                Confirm Action
+              </Typography>
+              <Typography sx={{ mb: 3, color: '#666', fontSize: '14px' }}>
+                {confirmMessage}
+              </Typography>
+              <Box sx={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                <Button
+                  variant="outlined"
+                  onClick={handleCancelAction}
+                  disabled={isActivating || isDeactivating}
+                  sx={{ 
+                    borderColor: '#ccc', 
+                    color: '#666',
+                    textTransform: 'none',
+                    minWidth: '80px'
+                  }}
+                >
+                  No
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={handleConfirmAction}
+                  disabled={isActivating || isDeactivating}
+                  sx={{ 
+                    backgroundColor: confirmAction === 'activate' ? '#4caf50' : '#f44336',
+                    '&:hover': {
+                      backgroundColor: confirmAction === 'activate' ? '#45a049' : '#d32f2f'
+                    },
+                    textTransform: 'none',
+                    minWidth: '80px'
+                  }}
+                >
+                  {isActivating ? 'Activating...' : isDeactivating ? 'Deactivating...' : 'Yes'}
+                </Button>
+              </Box>
+            </Box>
+          </Box>
+        )}
+
         <form onSubmit={handleSubmit}>
           <div style={{ padding: '10px' }}>
             <div className="leadContainer">
@@ -460,14 +689,88 @@ useEffect(() => {
                             onChange={handleChange}
                             error={!!errors?.role?.[0]}
                           >
-                            {['ADMIN', 'USER'].map((option) => (
-                              <MenuItem key={option} value={option}>
-                                {option}
+                            {ROLES.map((role) => (
+                              <MenuItem key={role.value} value={role.value}>
+                                  {role.label}
                               </MenuItem>
                             ))}
                           </Select>
                           {/* <FormHelperText>{errors?.[0] ? errors[0] : ''}</FormHelperText> */}
                         </FormControl>
+                      </div>
+                    </div>
+                    {/* User Status Management Buttons - Integrated in two-column layout */}
+                    <div className="fieldContainer2">
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">User Status</div>
+                        <div style={{ fontSize: '12px', color: '#666', paddingTop: '8px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ 
+                              color: userStatus === 'Active' ? '#4caf50' : userStatus === 'Inactive' ? '#f44336' : '#666',
+                              fontWeight: 'bold',
+                              fontSize: '14px'
+                            }}>
+                              {userStatus}
+                            </span>
+                            {isSelfDeactivation && (
+                              <span style={{ 
+                                fontSize: '10px', 
+                                color: '#ff9800', 
+                                backgroundColor: '#fff3e0', 
+                                padding: '2px 6px', 
+                                borderRadius: '4px',
+                                border: '1px solid #ffb74d'
+                              }}>
+                                Your Account
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Action</div>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <Tooltip title={isSelfDeactivation ? "You cannot change your own account status" : "Activate user account"}>
+                            <span>
+                              <Button
+                                variant="outlined"
+                                color="success"
+                                onClick={handleActivateUser}
+                                disabled={isActivating || isDeactivating || isSelfDeactivation}
+                                size="small"
+                                style={{ 
+                                  borderColor: isSelfDeactivation ? '#ccc' : '#4caf50',
+                                  color: isSelfDeactivation ? '#999' : '#4caf50',
+                                  textTransform: 'none',
+                                  minWidth: '100px',
+                                  fontSize: '12px'
+                                }}
+                              >
+                                {isActivating ? 'Activating...' : 'Activate'}
+                              </Button>
+                            </span>
+                          </Tooltip>
+                          <Tooltip title={isSelfDeactivation ? "You cannot change your own account status" : "Deactivate user account"}>
+                            <span>
+                              <Button
+                                variant="outlined"
+                                color="error"
+                                onClick={handleDeactivateUser}
+                                disabled={isActivating || isDeactivating || isSelfDeactivation}
+                                size="small"
+                                style={{ 
+                                  borderColor: isSelfDeactivation ? '#ccc' : '#f44336',
+                                  color: isSelfDeactivation ? '#999' : '#f44336',
+                                  textTransform: 'none',
+                                  minWidth: '100px',
+                                  fontSize: '12px'
+                                }}
+                              >
+                                {isDeactivating ? 'Deactivating...' : 'Deactivate'}
+                              </Button>
+                            </span>
+                          </Tooltip>
+                        </div>
                       </div>
                     </div>
                     <div className="fieldContainer2">
@@ -495,7 +798,7 @@ useEffect(() => {
                       </div>
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Alternate Phone</div>
-                        <Tooltip title= "Number must start with country code prefix">
+                        <Tooltip title="Number must start with country code prefix">
                           <TextField
                             name="alternate_phone"
                             value={formData.alternate_phone}
@@ -515,71 +818,6 @@ useEffect(() => {
                         </Tooltip>
                       </div>
                     </div>
-                    {/* <div className='fieldContainer2'>
-                                            <div className='fieldSubContainer'>
-                                                <div className='fieldTitle'>Profile picture</div>
-                                                <Stack sx={{ display: 'flex', flexDirection: 'column' }}>
-                                                    <Stack sx={{ display: 'flex', flexDirection: 'row' }}>
-                                                        <label htmlFor="avatar-input">
-                                                            <input
-                                                                id="avatar-input"
-                                                                name="profile_pic"
-                                                                type="file"
-                                                                accept="image/*"
-                                                                onChange={(e: any) => {
-                                                                    handleFileChange(e);
-                                                                    handleChange(e);
-                                                                }}
-                                                                style={inputStyles}
-                                                            />
-                                                            <IconButton
-                                                                component="span"
-                                                                color="primary"
-                                                                aria-label="upload avatar"
-                                                            >
-                                                                <FaUpload fill='lightgrey' />
-                                                            </IconButton>
-                                                        </label>
-                                                        <Box>  {formData.profile_pic !== null ?
-                                                            <Box sx={{ position: 'relative' }}>
-                                                                <Avatar src={formData.profile_pic || ''} />
-                                                                <FaTimes style={{ position: 'absolute', marginTop: '-45px', marginLeft: '25px', fill: 'lightgray', cursor: 'pointer' }}
-                                                                    onClick={() => setFormData({ ...formData, profile_pic: null })} />
-                                                            </Box> : ''}
-                                                        </Box>
-                                                        {formData.profile_pic && <Typography sx={{ color: '#d32f2f', fontSize: '12px', ml: '-70px', mt: '40px' }}>{profileErrors?.profile_pic?.[0] || userErrors?.profile_pic?.[0] || ''}</Typography>}
-                                                    </Stack>
-                                                </Stack>
-
-
-                                            </div>
-                                            <div className='fieldSubContainer'>
-                                                <div className='fieldTitle'>Sales Access</div>
-                                                <AntSwitch
-                                                    name='has_sales_access'
-                                                    checked={formData.has_sales_access}
-                                                    onChange={handleChange}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className='fieldContainer2'>
-                                            <div className='fieldSubContainer'>
-                                                <div className='fieldTitle'>Marketing Access</div>
-                                                <AntSwitch
-                                                    name='has_marketing_access'
-                                                    checked={formData.has_marketing_access}
-                                                    onChange={handleChange}
-                                                />
-                                            </div>
-                                            <div className='fieldSubContainer'>
-                                                <div className='fieldTitle'>Organization Admin</div>
-                                                <AntSwitch
-                                                    name='is_organization_admin'
-                                                    checked={formData.is_organization_admin}
-                                                    onChange={handleChange}
-                                                />
-                                            </div>
-                                        </div> */}
                   </Box>
                 </AccordionDetails>
               </Accordion>
@@ -686,21 +924,21 @@ useEffect(() => {
                     </div>
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Pincode</div>
+                        <div className="fieldTitle">postcode</div>
                         <TextField
                           required
-                          name="pincode"
-                          value={formData.pincode}
+                          name="postcode"
+                          value={formData.postcode}
                           onChange={handleChange}
                           style={{ width: '70%' }}
                           size="small"
                           error={
-                            !!profileErrors?.pincode?.[0] ||
-                            !!userErrors?.pincode?.[0]
+                            !!profileErrors?.postcode?.[0] ||
+                            !!userErrors?.postcode?.[0]
                           }
                           helperText={
-                            profileErrors?.pincode?.[0] ||
-                            userErrors?.pincode?.[0] ||
+                            profileErrors?.postcode?.[0] ||
+                            userErrors?.postcode?.[0] ||
                             ''
                           }
                         />
@@ -733,7 +971,10 @@ useEffect(() => {
                             onChange={handleChange}
                             error={!!profileErrors?.country?.[0]}
                           >
-                            {(state?.countries?.length ? state.countries : countries).map((option: any) => (
+                            {(state?.countries?.length
+                              ? state.countries
+                              : countries
+                            ).map((option: any) => (
                               <MenuItem key={option[0]} value={option[0]}>
                                 {option[1]}
                               </MenuItem>

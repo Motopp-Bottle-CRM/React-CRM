@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react'
 import { Grid, Stack, Typography, Box, TextField, Button } from '@mui/material'
 import { useGoogleLogin } from '@react-oauth/google'
@@ -10,7 +9,7 @@ import { GoogleButton } from '../../styles/CssStyled'
 import { fetchData } from '../../components/FetchData'
 import { LoginUrl, AuthUrl } from '../../services/ApiUrls'
 import '../../styles/style.css'
-console.log("Login.tsx file is loaded")
+console.log('Login.tsx file is loaded')
 
 declare global {
   interface Window {
@@ -28,20 +27,20 @@ export default function Login() {
   const [success, setSuccess] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {
-    console.log("Form is being submitted")
+    console.log('Form is being submitted')
     e.preventDefault()
     console.log('Form submitted')
     submitForm()
   }
   const submitForm = () => {
-    console.log("submitForm is running")
-  console.log('submitForm is running', { email, password })
-  console.log("Email vefore sending to server : " , email)
+    console.log('submitForm is running')
+    console.log('submitForm is running', { email, password })
+    console.log('Email vefore sending to server : ', email)
 
-  const header = {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  }
+    const header = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    }
 
   fetchData(
     `${LoginUrl}/`,
@@ -52,7 +51,15 @@ export default function Login() {
     .then((res: any) => {
       console.log('Response from server:', res)   // <--- Add this
       localStorage.setItem('Token', `Bearer ${res.access}`)
+      if (res.refresh) {
+        localStorage.setItem('refreshToken', res.refresh)
+      }
+      if (res.org_id) {
+        localStorage.setItem('org', res.org_id)
+        console.log("Saving org to localStorage:", res.org_id)
+      }
       localStorage.setItem('email', email)
+      localStorage.setItem('role', res.role)
       console.log("Saving email to localStorage:", email)
       setToken(true)
       navigate('/app') // Redirect to app after successful login
@@ -89,19 +96,23 @@ export default function Login() {
       }
       fetchData(`${AuthUrl}/`, 'POST', JSON.stringify(apiToken), head)
         .then((res: any) => {
-
-
-
           if (res.access_token) {
             localStorage.setItem('Token', `Bearer ${res.access_token}`)
+            if (res.refresh_token) {
+              localStorage.setItem('refreshToken', res.refresh_token)
+            }
+            if (res.org_id) {
+              localStorage.setItem('org', res.org_id)
+              console.log("Saving org to localStorage:", res.org_id)
+            }
             localStorage.setItem('email', res.username)
+            localStorage.setItem('role', res.role)
             setToken(true)
             setSuccess('Successfully logged in with Google!')
             setError('')
           } else {
             setError('Failed to get access token from server')
           }
-
         })
         .catch((error: any) => {
           console.error('Google login error:', error)

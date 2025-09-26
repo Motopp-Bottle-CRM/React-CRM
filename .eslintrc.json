@@ -12,14 +12,13 @@
     "node": true
   },
 
-"plugins": ["@typescript-eslint", "react", "prettier", "n", "promise"],
+  "plugins": ["@typescript-eslint", "react", "prettier", "n", "promise"],
   "extends": [
     "react-app",
     "react-app/jest",
     "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended"
   ],
- 
 
   "globals": {
     "document": "readonly",

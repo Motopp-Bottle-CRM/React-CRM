@@ -1,4 +1,3 @@
-
 body {
   background-color: #fafafb;
   font-family:
@@ -16,7 +15,9 @@ body {
     'Segoe UI Symbol',
     'Noto Color Emoji';
 }
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   margin: 0;
 }

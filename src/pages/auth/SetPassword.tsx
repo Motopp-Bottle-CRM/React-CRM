@@ -20,7 +20,9 @@ export default function SetPassword() {
   // Check if we're coming from an invitation link
   const isInvitation = !!token
 
-  const [invitationData, setInvitationData] = useState<InvitationData | null>(null)
+  const [invitationData, setInvitationData] = useState<InvitationData | null>(
+    null
+  )
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -43,15 +45,10 @@ export default function SetPassword() {
 
   const fetchInvitationData = async () => {
     try {
-      const response = await fetchData(
-        `set-password/${token}/`,
-        'GET',
-        null,
-        {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        }
-      )
+      const response = await fetchData(`set-password/${token}/`, 'GET', null, {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      })
 
       if (!response.error) {
         setInvitationData(response.data)
@@ -232,7 +229,8 @@ export default function SetPassword() {
           {isInvitation && invitationData && (
             <Box sx={{ mb: 3, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
               <Typography variant="body2" color="text.secondary" gutterBottom>
-                You've been invited to join <strong>{invitationData.org_name}</strong>
+                You've been invited to join{' '}
+                <strong>{invitationData.org_name}</strong>
               </Typography>
               <Typography variant="body2" color="text.secondary" gutterBottom>
                 Role: <strong>{invitationData.role}</strong>

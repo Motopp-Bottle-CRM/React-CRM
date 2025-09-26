@@ -2,17 +2,21 @@ import React, { useEffect, useState } from 'react'
 import { Card, Box } from '@mui/material'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { CompanyUrl, ContactUrl } from '../../services/ApiUrls'
-import { fetchData, Header } from '../../components/FetchData'
+import { CompanyUrl } from '../../services/ApiUrls'
+import { fetchData } from '../../components/FetchData'
 
-type response = {
+type CompanyResponse = {
   name: string
+  address?: string
+  telephone?: string
 }
 
 export default function CompanyDetails() {
   const navigate = useNavigate()
   const { state } = useLocation()
-  const [companyDetails, setCompanyDetails] = useState<response | null>(null)
+  const [companyDetails, setCompanyDetails] = useState<CompanyResponse | null>(
+    null
+  )
 
   useEffect(() => {
     getCompanyDetail(state?.companyId?.id)
@@ -26,7 +30,6 @@ export default function CompanyDetails() {
       org: localStorage.getItem('org'),
     }
     fetchData(`${CompanyUrl}/${id}`, 'GET', null as any, Header).then((res) => {
-      console.log(res, 'res')
       if (!res.error) {
         setCompanyDetails(res?.data)
       }
@@ -40,7 +43,11 @@ export default function CompanyDetails() {
   const editHandle = () => {
     navigate('/app/companies/edit-company', {
       state: {
-        value: { name: companyDetails?.name },
+        value: {
+          name: companyDetails?.name,
+          address: companyDetails?.address || '',
+          telephone: companyDetails?.telephone || '',
+        },
         id: state?.companyId?.id,
       },
     })
@@ -49,7 +56,6 @@ export default function CompanyDetails() {
   const module = 'Companies'
   const crntPage = 'Company Detail'
   const backBtn = 'Back To Companies'
-  // console.log(state, 'Companies');
 
   return (
     <Box sx={{ mt: '60px' }}>
@@ -103,6 +109,14 @@ export default function CompanyDetails() {
                 <div style={{ width: '32%' }}>
                   <div className="title2">Name</div>
                   <div className="title3">{companyDetails?.name || '---'}</div>
+                </div>
+                <div style={{ width: '32%' }}>
+                  <div className="title2">Address</div>
+                  <div className="title3">{companyDetails?.address || '---'}</div>
+                </div>
+                <div style={{ width: '32%' }}>
+                  <div className="title2">Telephone</div>
+                  <div className="title3">{companyDetails?.telephone || '---'}</div>
                 </div>
               </div>
             </Card>
