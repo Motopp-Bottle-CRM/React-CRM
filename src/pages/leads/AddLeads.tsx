@@ -100,8 +100,7 @@ interface FormData {
   postcode: string
   country: string
   tags: string[]
-  company: string,
-  companyName: string,
+  company: string
   probability: number
   industry: string
   linkedin_id: string
@@ -157,14 +156,13 @@ export function AddLeads() {
     country: '',
     tags: [],
     company: '',
-    companyName: '',
     probability: 1,
     industry: 'ADVERTISING',
     linkedin_id: '',
     file: null,
   })
   const [inputValue, setInputValue] = useState('')
-  const [value, setValue] = useState('')
+
   // const [options, setOptions] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
 
@@ -320,7 +318,6 @@ export function AddLeads() {
       postcode: formData.postcode,
       country: formData.country,
       company: formData.company,
-      companyName: formData.companyName,
       organization: formData.company
         ? companies.find((c) => c.id === formData.company)?.name ||
           'Unknown Organization'
@@ -397,7 +394,6 @@ export function AddLeads() {
       country: '',
       tags: [],
       company: '',
-      companyName: '',
       probability: 1,
       industry: 'ADVERTISING',
       linkedin_id: '',
@@ -714,19 +710,27 @@ export function AddLeads() {
                           getOptionLabel={(option) =>
                             typeof option === 'string' ? option : option.name
                           }
-                          value={formData.companyName}
+                          value={formData.company}
                           onChange={(event: any, newValue: any) => {
-                            if( newValue === null ) {
-                              setFormData({...formData, company: '',companyName:''})
-                              return;
+                            if (newValue === null) {
+                              setFormData({
+                                ...formData,
+                                company: '',
+                              })
+                              return
                             }
-                            setFormData({...formData, company: newValue.id,companyName:newValue.name})
-
+                            setFormData({
+                              ...formData,
+                              company: newValue.name,
+                            })
                           }}
-                          inputValue={inputValue}
-                          onInputChange={(e, newInputValue) =>
-                            setInputValue(newInputValue)
-                          }
+                          inputValue={formData.company}
+                          onInputChange={(e, newInputValue) => {
+                            setFormData({
+                              ...formData,
+                              company: newInputValue,
+                            })
+                          }}
                           renderInput={(params) => (
                             <TextField
                               {...params}
