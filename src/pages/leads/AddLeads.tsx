@@ -46,44 +46,6 @@ import {
 import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
 
-// const useStyles = makeStyles({
-//   btnIcon: {
-//     height: '14px',
-//     color: '#5B5C63'
-//   },
-//   breadcrumbs: {
-//     color: 'white'
-//   },
-//   fields: {
-//     height: '5px'
-//   },
-//   chipStyle: {
-//     backgroundColor: 'red'
-//   },
-//   icon: {
-//     '&.MuiChip-deleteIcon': {
-//       color: 'darkgray'
-//     }
-//   }
-// })
-
-// const textFieldStyled = makeStyles(() => ({
-//   root: {
-//     borderLeft: '2px solid red',
-//     height: '35px'
-//   },
-//   fieldHeight: {
-//     height: '35px'
-//   }
-// }))
-
-// function getStyles (name, personName, theme) {
-//   return {
-//     fontWeight:
-//       theme.typography.fontWeightRegular
-//   }
-// }
-
 type FormErrors = {
   title?: string[]
   job_title?: string[]
@@ -150,7 +112,7 @@ export function AddLeads() {
   const { state } = useLocation()
   const { quill, quillRef } = useQuill()
   const initialContentRef = useRef(null)
-  
+
   // Debug: Log the industries data
   console.log('AddLeads - Industries data:', state?.industries);
   console.log('AddLeads - Industries length:', state?.industries?.length);
@@ -199,6 +161,10 @@ export function AddLeads() {
     linkedin_id: '',
     file: null,
   })
+  const [inputValue, setInputValue] = useState('')
+  const [value, setValue] = useState('')
+  const [options, setOptions] = useState<any[]>(['option1', 'option2'])
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (quill) {
@@ -292,46 +258,46 @@ export function AddLeads() {
   const submitForm = () => {
     // Get the current content from Quill editor
     const quillContent = quill ? quill.root.innerHTML : formData.description;
-    
+
     // Basic validation
     if (!formData.title || formData.title.trim() === '') {
       setError(true);
       setErrors({ general: ['Lead Name is required'] });
       return;
     }
-    
+
     if (!formData.company || formData.company.trim() === '') {
       setError(true);
       setErrors({ general: ['Company is required'] });
       return;
     }
-    
+
     if (!formData.first_name && !formData.last_name) {
       setError(true);
       setErrors({ general: ['Please provide at least first name or last name'] });
       return;
     }
-    
+
     // Check if user has organization set
     if (!localStorage.getItem('org')) {
       setError(true);
       setErrors({ general: ['Organization not set. Please login again.'] });
       return;
     }
-    
-    
+
+
     // console.log('Form data:', formData.lead_attachment,'sfs', formData.file);
     const data = {
-      title: formData.title || `New Lead ${Date.now()}`, 
+      title: formData.title || `New Lead ${Date.now()}`,
       job_title: formData.job_title,
       first_name: formData.first_name,
       last_name: formData.last_name,
       account_name: formData.account_name || `${formData.first_name} ${formData.last_name}`.trim() + ` ${Date.now()}` || `Unknown Account ${Date.now()}`,
-      phone: formData.phone ? (formData.phone.startsWith('+') ? formData.phone : `+31${formData.phone.replace(/\D/g, '')}`) : null, 
+      phone: formData.phone ? (formData.phone.startsWith('+') ? formData.phone : `+31${formData.phone.replace(/\D/g, '')}`) : null,
       email: formData.email,
       opportunity_amount: formData.opportunity_amount ? parseFloat(formData.opportunity_amount) : null,
       website: formData.website,
-      description: quillContent, 
+      description: quillContent,
       status: formData.status,
       source: formData.source,
       address_line: formData.address_line,
@@ -341,12 +307,12 @@ export function AddLeads() {
       postcode: formData.postcode,
       country: formData.country,
       company: formData.company,
-      organization: formData.company ? companies.find(c => c.id === formData.company)?.name || 'Unknown Organization' : 'Unknown Organization', 
-      probability: Math.round(Math.min(formData.probability, 100)), 
+      organization: formData.company ? companies.find(c => c.id === formData.company)?.name || 'Unknown Organization' : 'Unknown Organization',
+      probability: Math.round(Math.min(formData.probability, 100)),
       industry: formData.industry,
       linkedin_id: formData.linkedin_id,
     }
-    
+
     fetchData(`${LeadUrl}/`, 'POST', JSON.stringify(data), Header)
       .then((res: any) => {
         console.log('Form data response:', res);
@@ -370,7 +336,7 @@ export function AddLeads() {
         console.error('Error details:', JSON.stringify(error, null, 2));
         setError(true)
         setSuccess(false)
-        
+
         // Handle different types of errors
         if (error.message && error.message.includes('Session expired')) {
           setErrors({ general: ['Your session has expired. Please login again.'] })
@@ -476,12 +442,12 @@ export function AddLeads() {
                       </div>
                     )}
                     {success && (
-                      <div style={{ 
-                        color: '#2e7d32', 
-                        marginBottom: '15px', 
-                        padding: '15px', 
-                        backgroundColor: '#e8f5e8', 
-                        border: '2px solid #4caf50', 
+                      <div style={{
+                        color: '#2e7d32',
+                        marginBottom: '15px',
+                        padding: '15px',
+                        backgroundColor: '#e8f5e8',
+                        border: '2px solid #4caf50',
                         borderRadius: '8px',
                         fontSize: '16px',
                         fontWeight: 'bold',
@@ -681,76 +647,49 @@ export function AddLeads() {
                             {errors?.industry?.[0] ? errors?.industry[0] : ''}
                           </FormHelperText>
                         </FormControl>
-                        {/* <CustomSelectField
-                          name='industry'
-                          select
-                          value={formData.industry}
-                          InputProps={{
-                            style: {
-                              height: '40px',
-                              maxHeight: '40px'
-                            }
-                          }}
-                          onChange={handleChange}
-                          sx={{ width: '70%' }}
-                          helperText={errors?.industry?.[0] ? errors?.industry[0] : ''}
-                          error={!!errors?.industry?.[0]}
-                        >
-                          {state?.industries?.length && state?.industries.map((option: any) => (
-                            <MenuItem key={option[0]} value={option[1]}>
-                              {option[1]}
-                            </MenuItem>
-                          ))}
-                        </CustomSelectField> */}
+
                       </div>
                     </div>
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Company</div>
-                        <FormControl sx={{ width: '70%' }}>
-                          <RequiredSelect
-                            name="company"
-                            value={formData.company}
-                            open={companySelectOpen}
-                            onClick={() => setCompanySelectOpen(!companySelectOpen)}
-                            IconComponent={() => (
-                              <div
-                                onClick={() => setCompanySelectOpen(!companySelectOpen)}
-                                className="select-icon-background"
-                              >
-                                {companySelectOpen ? (
-                                  <FiChevronUp className="select-icon" />
-                                ) : (
-                                  <FiChevronDown className="select-icon" />
-                                )}
-                              </div>
-                            )}
-                            className={'select'}
-                            onChange={handleChange}
-                            error={!!errors?.company?.[0]}
-                            required
-                            MenuProps={{
-                              PaperProps: {
-                                style: {
-                                  height: '200px',
-                                },
-                              },
-                            }}
-                          >
-                            {companies && companies.length > 0 ? (
-                              companies.map((company: any) => (
-                                <MenuItem key={company?.id || ''} value={company?.id || ''}>
-                                  {company?.name || 'Unknown Company'}
-                                </MenuItem>
-                              ))
-                            ) : (
-                              <MenuItem disabled>No companies available</MenuItem>
-                            )}
-                          </RequiredSelect>
-                          <FormHelperText>
-                            {errors?.company?.[0] ? errors?.company[0] : ''}
-                          </FormHelperText>
-                        </FormControl>
+                        <Autocomplete
+                          sx={{
+                            width: '70%',
+                            '& .MuiInputBase-root': {
+                              padding: '4px 8px',
+                            },
+                            '& .MuiAutocomplete-inputRoot': {
+                              paddingLeft: 1,
+                            },
+                          }}
+                          freeSolo
+                          options={options}
+                          getOptionLabel={(option) =>
+                            typeof option === 'string' ? option : option.name
+                          }
+                          value={value}
+                          onChange={(event: any, newValue: string) => {
+                            setValue(newValue)
+                          }}
+                          inputValue={inputValue}
+                          onInputChange={(e, newInputValue) =>
+                            setInputValue(newInputValue)
+                          }
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder="search or add new company"
+                              InputProps={{
+                                ...params.InputProps,
+                                endAdornment: (
+                                  <>{params.InputProps.endAdornment}</>
+                                ),
+                              }}
+                            />
+                          )}
+                        />
+
                       </div>
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Status</div>
@@ -1048,7 +987,7 @@ export function AddLeads() {
                           aria-label='minimum height'
                           name='lost_reason'
                           minRows={2}
-                          // onChange={onChange} 
+                          // onChange={onChange}
                           style={{ width: '80%' }}
                         />
                       </div>
