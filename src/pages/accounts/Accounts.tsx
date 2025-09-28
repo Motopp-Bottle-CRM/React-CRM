@@ -72,10 +72,10 @@ const headCells: readonly HeadCell[] = [
     label: 'Website',
   },
   {
-    id: 'created_by',
+    id: 'industry',
     numeric: true,
     disablePadding: false,
-    label: 'Contact Person',
+    label: 'Industry',
   },
   {
     id: 'country',
@@ -96,68 +96,6 @@ const headCells: readonly HeadCell[] = [
     label: 'Actions',
   },
 ]
-
-// function EnhancedTableHead(props: any) {
-//     const {
-//         onSelectAllClick, order, orderBy,
-//         numSelected, rowCount,
-//         numSelectedId, isSelectedId,
-//         onRequestSort
-//     } = props
-
-//     const createSortHandler =
-//         (property: any) => (event: React.MouseEvent<unknown>) => {
-//             onRequestSort(event, property);
-//         };
-
-//     return (
-//         <TableHead>
-//             <TableRow>
-//                 {/* <TableCell padding='checkbox'>
-//                     <Checkbox
-//                         onChange={onSelectAllClick}
-//                         checked={numSelected === rowCount}
-//                         sx={{ color: 'inherit' }}
-//                     />
-//                 </TableCell> */}
-//                 {
-//                     headCells.map((headCell) => (
-//                         headCell.label === 'Actions' || headCell.label === 'Tags' ?
-//                             <TableCell
-//                                 sx={{ fontWeight: 'bold', color: 'rgb(26, 51, 83)' }}
-//                                 key={headCell.id}
-//                                 align={headCell.numeric ? 'left' : 'left'}
-//                                 padding={headCell.disablePadding ? 'none' : 'normal'}>{headCell.label}</TableCell>
-//                             : <TableCell
-//                                 sx={{ fontWeight: 'bold', color: 'rgb(26, 51, 83)' }}
-//                                 key={headCell.id}
-//                                 align={headCell.numeric ? 'left' : 'left'}
-//                                 padding={headCell.disablePadding ? 'none' : 'normal'}
-//                                 sortDirection={orderBy === headCell.id ? order : false}
-//                             >
-//                                 <TableSortLabel
-//                                     active={orderBy === headCell.id}
-//                                     direction={orderBy === headCell.id ? order : 'asc'}
-//                                     onClick={createSortHandler(headCell.id)}
-//                                 >
-//                                     {headCell.label}
-//                                     {
-//                                         orderBy === headCell.id
-//                                             ? (
-//                                                 <Box component='span' sx={{ display: 'none' }}>
-//                                                     {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-//                                                 </Box>
-//                                             )
-//                                             : null
-//                                     }
-//                                 </TableSortLabel>
-//                             </TableCell>
-//                     ))
-//                 }
-//             </TableRow>
-//         </TableHead>
-//     )
-// }
 
 type Item = {
   id: string
@@ -506,8 +444,6 @@ export default function Accounts() {
     [50, '50 Records per page'],
   ]
 
-  // const selectClasses = selectOpen ? 'select-opened' : '';
-  // console.log(!!(selectedId?.length === 0), 'asd');
 
   return (
     <Box sx={{ mt: '60px' }}>
@@ -710,7 +646,9 @@ export default function Accounts() {
                                 {item?.website ? item?.website : '---'}
                               </TableCell>
                               <TableCell className="tableCell">
-                                <Stack
+                                {item?.industry ? item?.industry.toLowerCase() : '---'}
+
+                                {/* <Stack
                                   style={{
                                     display: 'flex',
                                     flexDirection: 'row',
@@ -726,7 +664,7 @@ export default function Accounts() {
                                       ? `${item?.lead?.first_name} ${item?.lead?.last_name}`
                                       : '---'}
                                   </Stack>
-                                </Stack>
+                                </Stack> */}
                               </TableCell>
                               <TableCell className="tableCell">
                                 {item?.lead?.country
