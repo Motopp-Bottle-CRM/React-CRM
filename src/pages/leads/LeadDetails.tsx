@@ -589,9 +589,8 @@ export default function LeadDetails() {
                 <Box
                   sx={{
                     display: 'flex',
-                    justifyContent: 'space-bettween',
+                    justifyContent: 'space-between',
                     alignItems: 'center',
-                    gap: 16,
                     padding: 2,
                     borderBottom: 1,
                   }}
