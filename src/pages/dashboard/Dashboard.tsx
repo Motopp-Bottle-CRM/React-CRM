@@ -453,70 +453,70 @@ export default function Dashboard() {
           </Typography>
 
           <Box sx={{ display: "flex", alignItems: "center", gap: "6px" }}>
-  {/* Pie Chart */}
-  <PieChart width={140} height={140}>
-    <Pie
-      data={dash_data?.contacts_source_chart?.slice().sort((a, b) => b.value - a.value) || []} // sorted descending
-      dataKey="value"
-      nameKey="source"
-      outerRadius={60}
-      label={renderLabel}
-      labelLine={false}
-    >
-      {dash_data?.contacts_source_chart
-        ?.slice()
-        .sort((a, b) => b.value - a.value)
-        .map((entry, index) => (
-          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-        ))}
-    </Pie>
-    <Tooltip />
-  </PieChart>
+            {/* Pie Chart */}
+            <PieChart width={140} height={140}>
+              <Pie
+                data={dash_data?.contacts_source_chart?.slice().sort((a, b) => b.value - a.value) || []} // sorted descending
+                dataKey="value"
+                nameKey="source"
+                outerRadius={60}
+                label={renderLabel}
+                labelLine={false}
+              >
+                {dash_data?.contacts_source_chart
+                  ?.slice()
+                  .sort((a, b) => b.value - a.value)
+                  .map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
 
-  {/* Custom Legend */}
-  <Box
-    sx={{
-      display: "flex",
-      flexDirection: "column",
-      gap: "1px",
-      maxWidth: "200px",
-    }}
-  >
-    {dash_data?.contacts_source_chart
-      ?.slice()
-      .sort((a, b) => b.value - a.value)
-      .map((entry, index) => (
-        <Box
-          key={index}
-          sx={{
-            display: "flex",
-            alignItems: "flex-start",
-            gap: "4px",
-          }}
-        >
-          <Box
-            sx={{
-              minWidth: "12px",
-              minHeight: "12px",
-              backgroundColor: COLORS[index % COLORS.length],
-              borderRadius: "3px",
-              marginTop: "3px",
-            }}
-          />
-          <Typography
-            component="span"
-            sx={{
-              fontSize: "0.7rem",
-              lineHeight: 1.2,
-              wordBreak: "break-word",
-            }}
-          >
-            {entry.source}: {entry.value}
-          </Typography>
-        </Box>
-      ))}
-  </Box>
-</Box>
+            {/* Custom Legend */}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "1px",
+                maxWidth: "200px",
+              }}
+            >
+              {dash_data?.contacts_source_chart
+                ?.slice()
+                .sort((a, b) => b.value - a.value)
+                .map((entry, index) => (
+                  <Box
+                    key={index}
+                    sx={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: "4px",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        minWidth: "12px",
+                        minHeight: "12px",
+                        backgroundColor: COLORS[index % COLORS.length],
+                        borderRadius: "3px",
+                        marginTop: "3px",
+                      }}
+                    />
+                    <Typography
+                      component="span"
+                      sx={{
+                        fontSize: "0.7rem",
+                        lineHeight: 1.2,
+                        wordBreak: "break-word",
+                      }}
+                    >
+                      {entry.source}: {entry.value}
+                    </Typography>
+                  </Box>
+                ))}
+            </Box>
+          </Box>
         </Box>
         {/* end - Center column: Contacts by source chart */}
 
