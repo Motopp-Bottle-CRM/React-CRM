@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { fetchData } from '../../components/FetchData'
 import { DashboardUrl } from '../../services/ApiUrls'
-import { Box, Paper, Stack, Typography } from '@mui/material'
-import { FaBuilding, FaAddressBook, FaUsers, FaHandshake, FaClock } from 'react-icons/fa'
-import { ROLE_PERMISSIONS } from '../../constants/role_permissions'
+import { Box, Paper, Typography } from '@mui/material'
+import { FaAddressBook, FaUsers, FaClock, FaCheckCircle, FaArrowRight } from 'react-icons/fa'
+;
 import { hasAccess } from '../../utils/permissions'
 import { Link, useNavigate } from 'react-router-dom';
-import { FunnelChart, Funnel, LabelList, Tooltip } from "recharts";
-import { PieChart, Pie, Cell, Legend,Bar, BarChart,XAxis, YAxis,  PieLabelRenderProps } from "recharts";
+import { LabelList, Tooltip } from "recharts";
+import { PieChart, Pie, Cell, Bar, BarChart,XAxis, YAxis,  PieLabelRenderProps } from "recharts";
 
 interface DashboardData {
   leads_count: number
@@ -80,14 +80,14 @@ export default function Dashboard() {
   const kpi_leads = ((dash_data?.kpi_leads ?? 0) * 100).toFixed(2) + "%";
 
 
-  const AllDash_data = [
-    { label: 'leads', value: dash_data?.leads_count ?? 0, extraText:'Total',icon: <FaUsers size={40} /> },
-    { label: 'leads', value: dash_data?.leads_this_month ?? 0, extraText:'This month',icon: <FaUsers size={40} /> },
-    { label: 'leads', value: dash_data?.leads_in_process_this_month ?? 0, extraText:'In process - month',icon: <FaUsers size={40} /> },
+  const Dash_data = [
+    { label: 'leads', value: dash_data?.leads_count ?? 0, extraText:'Total',icon: <FaUsers size={30} /> },
+    { label: 'leads', value: dash_data?.leads_this_month ?? 0, extraText:'This month',icon: <FaUsers size={30} /> },
+    { label: 'leads - month', value: dash_data?.leads_in_process_this_month ?? 0, extraText:'In process ',icon: <FaUsers size={30} /> },
+    { label: 'leads', value: kpi_leads ?? 0, extraText:'KPI',icon: <FaUsers size={30} /> },
   ]
   
-  const AllDash_contacts_data = [
-    { label: 'leads', value: kpi_leads ?? 0, extraText:'KPI',icon: <FaUsers size={40} /> },
+  const Dash_contacts_data = [
     { label: 'contacts', value: dash_data?.contacts_count ?? 0, extraText:'Total', icon: <FaAddressBook size={40} /> },
     { label: 'contacts', value: dash_data?.contacts_this_month ?? 0, extraText:'This month', icon: <FaAddressBook size={40} /> },
   ]
@@ -98,8 +98,6 @@ export default function Dashboard() {
     const AllRecent_contacts_data = [
     { key: 'contacts', title: 'Recent Contacts', data: dash_data?.contacts, path: '/app/contacts' ,icon: <FaClock size={20} /> }, 
     ]
-  const Dash_data = AllDash_data.filter((stat) => hasAccess(role, stat.label));
-  const Dash_contacts_data = AllDash_contacts_data.filter((stat) => hasAccess(role, stat.label));
  
   {/* for Lead chart */}
   const Chart_leads = [
@@ -107,42 +105,42 @@ export default function Dashboard() {
     { stage: "In Process", value: dash_data?.leads_status_count.in_process ?? 0, fill: "#22c55eff" },
     { stage: "Converted", value: dash_data?.leads_status_count.converted ?? 0, fill: "#10b981ff" },
     { stage: "Recycled", value: dash_data?.leads_status_count.recycled ?? 0, fill: "#db8616ff" },
-    { stage: "Closed", value: dash_data?.leads_status_count.closed ?? 0, fill: "#f01010ff" }
+    { stage: "Closed", value: dash_data?.leads_status_count.closed ?? 0, fill: "#a70c0cff" }
   ];
 
   {/* for contacts chart */}
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#FF4560", "#4e55dcff", "#9f0b95ff"];
-    
-const renderLabel = (props: PieLabelRenderProps) => {
-  const { cx, cy, midAngle, innerRadius, outerRadius, percent } = props;
+        
+    const renderLabel = (props: PieLabelRenderProps) => {
+      const { cx, cy, midAngle, innerRadius, outerRadius, percent } = props;
 
-  const _cx = Number(cx ?? 0);
-  const _cy = Number(cy ?? 0);
-  const _midAngle = Number(midAngle ?? 0);
-  const _innerRadius = Number(innerRadius ?? 0);
-  const _outerRadius = Number(outerRadius ?? 0);
-  const _percent = Number(percent ?? 0);
+      const _cx = Number(cx ?? 0);
+      const _cy = Number(cy ?? 0);
+      const _midAngle = Number(midAngle ?? 0);
+      const _innerRadius = Number(innerRadius ?? 0);
+      const _outerRadius = Number(outerRadius ?? 0);
+      const _percent = Number(percent ?? 0);
 
-  // Skip labels for very small slices
-  if (_percent < 0.01) return null;
+      // Skip labels for very small slices
+      if (_percent < 0.01) return null;
 
-  const RADIAN = Math.PI / 180;
-  const radius = _innerRadius + (_outerRadius - _innerRadius) / 2;
-  const x = _cx + radius * Math.cos(-_midAngle * RADIAN);
-  const y = _cy + radius * Math.sin(-_midAngle * RADIAN);
+      const RADIAN = Math.PI / 180;
+      const radius = _innerRadius + (_outerRadius - _innerRadius) / 2;
+      const x = _cx + radius * Math.cos(-_midAngle * RADIAN);
+      const y = _cy + radius * Math.sin(-_midAngle * RADIAN);
 
-  return (
-    <text
-      x={x}
-      y={y}
-      fill="white"
-      textAnchor="middle"
-      dominantBaseline="middle"
-    >
-      {`${(_percent * 100).toFixed(0)}%`}
-    </text>
-  );
-};
+      return (
+        <text
+          x={x}
+          y={y}
+          fill="white"
+          textAnchor="middle"
+          dominantBaseline="middle"
+        >
+          {`${(_percent * 100).toFixed(0)}%`}
+        </text>
+      );
+    };
 
   // main
 
@@ -168,45 +166,46 @@ const renderLabel = (props: PieLabelRenderProps) => {
       >
         {/* Left column: KPI cards */}
         <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 1.5,
-            flex: "0 0 200px",    // fixed width
-          }}
-        >
-          {Dash_data.map((stat, index) => (
-            <Paper
-              key={`${stat.label}-${index}`}
-              sx={{
-                p: 1.5,
-                width: "200px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                borderRadius: "12px",
-                backgroundColor: "#e3f2fd",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-              }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                {stat.icon}
-                <Box sx={{ display: "flex", flexDirection: "column" }}>
-                  <Typography sx={{ fontSize: "0.8rem", fontWeight: "bold", color: "#000000" }}>
-                    {stat.extraText}
-                  </Typography>
-                  <Typography sx={{ fontSize: "0.7rem", color: "#000000" }}>
-                    {stat.label}
-                  </Typography>
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 1,
+              flex: "0 0 200px", // fixed width
+            }}
+          >
+            {Dash_data.map((stat, index) => (
+              <Paper
+                key={`${stat.label}-${index}`}
+                sx={{
+                  p: 1, // smaller padding
+                  width: "170px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  borderRadius: "10px",
+                  backgroundColor: "#e3f2fd",
+                  boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
+                  minHeight: "20px", // reduce height
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
+                  {stat.icon}
+                  <Box sx={{ display: "flex", flexDirection: "column", lineHeight: 1.2 }}>
+                    <Typography sx={{ fontSize: "0.7rem", fontWeight: "bold", color: "#000000" }}>
+                      {stat.extraText}
+                    </Typography>
+                    <Typography sx={{ fontSize: "0.6rem", color: "#000000" }}>
+                      {stat.label}
+                    </Typography>
+                  </Box>
                 </Box>
-              </Box>
-              <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-                {stat.value}
-              </Typography>
-            </Paper>
-          ))}
-        </Box>
-
+                <Typography variant="h5">
+                  {stat.value}
+                </Typography>
+              </Paper>
+            ))}
+          </Box>
+        {/* end - Left column: KPI cards */}
         {/* Center column: Leads chart */}
         <Box
           sx={{
@@ -233,12 +232,12 @@ const renderLabel = (props: PieLabelRenderProps) => {
                 pb: 0.5,
                 color: "#000000",
               }}
-            >
+            ><FaCheckCircle size={20} style={{ marginRight: '10px' }} /> 
               Leads by status
             </Typography>
             <BarChart
               width={320}
-              height={190}
+              height={230}
               data={Chart_leads}
               layout="vertical"
               margin={{ top: 10, right: 10, left: 20, bottom: 10 }}
@@ -252,7 +251,7 @@ const renderLabel = (props: PieLabelRenderProps) => {
             </BarChart>
           </Paper>
         </Box>
-
+        {/* end - Center column: Leads chart */}
         {/* Right column: Recent Leads */}
         <Box
           sx={{
@@ -274,11 +273,12 @@ const renderLabel = (props: PieLabelRenderProps) => {
                 border: "1px solid #c0c0c0",
                 display: "flex",
                 flexDirection: "column",
-                height: 200,
-                width: "200px",
+                height: 238,
+                width: 250,
                 overflow: "hidden",
               }}
             >
+              {/* Card Title */}
               <Typography
                 sx={{
                   mb: 1,
@@ -293,31 +293,82 @@ const renderLabel = (props: PieLabelRenderProps) => {
                 {item.icon} {item.title}
               </Typography>
 
-              <Box sx={{ overflow: "auto", flex: 1 }}>
-                <ol style={{ paddingLeft: "16px", margin: 0 }}>
-                  {item.data?.slice(-5).map((entry: any, idx: number) => (
-                    <li
-                      key={idx}
-                      style={{ marginBottom: "4px", listStyleType: "decimal" }}
-                    >
+              {/* Content Container */}
+              <Box sx={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
+                {/* Lead List */}
+                <ol style={{ paddingLeft: "16px", margin: 0, flex: 1, overflowY: "auto" }}>
+                  {item.data?.slice(-4).map((entry: any, idx: number) => (
+                    <li key={idx} style={{ marginBottom: 4, listStyleType: "decimal" }}>
                       <Link
-                        to={`/leads/lead-details/${entry.id}`}
+                        to={`/app/leads/lead-details/${entry.id}`}
                         style={{
                           textDecoration: "none",
                           color: "#1A3353",
-                          fontSize: "14px",
+                          fontSize: 14,
                           fontWeight: 500,
                         }}
                       >
                         {entry.name || entry.title || `#${entry.id ?? idx}`}
                       </Link>
+
+                      <span
+                        style={{
+                          display: "inline-block",
+                          backgroundColor: "#36419c",
+                          color: "#f5faf8ff",
+                          borderRadius: "12px",
+                          padding: "2px 8px",
+                          fontSize: "0.5rem",
+                          fontWeight: "bold",
+                          textAlign: "center",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          maxWidth: 60,
+                          marginLeft: 4,
+                        }}
+                      >
+                        {entry.status?.substring(0, 6)}
+                      </span>
+
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          fontSize: "0.7rem",
+                          color: "#000000",
+                          fontWeight: 300,
+                          marginTop: 2,
+                        }}
+                      >
+                        <span>{new Date(entry.created_at).toLocaleDateString()}</span>
+                        <span style={{ color: "#1A3353" }}>{entry.created_by?.email}</span>
+                      </div>
                     </li>
                   ))}
                 </ol>
+
+                {/* Bottom-right "More Leads" link */}
+                <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 0 }}>
+                  <Link
+                    to={`/app/leads/`}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      textDecoration: "none",
+                    }}
+                  >
+                    <span style={{ fontSize: "0.8rem", color: "#1A3353" }}>more leads</span>
+                    <FaArrowRight size={12} color="#1A3353" />
+                  </Link>
+                </Box>
               </Box>
             </Paper>
           ))}
         </Box>
+
+        {/* end - Right column: Recent Leads */}
       </Box>
       )}
       {/*  end of leads section */}
@@ -349,12 +400,13 @@ const renderLabel = (props: PieLabelRenderProps) => {
             <Paper
               key={`${stat.label}-${index}`}
               sx={{
-                p: 1.5,
-                width: "200px",
+                p: 1, // smaller padding
+                width: "170px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                borderRadius: "12px",
+                borderRadius: "10px",
+                minHeight: "20px",
                 backgroundColor: "#ebf4ecff",
                 boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
               }}
@@ -362,21 +414,21 @@ const renderLabel = (props: PieLabelRenderProps) => {
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 {stat.icon}
                 <Box sx={{ display: "flex", flexDirection: "column" }}>
-                  <Typography sx={{ fontSize: "0.8rem", fontWeight: "bold", color: "#000000" }}>
+                  <Typography sx={{ fontSize: "0.7rem", fontWeight: "bold", color: "#000000" }}>
                     {stat.extraText}
                   </Typography>
-                  <Typography sx={{ fontSize: "0.7rem", color: "#000000" }}>
+                  <Typography sx={{ fontSize: "0.6rem", color: "#000000" }}>
                     {stat.label}
                   </Typography>
                 </Box>
               </Box>
-              <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+              <Typography variant="h5">
                 {stat.value}
               </Typography>
             </Paper>
           ))}
         </Box>
-
+        {/* end - Left column: KPI cards */}
         {/* Center column: Contacts by source chart */}
         <Box
           sx={{
@@ -401,66 +453,74 @@ const renderLabel = (props: PieLabelRenderProps) => {
           </Typography>
 
           <Box sx={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            {/* Pie Chart */}
-            <PieChart width={140} height={140}>
-              <Pie
-                data={dash_data?.contacts_source_chart || []}
-                dataKey="value"
-                nameKey="source"
-                outerRadius={60}
-                label={renderLabel}
-                labelLine={false}
-              >
-                {dash_data?.contacts_source_chart.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
+  {/* Pie Chart */}
+  <PieChart width={140} height={140}>
+    <Pie
+      data={dash_data?.contacts_source_chart?.slice().sort((a, b) => b.value - a.value) || []} // sorted descending
+      dataKey="value"
+      nameKey="source"
+      outerRadius={60}
+      label={renderLabel}
+      labelLine={false}
+    >
+      {dash_data?.contacts_source_chart
+        ?.slice()
+        .sort((a, b) => b.value - a.value)
+        .map((entry, index) => (
+          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+        ))}
+    </Pie>
+    <Tooltip />
+  </PieChart>
 
-            {/* Custom Legend */}
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "1px",
-                maxWidth: "200px",
-              }}
-            >
-              {dash_data?.contacts_source_chart.map((entry, index) => (
-                <Box
-                  key={index}
-                  sx={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    gap: "4px",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      minWidth: "12px",
-                      minHeight: "12px",
-                      backgroundColor: COLORS[index % COLORS.length],
-                      borderRadius: "3px",
-                      marginTop: "3px",
-                    }}
-                  />
-                  <Typography
-                    component="span"
-                    sx={{
-                      fontSize: "0.7rem",
-                      lineHeight: 1.2,
-                      wordBreak: "break-word",
-                    }}
-                  >
-                    {entry.source}: {entry.value}
-                  </Typography>
-                </Box>
-              ))}
-            </Box>
-          </Box>
+  {/* Custom Legend */}
+  <Box
+    sx={{
+      display: "flex",
+      flexDirection: "column",
+      gap: "1px",
+      maxWidth: "200px",
+    }}
+  >
+    {dash_data?.contacts_source_chart
+      ?.slice()
+      .sort((a, b) => b.value - a.value)
+      .map((entry, index) => (
+        <Box
+          key={index}
+          sx={{
+            display: "flex",
+            alignItems: "flex-start",
+            gap: "4px",
+          }}
+        >
+          <Box
+            sx={{
+              minWidth: "12px",
+              minHeight: "12px",
+              backgroundColor: COLORS[index % COLORS.length],
+              borderRadius: "3px",
+              marginTop: "3px",
+            }}
+          />
+          <Typography
+            component="span"
+            sx={{
+              fontSize: "0.7rem",
+              lineHeight: 1.2,
+              wordBreak: "break-word",
+            }}
+          >
+            {entry.source}: {entry.value}
+          </Typography>
         </Box>
+      ))}
+  </Box>
+</Box>
+        </Box>
+        {/* end - Center column: Contacts by source chart */}
 
+        
         {/* Right column: Recent Contacts */}
         <Box
           sx={{
@@ -482,8 +542,8 @@ const renderLabel = (props: PieLabelRenderProps) => {
                 border: "1px solid #c0c0c0",
                 display: "flex",
                 flexDirection: "column",
-                height: 200,
-                width: "200px",
+                height: 150,
+                width: "250px",
                 overflow: "hidden",
               }}
             >
@@ -527,9 +587,11 @@ const renderLabel = (props: PieLabelRenderProps) => {
           ))}
         </Box>
       </Box>
+      
+      
        )}
-       {/*  end of contacts section */}
-    
+     
+    {/*  end of contacts section */}
     </div>
   )
 }

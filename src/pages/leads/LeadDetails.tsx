@@ -28,6 +28,10 @@ import {
   FaTrash,
 } from 'react-icons/fa'
 import { json } from 'stream/consumers'
+import { useParams } from 'react-router-dom';
+
+
+
 export default function LeadDetailsTest() {
   interface RecievedComments {
     id: string
@@ -140,11 +144,29 @@ export default function LeadDetailsTest() {
     []
   )
   const [recievedAttachments, setRecievedAttachments] = useState<RecievedAttachments[]>([])
+//   useEffect(() => {
+//     getLeadDetails(state?.leadId)
+//     getComment(state?.leadId)
+//     getAttachment(state?.leadId)
+//   }, [state.leadId])
+
+  // new code for also getting detail info from id in url
+  const { leadId: paramLeadId } = useParams<{ leadId: string }>();
+  const leadId = state?.leadId ?? paramLeadId;
+  const leadIdNumber = leadId ? Number(leadId) : null;
+
   useEffect(() => {
-    getLeadDetails(state?.leadId)
-    getComment(state?.leadId)
-    getAttachment(state?.leadId)
-  }, [state.leadId])
+    if (!leadId) return;
+
+    getLeadDetails(leadId);
+    getComment(leadId);
+
+    if (leadIdNumber !== null) {
+      getAttachment(leadIdNumber);
+    }
+  }, [leadId, leadIdNumber]);
+
+
 
   const getLeadDetails = async (id: any) => {
     const Header = {

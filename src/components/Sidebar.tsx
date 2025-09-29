@@ -419,6 +419,14 @@ useEffect(() => {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/app/leads/lead-details/:leadId"
+                element={
+                  <ProtectedRoute role={role} module="leads">
+                    <LeadDetails />
+                  </ProtectedRoute>
+                }
+              />
 
               {/* Companies */}
               <Route
