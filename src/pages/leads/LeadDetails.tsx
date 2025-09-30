@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -149,11 +150,19 @@ export default function LeadDetails() {
   const [open, setOpen] = useState(false)
   const [selectedLeadId, setSelectedLeadId] = useState('')
   const [success, setSuccess] = useState(false)
+  const { leadId: paramLeadId } = useParams<{ leadId: string }>();
+  const leadId = state?.leadId ?? paramLeadId;
+  const leadIdNumber = leadId ? Number(leadId) : null;
   useEffect(() => {
-    getLeadDetails(state?.leadId)
-    getComment(state?.leadId)
-    getAttachment(state?.leadId)
-  }, [state.leadId])
+    if (!leadId) return;
+
+    getLeadDetails(leadId);
+    getComment(leadId);
+
+    if (leadIdNumber !== null) {
+      getAttachment(leadIdNumber);
+    }
+  }, [leadId, leadIdNumber]);
 
 
 
@@ -373,7 +382,7 @@ export default function LeadDetails() {
   const module = 'Leads'
   const crntPage = 'Lead Details'
   const backBtn = 'Back To Leads'
-  const leadId = state?.leadId
+  // const leadId = state?.leadId
   const modelDialog =
     'Are you sure you want to convert this lead? This will create new records and mark the lead as converted.'
   const modelTitle = 'Convert Lead'
