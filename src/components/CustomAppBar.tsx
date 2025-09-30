@@ -22,6 +22,7 @@ export function CustomAppBar(props: any) {
 
   const Module = module.toLowerCase()
 
+
   return (
     <AppBar
       sx={{

@@ -19,6 +19,7 @@ import {
   Divider,
   Select,
   Button,
+  Alert,
 } from '@mui/material'
 import { useQuill } from 'react-quilljs'
 import 'quill/dist/quill.snow.css'
@@ -106,12 +107,10 @@ type FormErrors = {
   state?: string[]
   postcode?: string[]
   country?: string[]
-  tags?: string[]
-  company?: string[]
+  company_name?: string[]
   probability?: number[]
   industry?: string[]
   linkedin_id?: string[]
-  file?: string[]
   general?: string[]
 }
 interface FormData {
@@ -122,7 +121,6 @@ interface FormData {
   account_name: string
   phone: string
   email: string
-  lead_attachment: string | null
   opportunity_amount: string
   website: string
   description: string
@@ -137,12 +135,10 @@ interface FormData {
   state: string
   postcode: string
   country: string
-  tags: string[]
-  company: string
+  company_name: string
   probability: number
   industry: string
   linkedin_id: string
-  file: string | null
 }
 
 export function AddLeads() {
@@ -157,17 +153,14 @@ export function AddLeads() {
 
   const autocompleteRef = useRef<any>(null)
   const [error, setError] = useState(false)
-  const [success, setSuccess] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
   const [selectedContacts, setSelectedContacts] = useState<any[]>([])
   const [selectedAssignTo, setSelectedAssignTo] = useState<any[]>([])
-  const [selectedTags, setSelectedTags] = useState<any[]>([])
   const [selectedCountry, setSelectedCountry] = useState<any[]>([])
   const [sourceSelectOpen, setSourceSelectOpen] = useState(false)
   const [statusSelectOpen, setStatusSelectOpen] = useState(false)
   const [countrySelectOpen, setCountrySelectOpen] = useState(false)
   const [industrySelectOpen, setIndustrySelectOpen] = useState(false)
-  const [companySelectOpen, setCompanySelectOpen] = useState(false)
-  const [companies, setCompanies] = useState<any[]>([])
   const [errors, setErrors] = useState<FormErrors>({})
   const [formData, setFormData] = useState<FormData>({
     title: '',
@@ -177,7 +170,6 @@ export function AddLeads() {
     account_name: '',
     phone: '',
     email: '',
-    lead_attachment: null,
     opportunity_amount: '',
     website: '',
     description: '',
@@ -192,12 +184,10 @@ export function AddLeads() {
     state: '',
     postcode: '',
     country: '',
-    tags: [],
-    company: '',
+    company_name: '',
     probability: 1,
     industry: 'ADVERTISING',
     linkedin_id: '',
-    file: null,
   })
 
   useEffect(() => {
@@ -207,18 +197,6 @@ export function AddLeads() {
     }
   }, [quill])
 
-  // Fetch companies on component mount
-  useEffect(() => {
-    fetchData('leads/companies', 'GET', null, Header)
-      .then((res: any) => {
-        if (!res.error) {
-          setCompanies(res.data || [])
-        }
-      })
-      .catch((error) => {
-        console.log('Error fetching companies:', error)
-      })
-  }, [])
 
   const handleChange2 = (title: any, val: any) => {
     // const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -235,12 +213,6 @@ export function AddLeads() {
         assigned_to: val.length > 0 ? val.map((item: any) => item.id) : [],
       })
       setSelectedAssignTo(val)
-    } else if (title === 'tags') {
-      setFormData({
-        ...formData,
-        assigned_to: val.length > 0 ? val.map((item: any) => item.id) : [],
-      })
-      setSelectedTags(val)
     }
     // else if (title === 'country') {
     //   setFormData({ ...formData, country: val || [] })
@@ -254,28 +226,15 @@ export function AddLeads() {
   const handleChange = (e: any) => {
     // const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     // console.log('e.target',e)
-    const { name, value, files, type, checked, id } = e.target
+    const { name, value, type, checked, id } = e.target
     // console.log('auto', val)
-    if (type === 'file') {
-      setFormData({ ...formData, [name]: e.target.files?.[0] || null })
-    } else if (type === 'checkbox') {
+    if (type === 'checkbox') {
       setFormData({ ...formData, [name]: checked })
     } else {
       setFormData({ ...formData, [name]: value })
     }
   }
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] || null
-    if (file) {
-      const reader = new FileReader()
-      reader.onload = () => {
-        // setFormData({ ...formData, lead_attachment: reader.result as string });
-        setFormData({ ...formData, file: reader.result as string })
-      }
-      reader.readAsDataURL(file)
-    }
-  }
 
   const resetQuillToInitialState = () => {
     // Reset the Quill editor to its initial state
@@ -300,9 +259,9 @@ export function AddLeads() {
       return;
     }
     
-    if (!formData.company || formData.company.trim() === '') {
+    if (!formData.company_name || formData.company_name.trim() === '') {
       setError(true);
-      setErrors({ general: ['Company is required'] });
+      setErrors({ general: ['Company name is required'] });
       return;
     }
     
@@ -321,7 +280,7 @@ export function AddLeads() {
     
     
     // console.log('Form data:', formData.lead_attachment,'sfs', formData.file);
-    const data = {
+    const data: any = {
       title: formData.title || `New Lead ${Date.now()}`, 
       job_title: formData.job_title,
       first_name: formData.first_name,
@@ -339,29 +298,28 @@ export function AddLeads() {
       city: formData.city,
       state: formData.state,
       postcode: formData.postcode,
-      country: formData.country,
-      company: formData.company,
-      organization: formData.company ? companies.find(c => c.id === formData.company)?.name || 'Unknown Organization' : 'Unknown Organization', 
+      company: formData.company_name, 
       probability: Math.round(Math.min(formData.probability, 100)), 
       industry: formData.industry,
       linkedin_id: formData.linkedin_id,
+      ...(formData.country && typeof formData.country === 'string' && formData.country.trim() !== '' && { country: formData.country })
     }
     
     fetchData(`${LeadUrl}/`, 'POST', JSON.stringify(data), Header)
       .then((res: any) => {
         console.log('Form data response:', res);
         if (!res.error) {
-          setSuccess(true)
+          setSuccessMessage('Lead created successfully!')
           setError(false)
-          // Show success message for 2 seconds before navigating
+          // Show success message for 1 second before navigating
           setTimeout(() => {
             resetForm()
             navigate('/app/leads')
-          }, 2000)
+          }, 1000)
         }
         if (res.error) {
           setError(true)
-          setSuccess(false)
+          setSuccessMessage('')
           setErrors(res?.errors)
         }
       })
@@ -369,7 +327,7 @@ export function AddLeads() {
         console.error('Lead creation error:', error);
         console.error('Error details:', JSON.stringify(error, null, 2));
         setError(true)
-        setSuccess(false)
+        setSuccessMessage('')
         
         // Handle different types of errors
         if (error.message && error.message.includes('Session expired')) {
@@ -393,7 +351,6 @@ export function AddLeads() {
       account_name: '',
       phone: '',
       email: '',
-      lead_attachment: null,
       opportunity_amount: '',
       website: '',
       description: '',
@@ -408,18 +365,15 @@ export function AddLeads() {
       state: '',
       postcode: '',
       country: '',
-      tags: [],
-      company: '',
+      company_name: '',
       probability: 1,
       industry: 'ADVERTISING',
       linkedin_id: '',
-      file: null,
     })
     setErrors({})
-    setSuccess(false)
+    setSuccessMessage('')
     setSelectedContacts([])
     setSelectedAssignTo([])
-    setSelectedTags([])
     // setSelectedCountry([])
     // if (autocompleteRef.current) {
     //   console.log(autocompleteRef.current,'ccc')
@@ -451,6 +405,14 @@ export function AddLeads() {
         onSubmit={handleSubmit}
       />
       <Box sx={{ mt: '120px' }}>
+        {/* Success Message Alert */}
+        {successMessage && (
+          <Box sx={{ mb: 2, px: 2 }}>
+            <Alert severity="success" onClose={() => setSuccessMessage('')}>
+              {successMessage}
+            </Alert>
+          </Box>
+        )}
         <form onSubmit={handleSubmit}>
           <div style={{ padding: '10px' }}>
             <div className="leadContainer">
@@ -473,22 +435,6 @@ export function AddLeads() {
                     {error && errors?.general && (
                       <div style={{ color: 'red', marginBottom: '10px', padding: '10px', backgroundColor: '#ffebee', border: '1px solid #f44336', borderRadius: '4px' }}>
                         {errors.general[0]}
-                      </div>
-                    )}
-                    {success && (
-                      <div style={{ 
-                        color: '#2e7d32', 
-                        marginBottom: '15px', 
-                        padding: '15px', 
-                        backgroundColor: '#e8f5e8', 
-                        border: '2px solid #4caf50', 
-                        borderRadius: '8px',
-                        fontSize: '16px',
-                        fontWeight: 'bold',
-                        textAlign: 'center',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                      }}>
-                        ✅ Lead created successfully! Redirecting to leads list...
                       </div>
                     )}
                     <div className="fieldContainer">
@@ -706,51 +652,19 @@ export function AddLeads() {
                     </div>
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Company</div>
-                        <FormControl sx={{ width: '70%' }}>
-                          <RequiredSelect
-                            name="company"
-                            value={formData.company}
-                            open={companySelectOpen}
-                            onClick={() => setCompanySelectOpen(!companySelectOpen)}
-                            IconComponent={() => (
-                              <div
-                                onClick={() => setCompanySelectOpen(!companySelectOpen)}
-                                className="select-icon-background"
-                              >
-                                {companySelectOpen ? (
-                                  <FiChevronUp className="select-icon" />
-                                ) : (
-                                  <FiChevronDown className="select-icon" />
-                                )}
-                              </div>
-                            )}
-                            className={'select'}
-                            onChange={handleChange}
-                            error={!!errors?.company?.[0]}
-                            required
-                            MenuProps={{
-                              PaperProps: {
-                                style: {
-                                  height: '200px',
-                                },
-                              },
-                            }}
-                          >
-                            {companies && companies.length > 0 ? (
-                              companies.map((company: any) => (
-                                <MenuItem key={company?.id || ''} value={company?.id || ''}>
-                                  {company?.name || 'Unknown Company'}
-                                </MenuItem>
-                              ))
-                            ) : (
-                              <MenuItem disabled>No companies available</MenuItem>
-                            )}
-                          </RequiredSelect>
-                          <FormHelperText>
-                            {errors?.company?.[0] ? errors?.company[0] : ''}
-                          </FormHelperText>
-                        </FormControl>
+                        <div className="fieldTitle">Company Name</div>
+                        <RequiredTextField
+                          name="company_name"
+                          value={formData.company_name}
+                          onChange={handleChange}
+                          style={{ width: '70%' }}
+                          size="small"
+                          required
+                          error={!!errors?.company_name?.[0]}
+                          helperText={
+                            errors?.company_name?.[0] ? errors?.company_name[0] : ''
+                          }
+                        />
                       </div>
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Status</div>
@@ -825,26 +739,12 @@ export function AddLeads() {
                           >
                             {[
                               { value: '', label: 'Select source' },
-                              { value: 'website', label: 'Website' },
-                              { value: 'phone_inquiry', label: 'Phone Inquiry' },
-                              { value: 'partner_referral', label: 'Partner Referral' },
-                              { value: 'cold_call', label: 'Cold Call' },
-                              { value: 'trade_show', label: 'Trade Show' },
-                              { value: 'employee_referral', label: 'Employee Referral' },
-                              { value: 'advertisement', label: 'Advertisement' },
-                              { value: 'social_media', label: 'Social Media' },
-                              { value: 'email_campaign', label: 'Email Campaign' },
-                              { value: 'webinar', label: 'Webinar' },
-                              { value: 'content_marketing', label: 'Content Marketing' },
-                              { value: 'seo_organic', label: 'SEO/Organic Search' },
-                              { value: 'ppc_advertising', label: 'Pay-Per-Click Advertising' },
-                              { value: 'direct_mail', label: 'Direct Mail' },
-                              { value: 'call', label: 'Call' },
-                              { value: 'email', label: 'Email' },
-                              { value: 'existing_customer', label: 'Existing Customer' },
-                              { value: 'partner', label: 'Partner' },
-                              { value: 'public_relations', label: 'Public Relations' },
-                              { value: 'campaign', label: 'Campaign' },
+                              { value: 'referrals', label: 'Referrals & Recommendations' },
+                              { value: 'marketing', label: 'Digital Content & SEO' },
+                              { value: 'advertisement', label: 'Paid Ads (Google, LinkedIn, Meta)' },
+                              { value: 'networking', label: 'Networking & Professional Platforms' },
+                              { value: 'events', label: 'Events & Trade Shows' },
+                              { value: 'campaign', label: 'Email/Call Campaigns' },
                               { value: 'other', label: 'Other' }
                             ].map((option) => (
                               <MenuItem key={option.value} value={option.value}>
@@ -857,120 +757,8 @@ export function AddLeads() {
                           </FormHelperText>
                         </FormControl>
                       </div>
-                      <div className="fieldSubContainer">
-                        <div className="fieldTitle">Lead Attachment</div>
-                        <TextField
-                          name="lead_attachment"
-                          value={formData.lead_attachment}
-                          InputProps={{
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <IconButton
-                                  disableFocusRipple
-                                  disableTouchRipple
-                                  sx={{
-                                    width: '40px',
-                                    height: '40px',
-                                    backgroundColor: 'whitesmoke',
-                                    borderRadius: '0px',
-                                    mr: '-13px',
-                                    cursor: 'pointer',
-                                  }}
-                                >
-                                  <label htmlFor="icon-button-file">
-                                    <input
-                                      hidden
-                                      accept="image/*"
-                                      id="icon-button-file"
-                                      type="file"
-                                      name="account_attachment"
-                                      onChange={(e: any) => {
-                                        //  handleChange(e);
-                                        handleFileChange(e)
-                                      }}
-                                    />
-                                    <FaUpload
-                                      color="primary"
-                                      style={{
-                                        fontSize: '15px',
-                                        cursor: 'pointer',
-                                      }}
-                                    />
-                                  </label>
-                                </IconButton>
-                              </InputAdornment>
-                            ),
-                          }}
-                          sx={{ width: '70%' }}
-                          size="small"
-                        />
-                      </div>
                     </div>
                     <div className="fieldContainer2">
-                      <div className="fieldSubContainer">
-                        <div className="fieldTitle">Tags</div>
-                        <FormControl
-                          error={!!errors?.tags?.[0]}
-                          sx={{ width: '70%' }}
-                        >
-                          <Autocomplete
-                            // ref={autocompleteRef}
-                            value={selectedTags}
-                            multiple
-                            limitTags={5}
-                            options={state?.tags || []}
-                            // options={state.contacts ? state.contacts.map((option: any) => option) : ['']}
-                            getOptionLabel={(option: any) => option}
-                            onChange={(e: any, value: any) =>
-                              handleChange2('tags', value)
-                            }
-                            size="small"
-                            filterSelectedOptions
-                            renderTags={(value, getTagProps) =>
-                              value.map((option, index) => (
-                                <Chip
-                                  deleteIcon={
-                                    <FaTimes style={{ width: '9px' }} />
-                                  }
-                                  sx={{
-                                    backgroundColor: 'rgba(0, 0, 0, 0.08)',
-                                    height: '18px',
-                                  }}
-                                  variant="outlined"
-                                  label={option}
-                                  {...getTagProps({ index })}
-                                />
-                              ))
-                            }
-                            popupIcon={
-                              <CustomPopupIcon>
-                                <FaPlus className="input-plus-icon" />
-                              </CustomPopupIcon>
-                            }
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                placeholder="Add Tags"
-                                InputProps={{
-                                  ...params.InputProps,
-                                  sx: {
-                                    '& .MuiAutocomplete-popupIndicator': {
-                                      '&:hover': { backgroundColor: 'white' },
-                                    },
-                                    '& .MuiAutocomplete-endAdornment': {
-                                      mt: '-8px',
-                                      mr: '-8px',
-                                    },
-                                  },
-                                }}
-                              />
-                            )}
-                          />
-                          <FormHelperText>
-                            {errors?.tags?.[0] || ''}
-                          </FormHelperText>
-                        </FormControl>
-                      </div>
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Probability</div>
                         <TextField

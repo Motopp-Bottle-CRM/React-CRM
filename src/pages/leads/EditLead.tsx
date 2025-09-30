@@ -19,6 +19,7 @@ import {
   Divider,
   Select,
   Button,
+  Alert,
 } from '@mui/material'
 import { useQuill } from 'react-quilljs'
 import 'quill/dist/quill.snow.css'
@@ -105,7 +106,7 @@ type FormErrors = {
   postcode?: string[]
   country?: string[]
   tags?: string[]
-  company?: string[]
+  company_name?: string[]
   probability?: number[]
   industry?: string[]
   linkedin_id?: string[]
@@ -136,7 +137,7 @@ interface FormData {
   postcode: string
   country: string
   tags: string[]
-  company: string
+  company_name: string
   probability: number
   industry: string
   linkedin_id: string
@@ -157,6 +158,7 @@ export function EditLead() {
   const autocompleteRef = useRef<any>(null)
   const [reset, setReset] = useState(false)
   const [error, setError] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
   const [selectedContacts, setSelectedContacts] = useState<any[]>([])
   const [selectedAssignTo, setSelectedAssignTo] = useState<any[]>([])
   const [selectedTags, setSelectedTags] = useState<any[]>([])
@@ -165,9 +167,6 @@ export function EditLead() {
   const [statusSelectOpen, setStatusSelectOpen] = useState(false)
   const [countrySelectOpen, setCountrySelectOpen] = useState(false)
   const [industrySelectOpen, setIndustrySelectOpen] = useState(false)
-  const [companySelectOpen, setCompanySelectOpen] = useState(false)
-  const [companies, setCompanies] = useState<any[]>([])
-  const [companiesLoading, setCompaniesLoading] = useState(true)
   const [errors, setErrors] = useState<FormErrors>({})
   const [formData, setFormData] = useState<FormData>({
     title: '',
@@ -193,7 +192,7 @@ export function EditLead() {
     postcode: '',
     country: '',
     tags: [],
-    company: '',
+    company_name: '',
     probability: 1,
     industry: 'ADVERTISING',
     linkedin_id: '',
@@ -290,25 +289,6 @@ export function EditLead() {
     }
   }, [quill, formData.description])
 
-  // Fetch companies on component mount
-  useEffect(() => {
-    setCompaniesLoading(true)
-    fetchData('leads/companies', 'GET', null, Header)
-      .then((res: any) => {
-        if (!res.error && res.data) {
-          setCompanies(Array.isArray(res.data) ? res.data : [])
-        } else {
-          setCompanies([])
-        }
-      })
-      .catch((error) => {
-        console.log('Error fetching companies:', error)
-        setCompanies([])
-      })
-      .finally(() => {
-        setCompaniesLoading(false)
-      })
-  }, [])
 
   // useEffect(() => {
   //     if (quill && initialContentRef.current === null) {
@@ -406,6 +386,12 @@ export function EditLead() {
       return;
     }
 
+    if (!formData.company_name || formData.company_name.trim() === '') {
+      setError(true);
+      setErrors({ general: ['Company name is required'] });
+      return;
+    }
+
     if (!formData.first_name && !formData.last_name) {
       setError(true);
       setErrors({ general: ['Please provide at least first name or last name'] });
@@ -434,9 +420,8 @@ export function EditLead() {
       city: formData.city,
       state: formData.state,
       postcode: formData.postcode,
-      country: formData.country,
+      company: formData.company_name,
       tags: formData.tags || [],
-      company: formData.company || null,
       probability: formData.probability ? Math.round(Math.min(formData.probability, 100)) : 0,
       industry: formData.industry,
       linkedin_id: formData.linkedin_id || '',
@@ -447,22 +432,29 @@ export function EditLead() {
       data.contacts = formData.contacts;
     }
 
+    // Only include country if it has a value
+    if (formData.country && typeof formData.country === 'string' && formData.country.trim() !== '') {
+      data.country = formData.country;
+    }
+
     console.log('EditLead - Submitting data:', data);
     console.log('EditLead - Industry value:', formData.industry);
-    console.log('EditLead - Company field:', formData.company, 'Company name:', companies.find(c => c.id === formData.company)?.name);
-    console.log('EditLead - Company UUID being sent:', data.company);
+    console.log('EditLead - Company name:', formData.company_name);
     fetchData(`${LeadUrl}/${state?.id}/`, 'PUT', JSON.stringify(data), Header)
       .then((res: any) => {
         console.log('EditLead - API Response:', res);
         if (!res.error) {
-          backbtnHandle()
-          // setResponceError(data.error)
-          // navigate('/contacts')
-          // resetForm()
+          setSuccessMessage('Lead updated successfully!')
+          setError(false)
+          // Show success message for 1 second before navigating
+          setTimeout(() => {
+            backbtnHandle()
+          }, 1000)
         }
         if (res.error) {
           console.log('EditLead - API Error:', res.errors);
           setError(true)
+          setSuccessMessage('')
           setErrors(res?.errors)
         }
       })
@@ -470,6 +462,7 @@ export function EditLead() {
         console.log('EditLead - Fetch Error:', error);
         console.log('EditLead - Error details:', JSON.stringify(error, null, 2));
         setError(true)
+        setSuccessMessage('')
         setErrors(error?.errors || { general: ['An error occurred while saving the lead.'] })
       })
   }
@@ -498,7 +491,7 @@ export function EditLead() {
       postcode: '',
       country: '',
       tags: [],
-      company: '',
+      company_name: '',
       probability: 1,
       industry: 'ADVERTISING',
       linkedin_id: '',
@@ -574,6 +567,14 @@ export function EditLead() {
         onSubmit={handleSubmit}
       />
       <Box sx={{ mt: '120px' }}>
+        {/* Success Message Alert */}
+        {successMessage && (
+          <Box sx={{ mb: 2, px: 2 }}>
+            <Alert severity="success" onClose={() => setSuccessMessage('')}>
+              {successMessage}
+            </Alert>
+          </Box>
+        )}
         <form onSubmit={handleSubmit}>
           <div style={{ padding: '10px' }}>
             <div className="leadContainer">
@@ -798,52 +799,19 @@ export function EditLead() {
                     </div>
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Company</div>
-                        <FormControl sx={{ width: '70%' }}>
-                          <Select
-                            name="company"
-                            value={formData.company}
-                            open={companySelectOpen}
-                            onClick={() => setCompanySelectOpen(!companySelectOpen)}
-                            IconComponent={() => (
-                              <div
-                                onClick={() => setCompanySelectOpen(!companySelectOpen)}
-                                className="select-icon-background"
-                              >
-                                {companySelectOpen ? (
-                                  <FiChevronUp className="select-icon" />
-                                ) : (
-                                  <FiChevronDown className="select-icon" />
-                                )}
-                              </div>
-                            )}
-                            className={'select'}
-                            onChange={handleChange}
-                            error={!!errors?.company?.[0]}
-                            MenuProps={{
-                              PaperProps: {
-                                style: {
-                                  height: '200px',
-                                },
-                              },
-                            }}
-                          >
-                            {companiesLoading ? (
-                              <MenuItem disabled>Loading companies...</MenuItem>
-                            ) : companies && companies.length > 0 ? (
-                              companies.map((company: any) => (
-                                <MenuItem key={company?.id || ''} value={company?.id || ''}>
-                                  {company?.name || 'Unknown Company'}
-                              </MenuItem>
-                              ))
-                            ) : (
-                              <MenuItem disabled>No companies available</MenuItem>
-                            )}
-                          </Select>
-                          <FormHelperText>
-                            {errors?.company?.[0] ? errors?.company[0] : ''}
-                          </FormHelperText>
-                        </FormControl>
+                        <div className="fieldTitle">Company Name</div>
+                        <RequiredTextField
+                          name="company_name"
+                          value={formData.company_name}
+                          onChange={handleChange}
+                          style={{ width: '70%' }}
+                          size="small"
+                          required
+                          error={!!errors?.company_name?.[0]}
+                          helperText={
+                            errors?.company_name?.[0] ? errors?.company_name[0] : ''
+                          }
+                        />
                       </div>
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Status</div>
@@ -917,26 +885,12 @@ export function EditLead() {
                           >
                             {[
                               { value: '', label: 'Select source' },
-                              { value: 'website', label: 'Website' },
-                              { value: 'phone_inquiry', label: 'Phone Inquiry' },
-                              { value: 'partner_referral', label: 'Partner Referral' },
-                              { value: 'cold_call', label: 'Cold Call' },
-                              { value: 'trade_show', label: 'Trade Show' },
-                              { value: 'employee_referral', label: 'Employee Referral' },
-                              { value: 'advertisement', label: 'Advertisement' },
-                              { value: 'social_media', label: 'Social Media' },
-                              { value: 'email_campaign', label: 'Email Campaign' },
-                              { value: 'webinar', label: 'Webinar' },
-                              { value: 'content_marketing', label: 'Content Marketing' },
-                              { value: 'seo_organic', label: 'SEO/Organic Search' },
-                              { value: 'ppc_advertising', label: 'Pay-Per-Click Advertising' },
-                              { value: 'direct_mail', label: 'Direct Mail' },
-                              { value: 'call', label: 'Call' },
-                              { value: 'email', label: 'Email' },
-                              { value: 'existing_customer', label: 'Existing Customer' },
-                              { value: 'partner', label: 'Partner' },
-                              { value: 'public_relations', label: 'Public Relations' },
-                              { value: 'campaign', label: 'Campaign' },
+                              { value: 'referrals', label: 'Referrals & Recommendations' },
+                              { value: 'marketing', label: 'Digital Content & SEO' },
+                              { value: 'advertisement', label: 'Paid Ads (Google, LinkedIn, Meta)' },
+                              { value: 'networking', label: 'Networking & Professional Platforms' },
+                              { value: 'events', label: 'Events & Trade Shows' },
+                              { value: 'campaign', label: 'Email/Call Campaigns' },
                               { value: 'other', label: 'Other' }
                             ].map((option) => (
                               <MenuItem key={option.value} value={option.value}>

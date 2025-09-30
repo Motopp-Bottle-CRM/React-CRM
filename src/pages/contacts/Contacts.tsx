@@ -438,7 +438,7 @@ export default function Contacts() {
                             >
                               <TableCell
                                 className="tableCell-link"
-                                onClick={() => contactHandle(item)}
+                                onClick={() => contactHandle(item.id)}
                               >
                                 {item.first_name + ' ' + item.last_name}
                               </TableCell>
