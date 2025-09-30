@@ -77,10 +77,10 @@ export default function Sidebar(props: any) {
   const [headerWidth, setHeaderWidth] = useState(drawerWidth)
   const [userDetail, setUserDetail] = useState('')
   const [organizationModal, setOrganizationModal] = useState(false)
-  
+
   const email = localStorage.getItem('email') || 'No email'
   const role = localStorage.getItem('role') || 'SALES'
-  
+
   const organizationModalClose = () => {
     setOrganizationModal(false)
   }
@@ -111,7 +111,7 @@ const toggleScreen = () => {
 
 useEffect(() => {
   toggleScreen();
-}, [navigate, location.pathname, role]); 
+}, [navigate, location.pathname, role]);
 
 
 
@@ -327,7 +327,7 @@ useEffect(() => {
             </Popover>
           </Box>
         </AppBar>
-        
+
         {/*  Creating  of the  left-side menu */}
         <Drawer
           variant="permanent"
@@ -616,9 +616,9 @@ useEffect(() => {
               {/* Not Found */}
               <Route path="/not-found" element={<NotFounded />} />
               <Route path="*" element={<NotFounded />} />
-            </Routes> 
-          
-          
+            </Routes>
+
+
           </Box>
         </MyContext.Provider>
         <OrganizationModal

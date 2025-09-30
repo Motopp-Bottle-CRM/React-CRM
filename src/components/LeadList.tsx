@@ -74,7 +74,7 @@ export default function LeadList({
         </TableHead>
 
         <TableBody>
-          {leads.map((lead) => (
+          {leads.filter(lead => lead.status.toLowerCase() !== "converted").map(lead=>(
             <TableRow key={lead.id}>
               {/* Lead Name */}
               <TableCell

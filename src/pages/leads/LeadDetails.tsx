@@ -28,11 +28,9 @@ import {
   FaTrash,
 } from 'react-icons/fa'
 import { json } from 'stream/consumers'
-import { useParams } from 'react-router-dom';
-
-
-
-export default function LeadDetailsTest() {
+import { ConvertModel } from '../../components/ConvertModel'
+import zIndex from 'material-ui/styles/zIndex'
+export default function LeadDetails() {
   interface RecievedComments {
     id: string
     comment: string
@@ -143,18 +141,14 @@ export default function LeadDetailsTest() {
   const [recievedComments, setRecievedComments] = useState<RecievedComments[]>(
     []
   )
-  const [recievedAttachments, setRecievedAttachments] = useState<RecievedAttachments[]>([])
-//   useEffect(() => {
-//     getLeadDetails(state?.leadId)
-//     getComment(state?.leadId)
-//     getAttachment(state?.leadId)
-//   }, [state.leadId])
+  const [recievedAttachments, setRecievedAttachments] = useState<
+    RecievedAttachments[]
+  >([])
 
-  // new code for also getting detail info from id in url
-  const { leadId: paramLeadId } = useParams<{ leadId: string }>();
-  const leadId = state?.leadId ?? paramLeadId;
-  const leadIdNumber = leadId ? Number(leadId) : null;
-
+  const [convertedLead, setConvertedLead] = useState(false)
+  const [open, setOpen] = useState(false)
+  const [selectedLeadId, setSelectedLeadId] = useState('')
+  const [success, setSuccess] = useState(false)
   useEffect(() => {
     if (!leadId) return;
 
@@ -226,7 +220,6 @@ export default function LeadDetailsTest() {
     navigate('/app/leads/')
   }
   const saveAttachment = async (id: number) => {
-
     if (attachmens.length === 0) return
 
     const formData = new FormData()
@@ -254,21 +247,23 @@ export default function LeadDetailsTest() {
     }
   }
 
-  const getAttachment = async(id:number)=>{
+  const getAttachment = async (id: number) => {
     const Header = {
       Authorization: localStorage.getItem('Token'),
       org: localStorage.getItem('org'),
     }
     try {
-      const response = await fetchData(`leads/attachment/${id}/`, 'GET', null as any, Header )
+      const response = await fetchData(
+        `leads/attachment/${id}/`,
+        'GET',
+        null as any,
+        Header
+      )
       setRecievedAttachments(response)
-      console.log("success")
-
+      console.log('success')
     } catch (error) {
-      console.log("faild to get all attachments", error)
-
+      console.log('faild to get all attachments', error)
     }
-
   }
   const saveComment = async (id: string) => {
     const Header = {
@@ -338,9 +333,55 @@ export default function LeadDetailsTest() {
       },
     })
   }
+  const openConvertDailog = () => {
+    setOpen(true)
+    setSelectedLeadId(state?.leadId)
+  }
+  const closeConvertedLead = () => {
+    setConvertedLead(false)
+    setOpen(false)
+    setSelectedLeadId('')
+  }
+
+  const handleConvert = () => {
+    setSelectedLeadId(state?.leadId)
+    setOpen(false)
+    postConveredLead(selectedLeadId)
+    setSuccess(true)
+    setTimeout(() => {
+      navigate('/app/accounts/')
+    }, 3000)
+    // alert('Lead Converted Successfully')
+  }
+  const postConveredLead = async (id: string) => {
+    const Header = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: localStorage.getItem('Token'),
+      org: localStorage.getItem('org'),
+    }
+    const body = JSON.stringify({
+      status: 'Converted',
+    })
+    try {
+      const response = await fetchData(
+        `leads/status/${id}/`,
+        'PUT',
+        body,
+        Header
+      )
+      setConvertedLead(true)
+    } catch (error) {
+      console.log('failed to convert lead', error)
+    }
+  }
   const module = 'Leads'
   const crntPage = 'Lead Details'
   const backBtn = 'Back To Leads'
+  const leadId = state?.leadId
+  const modelDialog =
+    'Are you sure you want to convert this lead? This will create new records and mark the lead as converted.'
+  const modelTitle = 'Convert Lead'
   return (
     <Box sx={{ mt: 10 }}>
       <CustomAppBar
@@ -350,7 +391,7 @@ export default function LeadDetailsTest() {
         crntPage={crntPage}
         editHandle={editHandle}
       />
-      <Box sx={{ mt: 15 }}>
+      <Box sx={{ mt: 15, position: 'relative' }}>
         <Box sx={{ display: 'flex' }}>
           <Box
             sx={{
@@ -371,12 +412,29 @@ export default function LeadDetailsTest() {
                 boxShadow: 3,
               }}
             >
-              <Typography
-                variant="h5"
-                sx={{ color: 'gray.900', fontWeight: 700 }}
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
               >
-                Contact Information
-              </Typography>
+                <Typography
+                  variant="h5"
+                  sx={{ color: 'gray.900', fontWeight: 700 }}
+                >
+                  Contact Information
+                </Typography>
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={openConvertDailog}
+                >
+                  {' '}
+                  Convert Lead
+                </Button>
+              </Box>
+
               <Box sx={{ mt: 2 }}>
                 <Grid container>
                   <Grid
@@ -468,7 +526,10 @@ export default function LeadDetailsTest() {
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       Company
                     </Typography>
-                    <Typography> {leadDetails?.lead_obj?.company_name}</Typography>
+                    <Typography>
+                      {' '}
+                      {leadDetails?.lead_obj?.company_name}
+                    </Typography>
                   </Grid>
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
@@ -535,9 +596,8 @@ export default function LeadDetailsTest() {
                 <Box
                   sx={{
                     display: 'flex',
-                    justifyContent: 'space-bettween',
+                    justifyContent: 'space-between',
                     alignItems: 'center',
-                    gap: 16,
                     padding: 2,
                     borderBottom: 1,
                   }}
@@ -565,7 +625,7 @@ export default function LeadDetailsTest() {
                   </Button>
                 </Box>
                 <Box sx={{ padding: 2 }}>
-                  <Box sx={{ minHeight:100 }}>
+                  <Box sx={{ minHeight: 100 }}>
                     {attachmens.map((file, index) => {
                       const url = URL.createObjectURL(file)
                       return (
@@ -601,21 +661,23 @@ export default function LeadDetailsTest() {
                     <Button
                       variant="contained"
                       size="small"
-                      onClick={()=>saveAttachment(state?.leadId)}
+                      onClick={() => saveAttachment(state?.leadId)}
                     >
                       {' '}
                       Save
                     </Button>
                   </Box>
-                  <Box sx={{mt:1}}>
-
-                      {recievedAttachments.map((attachment, index)=>(
-                        <ListItem key={attachment.id}>
-                          <a href={attachment.file_path} download={attachment.file_name}>{attachment.file_name}</a>
-                        </ListItem>
-
-                      ))}
-
+                  <Box sx={{ mt: 1 }}>
+                    {recievedAttachments.map((attachment, index) => (
+                      <ListItem key={attachment.id}>
+                        <a
+                          href={attachment.file_path}
+                          download={attachment.file_name}
+                        >
+                          {attachment.file_name}
+                        </a>
+                      </ListItem>
+                    ))}
                   </Box>
                 </Box>
               </Box>
@@ -680,26 +742,47 @@ export default function LeadDetailsTest() {
                   </Box>
                   <Box>
                     {recievedComments.map((comment, index) => (
-                      <ListItem sx={{display:'flex', flexDirection:'column', gap:2, alignItems:"flex-start"}}>
+                      <ListItem
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 2,
+                          alignItems: 'flex-start',
+                        }}
+                      >
                         <Box>
                           <Box>
-                            <Avatar sx={{backgroundColor: "#1976d2"}}></Avatar>
-                            <Typography>{comment?.commented_by?.email}</Typography>
+                            <Avatar
+                              sx={{ backgroundColor: '#1976d2' }}
+                            ></Avatar>
+                            <Typography>
+                              {comment?.commented_by?.email}
+                            </Typography>
                           </Box>
                           <Box>
-                            {new Date(comment.commented_on).toLocaleString("nl-NL",{
-                              year:"numeric",
-                              month:"short",
-                              day:"numeric",
-                              hour:"2-digit",
-                              minute:"2-digit"
-                            })}
+                            {new Date(comment.commented_on).toLocaleString(
+                              'nl-NL',
+                              {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              }
+                            )}
                           </Box>
                         </Box>
-                        <Box sx={{padding:2, border:1, borderColor:"#c0b8b8ff", borderRadius:4, width:'90%'}}>{comment.comment}</Box>
-
-
-
+                        <Box
+                          sx={{
+                            padding: 2,
+                            border: 1,
+                            borderColor: '#c0b8b8ff',
+                            borderRadius: 4,
+                            width: '90%',
+                          }}
+                        >
+                          {comment.comment}
+                        </Box>
 
                         {/* <Typography>{comment?.commented_by?.email}</Typography> */}
                       </ListItem>
@@ -709,7 +792,38 @@ export default function LeadDetailsTest() {
               </Box>
             </Box>
           </Box>
+
         </Box>
+        <ConvertModel
+          onClose={closeConvertedLead}
+          open={open}
+          modalDialog={modelDialog}
+          modalTitle={modelTitle}
+          id={leadId}
+          ConvertLead={handleConvert}
+        />
+        {success && (
+            <Box sx={{ display: 'flex', justifyContent: 'center' , alignItems: 'center', position: 'absolute',
+                  top: 8,
+                  right: 700,
+                  zIndex: 1000,
+                  }}>
+              <Box
+                sx={{
+
+                  padding: 2,
+                  borderRadius: 2,
+                  display: 'flex',
+                  alignItems: 'center',
+                  backgroundColor: '#82e6edff',
+                  boxShadow: 3,
+                  gap: 1,
+                }}
+              >
+                <Typography variant='h6'> lead converted successfully!</Typography>
+              </Box>
+            </Box>
+          )}
       </Box>
     </Box>
   )
