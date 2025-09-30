@@ -854,7 +854,7 @@ export function EditLead() {
                         </FormControl>
                       </div>
                     </div>
-                    <div className="fieldContainer2">
+                    <div className="fieldContainer">
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Lead Source</div>
                         <FormControl sx={{ width: '70%' }}>
@@ -904,10 +904,11 @@ export function EditLead() {
                         </FormControl>
                       </div>
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Lead Attachment</div>
+                        <div className="fieldTitle">Probability</div>
                         <TextField
-                          name="lead_attachment"
-                          value={formData.lead_attachment}
+                          name="probability"
+                          value={formData.probability}
+                          onChange={handleChange}
                           InputProps={{
                             endAdornment: (
                               <InputAdornment position="end">
@@ -915,40 +916,25 @@ export function EditLead() {
                                   disableFocusRipple
                                   disableTouchRipple
                                   sx={{
-                                    width: '40px',
-                                    height: '40px',
-                                    backgroundColor: 'whitesmoke',
+                                    backgroundColor: '#d3d3d34a',
+                                    width: '45px',
                                     borderRadius: '0px',
-                                    mr: '-13px',
-                                    cursor: 'pointer',
+                                    mr: '-12px',
                                   }}
                                 >
-                                  <label htmlFor="icon-button-file">
-                                    <input
-                                      hidden
-                                      accept="image/*"
-                                      id="icon-button-file"
-                                      type="file"
-                                      name="lead_attachment"
-                                      onChange={(e: any) => {
-                                        //  handleChange(e);
-                                        handleFileChange(e)
-                                      }}
-                                    />
-                                    <FaUpload
-                                      color="primary"
-                                      style={{
-                                        fontSize: '15px',
-                                        cursor: 'pointer',
-                                      }}
-                                    />
-                                  </label>
+                                  <FaPercent style={{ width: '12px' }} />
                                 </IconButton>
                               </InputAdornment>
                             ),
                           }}
-                          sx={{ width: '70%' }}
+                          style={{ width: '70%' }}
                           size="small"
+                          helperText={
+                            errors?.probability?.[0]
+                              ? errors?.probability[0]
+                              : ''
+                          }
+                          error={!!errors?.probability?.[0]}
                         />
                       </div>
                     </div>

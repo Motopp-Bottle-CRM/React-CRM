@@ -757,8 +757,6 @@ export function AddLeads() {
                           </FormHelperText>
                         </FormControl>
                       </div>
-                    </div>
-                    <div className="fieldContainer2">
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Probability</div>
                         <TextField

@@ -261,12 +261,12 @@ export default function ContactDetails() {
           backBtn={backBtn}
           crntPage={crntPage}
         onEdit={editHandle}
-      />
+        />
       <Box sx={{ mt: '120px' }}>
         <Box sx={{ display: 'flex', gap: 2, width: '100%' }}>
           <Box sx={{ width: '65%' }}>
-            <Box
-              sx={{
+        <Box
+          sx={{
                 width: '90%',
                 border: 1,
                 borderRadius: '12px',
@@ -279,8 +279,8 @@ export default function ContactDetails() {
               <Typography
                 variant="h5"
                 sx={{ color: 'gray.900', fontWeight: 700, mb: 2 }}
-              >
-                Contact Information
+                >
+                  Contact Information
               </Typography>
               <Box>
                 <Grid container>
@@ -453,9 +453,9 @@ export default function ContactDetails() {
           <Box sx={{ width: '35%' }}>
             <Box
               sx={{
-                  display: 'flex',
+                        display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'center',
+                        justifyContent: 'center',
                 alignItems: 'center',
                 gap: 2,
               }}
@@ -471,7 +471,7 @@ export default function ContactDetails() {
               >
                 <Box
                   sx={{
-                    display: 'flex',
+                      display: 'flex',
                     justifyContent: 'space-bettween',
                     alignItems: 'center',
                     gap: 16,
@@ -537,7 +537,7 @@ export default function ContactDetails() {
                     </Button>
                     <Button
                       variant="contained"
-                      size="small"
+                  size="small"
                       onClick={() => saveAttachment(parseInt(state?.contactId || '0'))}
                     >
                       {' '}
@@ -597,7 +597,7 @@ export default function ContactDetails() {
                     </Button>
                     <Button
                       variant="contained"
-                      size="small"
+                  size="small"
                       onClick={() => saveComment(state?.contactId || '')}
                     >
                       {' '}
@@ -608,8 +608,8 @@ export default function ContactDetails() {
               </Box>
             </Box>
           </Box>
+          </Box>
         </Box>
-      </Box>
     </Box>
   )
 }

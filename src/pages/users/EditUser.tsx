@@ -348,14 +348,12 @@ useEffect(() => {
   }
   const handleSubmit = (e: any) => {
     e.preventDefault()
-    if (formData.phone) {
-      if (formData.phone === formData.alternate_phone) {
+    if (formData.phone && formData.alternate_phone && formData.phone === formData.alternate_phone) {
         setProfileErrors({
           ...profileErrors,
           alternate_phone: ['Alternate phone cannot be the same as phone'],
         })
         return
-      }
     }
 
     submitForm()
@@ -385,7 +383,8 @@ useEffect(() => {
       city: formData.city,
       state: formData.state,
       postcode: formData.postcode,
-      country: getCountryNameFromCode(formData.country),
+      // Send country code to backend; backend provides display via serializer
+      country: formData.country,
     }
 
     fetchData(`${UserUrl}/${state?.id}/`, 'PUT', JSON.stringify(data), Header)
@@ -401,11 +400,21 @@ useEffect(() => {
       .catch(async (err: any) => {
         setError(true)
         setSuccessMessage('')
-        const profileErr = err?.profile_errors?.[0] || {}
-        const userErr = err?.user_errors?.[0] || {}
-
-        setProfileErrors(profileErr)
-        setUserErrors(userErr)
+        
+        // Handle nested error structure from backend
+        const profileErrors = err?.profile_errors || {}
+        const userErrors = err?.user_errors || {}
+        
+        setProfileErrors(profileErrors)
+        setUserErrors(userErrors)
+        
+        // Show the first error message found
+        const firstError = 
+          userErrors?.email?.[0] || 
+          profileErrors?.phone?.[0] || 
+          profileErrors?.alternate_phone?.[0] ||
+          'Please correct the highlighted errors.'
+        setMsg(firstError)
       })
   }
   const resetForm = () => {
