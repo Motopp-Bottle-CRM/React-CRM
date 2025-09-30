@@ -107,12 +107,10 @@ type FormErrors = {
   state?: string[]
   postcode?: string[]
   country?: string[]
-  tags?: string[]
   company_name?: string[]
   probability?: number[]
   industry?: string[]
   linkedin_id?: string[]
-  file?: string[]
   general?: string[]
 }
 interface FormData {
@@ -123,7 +121,6 @@ interface FormData {
   account_name: string
   phone: string
   email: string
-  lead_attachment: string | null
   opportunity_amount: string
   website: string
   description: string
@@ -138,12 +135,10 @@ interface FormData {
   state: string
   postcode: string
   country: string
-  tags: string[]
   company_name: string
   probability: number
   industry: string
   linkedin_id: string
-  file: string | null
 }
 
 export function AddLeads() {
@@ -161,7 +156,6 @@ export function AddLeads() {
   const [successMessage, setSuccessMessage] = useState('')
   const [selectedContacts, setSelectedContacts] = useState<any[]>([])
   const [selectedAssignTo, setSelectedAssignTo] = useState<any[]>([])
-  const [selectedTags, setSelectedTags] = useState<any[]>([])
   const [selectedCountry, setSelectedCountry] = useState<any[]>([])
   const [sourceSelectOpen, setSourceSelectOpen] = useState(false)
   const [statusSelectOpen, setStatusSelectOpen] = useState(false)
@@ -176,7 +170,6 @@ export function AddLeads() {
     account_name: '',
     phone: '',
     email: '',
-    lead_attachment: null,
     opportunity_amount: '',
     website: '',
     description: '',
@@ -191,12 +184,10 @@ export function AddLeads() {
     state: '',
     postcode: '',
     country: '',
-    tags: [],
     company_name: '',
     probability: 1,
     industry: 'ADVERTISING',
     linkedin_id: '',
-    file: null,
   })
 
   useEffect(() => {
@@ -222,12 +213,6 @@ export function AddLeads() {
         assigned_to: val.length > 0 ? val.map((item: any) => item.id) : [],
       })
       setSelectedAssignTo(val)
-    } else if (title === 'tags') {
-      setFormData({
-        ...formData,
-        assigned_to: val.length > 0 ? val.map((item: any) => item.id) : [],
-      })
-      setSelectedTags(val)
     }
     // else if (title === 'country') {
     //   setFormData({ ...formData, country: val || [] })
@@ -241,28 +226,15 @@ export function AddLeads() {
   const handleChange = (e: any) => {
     // const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     // console.log('e.target',e)
-    const { name, value, files, type, checked, id } = e.target
+    const { name, value, type, checked, id } = e.target
     // console.log('auto', val)
-    if (type === 'file') {
-      setFormData({ ...formData, [name]: e.target.files?.[0] || null })
-    } else if (type === 'checkbox') {
+    if (type === 'checkbox') {
       setFormData({ ...formData, [name]: checked })
     } else {
       setFormData({ ...formData, [name]: value })
     }
   }
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] || null
-    if (file) {
-      const reader = new FileReader()
-      reader.onload = () => {
-        // setFormData({ ...formData, lead_attachment: reader.result as string });
-        setFormData({ ...formData, file: reader.result as string })
-      }
-      reader.readAsDataURL(file)
-    }
-  }
 
   const resetQuillToInitialState = () => {
     // Reset the Quill editor to its initial state
@@ -379,7 +351,6 @@ export function AddLeads() {
       account_name: '',
       phone: '',
       email: '',
-      lead_attachment: null,
       opportunity_amount: '',
       website: '',
       description: '',
@@ -394,18 +365,15 @@ export function AddLeads() {
       state: '',
       postcode: '',
       country: '',
-      tags: [],
       company_name: '',
       probability: 1,
       industry: 'ADVERTISING',
       linkedin_id: '',
-      file: null,
     })
     setErrors({})
     setSuccessMessage('')
     setSelectedContacts([])
     setSelectedAssignTo([])
-    setSelectedTags([])
     // setSelectedCountry([])
     // if (autocompleteRef.current) {
     //   console.log(autocompleteRef.current,'ccc')
@@ -789,120 +757,8 @@ export function AddLeads() {
                           </FormHelperText>
                         </FormControl>
                       </div>
-                      <div className="fieldSubContainer">
-                        <div className="fieldTitle">Lead Attachment</div>
-                        <TextField
-                          name="lead_attachment"
-                          value={formData.lead_attachment}
-                          InputProps={{
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <IconButton
-                                  disableFocusRipple
-                                  disableTouchRipple
-                                  sx={{
-                                    width: '40px',
-                                    height: '40px',
-                                    backgroundColor: 'whitesmoke',
-                                    borderRadius: '0px',
-                                    mr: '-13px',
-                                    cursor: 'pointer',
-                                  }}
-                                >
-                                  <label htmlFor="icon-button-file">
-                                    <input
-                                      hidden
-                                      accept="image/*"
-                                      id="icon-button-file"
-                                      type="file"
-                                      name="account_attachment"
-                                      onChange={(e: any) => {
-                                        //  handleChange(e);
-                                        handleFileChange(e)
-                                      }}
-                                    />
-                                    <FaUpload
-                                      color="primary"
-                                      style={{
-                                        fontSize: '15px',
-                                        cursor: 'pointer',
-                                      }}
-                                    />
-                                  </label>
-                                </IconButton>
-                              </InputAdornment>
-                            ),
-                          }}
-                          sx={{ width: '70%' }}
-                          size="small"
-                        />
-                      </div>
                     </div>
                     <div className="fieldContainer2">
-                      <div className="fieldSubContainer">
-                        <div className="fieldTitle">Tags</div>
-                        <FormControl
-                          error={!!errors?.tags?.[0]}
-                          sx={{ width: '70%' }}
-                        >
-                          <Autocomplete
-                            // ref={autocompleteRef}
-                            value={selectedTags}
-                            multiple
-                            limitTags={5}
-                            options={state?.tags || []}
-                            // options={state.contacts ? state.contacts.map((option: any) => option) : ['']}
-                            getOptionLabel={(option: any) => option}
-                            onChange={(e: any, value: any) =>
-                              handleChange2('tags', value)
-                            }
-                            size="small"
-                            filterSelectedOptions
-                            renderTags={(value, getTagProps) =>
-                              value.map((option, index) => (
-                                <Chip
-                                  deleteIcon={
-                                    <FaTimes style={{ width: '9px' }} />
-                                  }
-                                  sx={{
-                                    backgroundColor: 'rgba(0, 0, 0, 0.08)',
-                                    height: '18px',
-                                  }}
-                                  variant="outlined"
-                                  label={option}
-                                  {...getTagProps({ index })}
-                                />
-                              ))
-                            }
-                            popupIcon={
-                              <CustomPopupIcon>
-                                <FaPlus className="input-plus-icon" />
-                              </CustomPopupIcon>
-                            }
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                placeholder="Add Tags"
-                                InputProps={{
-                                  ...params.InputProps,
-                                  sx: {
-                                    '& .MuiAutocomplete-popupIndicator': {
-                                      '&:hover': { backgroundColor: 'white' },
-                                    },
-                                    '& .MuiAutocomplete-endAdornment': {
-                                      mt: '-8px',
-                                      mr: '-8px',
-                                    },
-                                  },
-                                }}
-                              />
-                            )}
-                          />
-                          <FormHelperText>
-                            {errors?.tags?.[0] || ''}
-                          </FormHelperText>
-                        </FormControl>
-                      </div>
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Probability</div>
                         <TextField

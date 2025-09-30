@@ -450,7 +450,23 @@ useEffect(() => {
                 }
               />
               <Route
+                path="/app/contacts/contact-details/:id"
+                element={
+                  <ProtectedRoute role={role} module="contacts">
+                    <ContactDetails />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/app/contacts/edit-contact"
+                element={
+                  <ProtectedRoute role={role} module="contacts">
+                    <EditContact />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/contacts/edit-contact/:id"
                 element={
                   <ProtectedRoute role={role} module="contacts">
                     <EditContact />
