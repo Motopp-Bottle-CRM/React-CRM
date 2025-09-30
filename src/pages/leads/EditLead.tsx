@@ -885,26 +885,12 @@ export function EditLead() {
                           >
                             {[
                               { value: '', label: 'Select source' },
-                              { value: 'website', label: 'Website' },
-                              { value: 'phone_inquiry', label: 'Phone Inquiry' },
-                              { value: 'partner_referral', label: 'Partner Referral' },
-                              { value: 'cold_call', label: 'Cold Call' },
-                              { value: 'trade_show', label: 'Trade Show' },
-                              { value: 'employee_referral', label: 'Employee Referral' },
-                              { value: 'advertisement', label: 'Advertisement' },
-                              { value: 'social_media', label: 'Social Media' },
-                              { value: 'email_campaign', label: 'Email Campaign' },
-                              { value: 'webinar', label: 'Webinar' },
-                              { value: 'content_marketing', label: 'Content Marketing' },
-                              { value: 'seo_organic', label: 'SEO/Organic Search' },
-                              { value: 'ppc_advertising', label: 'Pay-Per-Click Advertising' },
-                              { value: 'direct_mail', label: 'Direct Mail' },
-                              { value: 'call', label: 'Call' },
-                              { value: 'email', label: 'Email' },
-                              { value: 'existing_customer', label: 'Existing Customer' },
-                              { value: 'partner', label: 'Partner' },
-                              { value: 'public_relations', label: 'Public Relations' },
-                              { value: 'campaign', label: 'Campaign' },
+                              { value: 'referrals', label: 'Referrals & Recommendations' },
+                              { value: 'marketing', label: 'Digital Content & SEO' },
+                              { value: 'advertisement', label: 'Paid Ads (Google, LinkedIn, Meta)' },
+                              { value: 'networking', label: 'Networking & Professional Platforms' },
+                              { value: 'events', label: 'Events & Trade Shows' },
+                              { value: 'campaign', label: 'Email/Call Campaigns' },
                               { value: 'other', label: 'Other' }
                             ].map((option) => (
                               <MenuItem key={option.value} value={option.value}>
