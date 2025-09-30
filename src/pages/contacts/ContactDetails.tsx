@@ -55,24 +55,24 @@ export default function ContactDetails() {
   interface Contact {
     id: string
     salutation: string
-  first_name: string
-  last_name: string
-  primary_email: string
-  secondary_email: string
+    first_name: string
+    last_name: string
+    primary_email: string
+    secondary_email: string
     mobile_number: string
-  secondary_number: string
+    secondary_number: string
     date_of_birth: string
     organization: string
-  title: string
+    title: string
     language: string
     do_not_call: boolean
     department: string
-  address_line: string
+    address_line: string
     street: string
-  city: string
+    city: string
     state: string
-  country: string
-  postcode: string
+    country: string
+    postcode: string
     description: string
     linked_in_url: string
     facebook_url: string
@@ -93,7 +93,7 @@ export default function ContactDetails() {
 
   const navigate = useNavigate()
   const { state } = useLocation()
-  const [leadDetails, setLeadDetails] = useState<{
+  const [contactDetails, setContactDetails] = useState<{
     contact_obj: Contact
   } | null>(null)
 
@@ -125,7 +125,7 @@ export default function ContactDetails() {
         null as any,
         Header
       )
-      setLeadDetails(response)
+      setContactDetails(response)
       setLoading(false)
     } catch (error) {
       console.log('error', error)
@@ -240,7 +240,7 @@ export default function ContactDetails() {
     navigate('/app/contacts/edit-contact', {
       state: {
         id: state?.contactId,
-        value: leadDetails?.contact_obj
+        value: contactDetails?.contact_obj
       }
     })
   }
@@ -290,7 +290,7 @@ export default function ContactDetails() {
                       Full Name
                     </Typography>
                     <Typography sx={{ color: 'gray.900' }}>
-                      {leadDetails?.contact_obj?.first_name} {leadDetails?.contact_obj?.last_name}
+                      {contactDetails?.contact_obj?.first_name} {contactDetails?.contact_obj?.last_name}
                     </Typography>
                   </Grid>
                   <Grid item md={4}>
@@ -299,7 +299,7 @@ export default function ContactDetails() {
                       Primary Email
                     </Typography>
                     <Typography sx={{ color: 'gray.900' }}>
-                      {leadDetails?.contact_obj?.primary_email}
+                      {contactDetails?.contact_obj?.primary_email}
                     </Typography>
                   </Grid>
                   <Grid item md={4}>
@@ -307,7 +307,7 @@ export default function ContactDetails() {
                       {' '}
                       Mobile Number
                     </Typography>
-                    <Typography> {leadDetails?.contact_obj?.mobile_number}</Typography>
+                    <Typography> {contactDetails?.contact_obj?.mobile_number}</Typography>
                   </Grid>
                 </Grid>
               </Box>
@@ -335,83 +335,122 @@ export default function ContactDetails() {
                       {' '}
                       Salutation
                     </Typography>
-                    <Typography> {leadDetails?.contact_obj?.salutation}</Typography>
+                    <Typography> {contactDetails?.contact_obj?.salutation}</Typography>
                   </Grid>
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
                       Organization
                     </Typography>
-                    <Typography> {leadDetails?.contact_obj?.organization}</Typography>
+                    <Typography> {contactDetails?.contact_obj?.organization}</Typography>
                   </Grid>
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
                       Title
                     </Typography>
-                    <Typography> {leadDetails?.contact_obj?.title}</Typography>
+                    <Typography> {contactDetails?.contact_obj?.title}</Typography>
                   </Grid>
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
                       Department
                     </Typography>
-                    <Typography> {leadDetails?.contact_obj?.department}</Typography>
+                    <Typography> {contactDetails?.contact_obj?.department}</Typography>
                   </Grid>
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       Language
                     </Typography>
-                    <Typography> {leadDetails?.contact_obj?.language}</Typography>
+                    <Typography> {contactDetails?.contact_obj?.language}</Typography>
                   </Grid>
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
                       Secondary Email
                     </Typography>
-                    <Typography> {leadDetails?.contact_obj?.secondary_email}</Typography>
+                    <Typography> {contactDetails?.contact_obj?.secondary_email}</Typography>
                   </Grid>
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
                       Secondary Number
                     </Typography>
-                    <Typography> {leadDetails?.contact_obj?.secondary_number}</Typography>
+                    <Typography> {contactDetails?.contact_obj?.secondary_number}</Typography>
                   </Grid>
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
                       Date of Birth
                     </Typography>
-                    <Typography> {leadDetails?.contact_obj?.date_of_birth}</Typography>
+                    <Typography> {contactDetails?.contact_obj?.date_of_birth}</Typography>
                   </Grid>
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
                       Do Not Call
                     </Typography>
-                    <Typography> {leadDetails?.contact_obj?.do_not_call ? 'Yes' : 'No'}</Typography>
+                    <Typography> {contactDetails?.contact_obj?.do_not_call ? 'Yes' : 'No'}</Typography>
                   </Grid>
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
                       LinkedIn URL
                     </Typography>
-                    <Typography> {leadDetails?.contact_obj?.linked_in_url}</Typography>
+                    <Typography>
+                      {contactDetails?.contact_obj?.linked_in_url ? (
+                        <a
+                          href={contactDetails.contact_obj.linked_in_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ color: '#1A3353', textDecoration: 'underline' }}
+                        >
+                          LinkedIn
+                        </a>
+                      ) : (
+                        ' '
+                      )}
+                    </Typography>
                   </Grid>
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
                       Facebook URL
                     </Typography>
-                    <Typography> {leadDetails?.contact_obj?.facebook_url}</Typography>
+                    <Typography>
+                      {contactDetails?.contact_obj?.facebook_url ? (
+                        <a
+                          href={contactDetails.contact_obj.facebook_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ color: '#1A3353', textDecoration: 'underline' }}
+                        >
+                          Facebook
+                        </a>
+                      ) : (
+                        ' '
+                      )}
+                    </Typography>
                   </Grid>
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
                       Twitter Username
                     </Typography>
-                    <Typography> {leadDetails?.contact_obj?.twitter_username}</Typography>
+                    <Typography>
+                      {contactDetails?.contact_obj?.twitter_username ? (
+                        <a
+                          href={`https://twitter.com/${contactDetails.contact_obj.twitter_username}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ color: '#1A3353', textDecoration: 'underline' }}
+                        >
+                          @{contactDetails.contact_obj.twitter_username}
+                        </a>
+                      ) : (
+                        ' '
+                      )}
+                    </Typography>
                   </Grid>
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
@@ -420,7 +459,7 @@ export default function ContactDetails() {
                     </Typography>
                     <Typography>
                       {' '}
-                      {leadDetails?.contact_obj?.created_by?.email}
+                      {contactDetails?.contact_obj?.created_by?.email}
                     </Typography>
                   </Grid>
                   <Grid item md={4} sx={{ mb: 2 }}>
@@ -430,7 +469,7 @@ export default function ContactDetails() {
                     </Typography>
                     <Typography>
                       {' '}
-                      {new Date(leadDetails?.contact_obj?.created_at || '').toLocaleDateString()}
+                      {new Date(contactDetails?.contact_obj?.created_at || '').toLocaleDateString()}
                     </Typography>
                   </Grid>
                   <Grid item md={4} sx={{ mb: 2 }}>
@@ -440,10 +479,10 @@ export default function ContactDetails() {
                     </Typography>
                     <Typography>
                       {' '}
-                      {leadDetails?.contact_obj?.country}{' '}
-                      {leadDetails?.contact_obj?.state}{' '}
-                      {leadDetails?.contact_obj?.city}{' '}
-                      {leadDetails?.contact_obj?.street}
+                      {contactDetails?.contact_obj?.country}{' '}
+                      {contactDetails?.contact_obj?.state}{' '}
+                      {contactDetails?.contact_obj?.city}{' '}
+                      {contactDetails?.contact_obj?.street}
                     </Typography>
                   </Grid>
                 </Grid>
