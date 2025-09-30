@@ -560,7 +560,7 @@ export function AddLeads() {
                               ))
                             }
                             popupIcon={
-                              <CustomPopupIcon>
+                              <CustomPopupIcon sx={{ mt: 2 }}>
                                 <FaPlus className="input-plus-icon" />
                               </CustomPopupIcon>
                             }
@@ -966,7 +966,7 @@ export function AddLeads() {
                               ))
                             }
                             popupIcon={
-                              <CustomPopupIcon>
+                              <CustomPopupIcon sx={{ mt: 2 }}>
                                 <FaPlus className="input-plus-icon" />
                               </CustomPopupIcon>
                             }
