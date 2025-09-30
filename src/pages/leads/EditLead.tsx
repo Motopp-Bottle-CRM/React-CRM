@@ -99,7 +99,7 @@ interface FormData {
   postcode: string
   country: string
   tags: string[]
-  company_name: string
+  company: string
   probability: number
   industry: string
   linkedin_id: string
@@ -129,6 +129,8 @@ export function EditLead() {
   const [statusSelectOpen, setStatusSelectOpen] = useState(false)
   const [countrySelectOpen, setCountrySelectOpen] = useState(false)
   const [industrySelectOpen, setIndustrySelectOpen] = useState(false)
+  const [companies, setCompanies] = useState<any[]>([])
+  const [companiesLoading, setCompaniesLoading] = useState(true)
   const [errors, setErrors] = useState<FormErrors>({})
   const [formData, setFormData] = useState<FormData>({
     title: '',
@@ -154,7 +156,7 @@ export function EditLead() {
     postcode: '',
     country: '',
     tags: [],
-    company_name: '',
+    company: '',
     probability: 1,
     industry: 'ADVERTISING',
     linkedin_id: '',
@@ -342,7 +344,7 @@ export function EditLead() {
       return
     }
 
-    if (!formData.company_name || formData.company_name.trim() === '') {
+    if (!formData.company || formData.company.trim() === '') {
       setError(true);
       setErrors({ general: ['Company name is required'] });
       return;
@@ -379,7 +381,6 @@ export function EditLead() {
       city: formData.city,
       state: formData.state,
       postcode: formData.postcode,
-      company: formData.company_name,
       tags: formData.tags || [],
       company: formData.company || null,
       probability: formData.probability
@@ -462,7 +463,7 @@ export function EditLead() {
       postcode: '',
       country: '',
       tags: [],
-      company_name: '',
+      company: '',
       probability: 1,
       industry: 'ADVERTISING',
       linkedin_id: '',

@@ -150,15 +150,10 @@ export default function LeadDetails() {
   const [selectedLeadId, setSelectedLeadId] = useState('')
   const [success, setSuccess] = useState(false)
   useEffect(() => {
-    if (!leadId) return;
-
-    getLeadDetails(leadId);
-    getComment(leadId);
-
-    if (leadIdNumber !== null) {
-      getAttachment(leadIdNumber);
-    }
-  }, [leadId, leadIdNumber]);
+    getLeadDetails(state?.leadId)
+    getComment(state?.leadId)
+    getAttachment(state?.leadId)
+  }, [state.leadId])
 
 
 

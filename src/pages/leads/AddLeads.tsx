@@ -97,7 +97,7 @@ interface FormData {
   state: string
   postcode: string
   country: string
-  company_name: string
+  company: string
   probability: number
   industry: string
   linkedin_id: string
@@ -115,6 +115,7 @@ export function AddLeads() {
 
   const autocompleteRef = useRef<any>(null)
   const [error, setError] = useState(false)
+  const [success, setSuccess] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
   const [selectedContacts, setSelectedContacts] = useState<any[]>([])
   const [selectedAssignTo, setSelectedAssignTo] = useState<any[]>([])
@@ -123,6 +124,7 @@ export function AddLeads() {
   const [statusSelectOpen, setStatusSelectOpen] = useState(false)
   const [countrySelectOpen, setCountrySelectOpen] = useState(false)
   const [industrySelectOpen, setIndustrySelectOpen] = useState(false)
+  const [companies, setCompanies] = useState<any[]>([])
   const [errors, setErrors] = useState<FormErrors>({})
   const [formData, setFormData] = useState<FormData>({
     title: '',
@@ -146,7 +148,7 @@ export function AddLeads() {
     state: '',
     postcode: '',
     country: '',
-    company_name: '',
+    company: '',
     probability: 1,
     industry: 'ADVERTISING',
     linkedin_id: '',
@@ -162,6 +164,18 @@ export function AddLeads() {
       initialContentRef.current = quillRef.current.firstChild.innerHTML
     }
   }, [quill])
+
+  useEffect(() => {
+    fetchData('leads/companies', 'GET', null, Header)
+      .then((res: any) => {
+        if (!res.error) {
+          setCompanies(res.data || [])
+        }
+      })
+      .catch((error) => {
+        console.log('Error fetching companies:', error)
+      })
+  }, [])
 
 
   const handleChange2 = (title: any, val: any) => {
@@ -351,7 +365,7 @@ export function AddLeads() {
       state: '',
       postcode: '',
       country: '',
-      company_name: '',
+      company: '',
       probability: 1,
       industry: 'ADVERTISING',
       linkedin_id: '',
