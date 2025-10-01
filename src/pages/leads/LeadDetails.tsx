@@ -160,11 +160,14 @@ export default function LeadDetailsTest() {
 
     getLeadDetails(leadId);
     getComment(leadId);
+    getAttachment(leadId); 
+    // # - >
 
     if (leadIdNumber !== null) {
-      getAttachment(leadIdNumber);
+      // getAttachment(leadIdNumber);
     }
-  }, [leadId, leadIdNumber]);
+  // }, [leadId, leadIdNumber]);
+   }, [leadId]);
 
 
 
@@ -225,8 +228,8 @@ export default function LeadDetailsTest() {
   const backbtnHandle = () => {
     navigate('/app/leads/')
   }
-  const saveAttachment = async (id: number) => {
-
+  // const saveAttachment = async (id: number) => {
+  const saveAttachment = async (id: string) => {
     if (attachmens.length === 0) return
 
     const formData = new FormData()
@@ -254,7 +257,8 @@ export default function LeadDetailsTest() {
     }
   }
 
-  const getAttachment = async(id:number)=>{
+  const getAttachment = async(id:string)=>{
+      // const getAttachment = async(id:number)=>{
     const Header = {
       Authorization: localStorage.getItem('Token'),
       org: localStorage.getItem('org'),
@@ -601,7 +605,8 @@ export default function LeadDetailsTest() {
                     <Button
                       variant="contained"
                       size="small"
-                      onClick={()=>saveAttachment(state?.leadId)}
+                      // onClick={()=>saveAttachment(state?.leadId)}
+                      onClick={()=>saveAttachment(leadId)}
                     >
                       {' '}
                       Save
@@ -671,7 +676,8 @@ export default function LeadDetailsTest() {
                       <Button
                         variant="contained"
                         size="small"
-                        onClick={() => saveComment(state.leadId)}
+                        // onClick={() => saveComment(state.leadId)}
+                          onClick={() => saveComment(leadId)}
                       >
                         {' '}
                         Save
