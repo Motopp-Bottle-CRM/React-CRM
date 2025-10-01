@@ -74,7 +74,7 @@ export default function LeadList({
         </TableHead>
 
         <TableBody>
-          {leads.map((lead) => (
+          {leads.filter(lead => lead.status.toLowerCase() !== "converted").map(lead=>(
             <TableRow key={lead.id}>
               {/* Lead Name */}
               <TableCell
@@ -106,11 +106,11 @@ export default function LeadList({
                 >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                     <FaEnvelope fontSize="small" />
-                    <Typography variant="body2">{lead.email}</Typography>
+                    <Typography variant="body2">{lead?.email ?? ''}</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                     <FaPhone fontSize="small" />
-                    <Typography variant="body2">{lead.phone}</Typography>
+                    <Typography variant="body2">{lead?.phone ?? ''}</Typography>
                   </Box>
                 </Box>
               </TableCell>
@@ -133,10 +133,10 @@ export default function LeadList({
               {/* Owner */}
               <TableCell sx={{ textAlign: 'center', verticalAlign: 'middle' }}>
                 <Avatar
-                  alt={lead.created_by.email}
-                  src={lead.created_by.profile_pic}
+                  alt={lead?.created_by?.email ?? ''}
+                  src={lead?.created_by?.profile_pic ?? ''}
                   sx={{ width: 24, height: 24, mx: 'auto' }}
-                  title={lead.created_by.email}
+                  title={lead?.created_by?.email ?? ''}
                 />
               </TableCell>
 
