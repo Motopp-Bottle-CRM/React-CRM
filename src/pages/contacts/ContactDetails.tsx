@@ -106,8 +106,8 @@ export default function ContactDetails() {
   useEffect(() => {
     getContactDetails()
     if (state?.contactId) {
-      getComment(state.contactId)
-      getAttachment(parseInt(state.contactId))
+       getComment(state.contactId)
+      // getAttachment(state.contactId)
     }
   }, [state?.contactId])
 
@@ -165,7 +165,7 @@ export default function ContactDetails() {
   const backbtnHandle = () => {
     navigate('/app/contacts/')
   }
-  const saveAttachment = async (id: number) => {
+  const saveAttachment = async (id: string) => {
 
     if (attachmens.length === 0) return
 
@@ -194,7 +194,7 @@ export default function ContactDetails() {
     }
   }
 
-  const getAttachment = async(id:number)=>{
+  const getAttachment = async(id:string)=>{
     const Header = {
       Authorization: localStorage.getItem('Token'),
       org: localStorage.getItem('org'),
@@ -296,7 +296,7 @@ export default function ContactDetails() {
                   <Grid item md={4}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
-                      Primary Email
+                      Email
                     </Typography>
                     <Typography sx={{ color: 'gray.900' }}>
                       {contactDetails?.contact_obj?.primary_email}
@@ -333,23 +333,9 @@ export default function ContactDetails() {
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
-                      Salutation
-                    </Typography>
-                    <Typography> {contactDetails?.contact_obj?.salutation}</Typography>
-                  </Grid>
-                  <Grid item md={4} sx={{ mb: 2 }}>
-                    <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
-                      {' '}
                       Organization
                     </Typography>
                     <Typography> {contactDetails?.contact_obj?.organization}</Typography>
-                  </Grid>
-                  <Grid item md={4} sx={{ mb: 2 }}>
-                    <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
-                      {' '}
-                      Title
-                    </Typography>
-                    <Typography> {contactDetails?.contact_obj?.title}</Typography>
                   </Grid>
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
@@ -360,17 +346,12 @@ export default function ContactDetails() {
                   </Grid>
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
-                      Language
-                    </Typography>
-                    <Typography> {contactDetails?.contact_obj?.language}</Typography>
-                  </Grid>
-                  <Grid item md={4} sx={{ mb: 2 }}>
-                    <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
-                      Secondary Email
+                      Job title
                     </Typography>
-                    <Typography> {contactDetails?.contact_obj?.secondary_email}</Typography>
+                    <Typography> {contactDetails?.contact_obj?.title}</Typography>
                   </Grid>
+                  
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
@@ -378,13 +359,7 @@ export default function ContactDetails() {
                     </Typography>
                     <Typography> {contactDetails?.contact_obj?.secondary_number}</Typography>
                   </Grid>
-                  <Grid item md={4} sx={{ mb: 2 }}>
-                    <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
-                      {' '}
-                      Date of Birth
-                    </Typography>
-                    <Typography> {contactDetails?.contact_obj?.date_of_birth}</Typography>
-                  </Grid>
+                 
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
@@ -392,6 +367,7 @@ export default function ContactDetails() {
                     </Typography>
                     <Typography> {contactDetails?.contact_obj?.do_not_call ? 'Yes' : 'No'}</Typography>
                   </Grid>
+                  
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
@@ -412,46 +388,7 @@ export default function ContactDetails() {
                       )}
                     </Typography>
                   </Grid>
-                  <Grid item md={4} sx={{ mb: 2 }}>
-                    <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
-                      {' '}
-                      Facebook URL
-                    </Typography>
-                    <Typography>
-                      {contactDetails?.contact_obj?.facebook_url ? (
-                        <a
-                          href={contactDetails.contact_obj.facebook_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{ color: '#1A3353', textDecoration: 'underline' }}
-                        >
-                          Facebook
-                        </a>
-                      ) : (
-                        ' '
-                      )}
-                    </Typography>
-                  </Grid>
-                  <Grid item md={4} sx={{ mb: 2 }}>
-                    <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
-                      {' '}
-                      Twitter Username
-                    </Typography>
-                    <Typography>
-                      {contactDetails?.contact_obj?.twitter_username ? (
-                        <a
-                          href={`https://twitter.com/${contactDetails.contact_obj.twitter_username}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{ color: '#1A3353', textDecoration: 'underline' }}
-                        >
-                          @{contactDetails.contact_obj.twitter_username}
-                        </a>
-                      ) : (
-                        ' '
-                      )}
-                    </Typography>
-                  </Grid>
+                  
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
@@ -472,19 +409,7 @@ export default function ContactDetails() {
                       {new Date(contactDetails?.contact_obj?.created_at || '').toLocaleDateString()}
                     </Typography>
                   </Grid>
-                  <Grid item md={4} sx={{ mb: 2 }}>
-                    <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
-                      {' '}
-                      Address
-                    </Typography>
-                    <Typography>
-                      {' '}
-                      {contactDetails?.contact_obj?.country}{' '}
-                      {contactDetails?.contact_obj?.state}{' '}
-                      {contactDetails?.contact_obj?.city}{' '}
-                      {contactDetails?.contact_obj?.street}
-                    </Typography>
-                  </Grid>
+                  
                 </Grid>
               </Box>
             </Box>
@@ -577,7 +502,7 @@ export default function ContactDetails() {
                     <Button
                       variant="contained"
                       size="small"
-                      onClick={() => saveAttachment(parseInt(state?.contactId || '0'))}
+                      onClick={() => saveAttachment(state?.contactId || '0')}
                     >
                       {' '}
                       Save
