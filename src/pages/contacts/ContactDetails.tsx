@@ -23,6 +23,19 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { AntSwitch } from '../../styles/CssStyled'
 import { ContactUrl } from '../../services/ApiUrls'
 import { fetchData } from '../../components/FetchData'
+// Insert this after your imports (before export default ...)
+const InfoBox: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => {
+  return (
+    <Card sx={{ borderRadius: '7px', mb: 2 }}>
+      <Box sx={{ p: 2 }}>
+        <Box sx={{ fontWeight: 600, fontSize: '16px', color: '#1a3353f0', mb: 1 }}>
+          {title}
+        </Box>
+        {children}
+      </Box>
+    </Card>
+  )
+}
 
 type response = {
   created_by: string
