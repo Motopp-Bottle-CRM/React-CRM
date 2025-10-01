@@ -348,7 +348,7 @@ function AddContacts() {
                       </div>
                     </div>
                     <div className="fieldContainer2">
-                      <div className="fieldSubContainer">
+                      {/* <div className="fieldSubContainer">
                         <div className="fieldTitle">Organization</div>
                         <RequiredTextField
                           name="organization"
@@ -364,8 +364,8 @@ function AddContacts() {
                               : ''
                           }
                         />
-                      </div>
-                      <div className="fieldSubContainer">
+                      </div> */}
+                      {/* <div className="fieldSubContainer">
                         <div className="fieldTitle">Department</div>
                         <TextField
                           name="department"
@@ -379,7 +379,7 @@ function AddContacts() {
                             errors?.department?.[0] ? errors?.department[0] : ''
                           }
                         />
-                      </div>
+                      </div> */}
                     </div>
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
@@ -470,7 +470,7 @@ function AddContacts() {
                         />
                       </div>
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Do Not Call</div>
+                        {/* <div className="fieldTitle">Do Not Call</div> */}
                         {/* <FormControlLabel
                           control={<AntSwitch
                             name='do_not_call'
@@ -479,7 +479,7 @@ function AddContacts() {
                             sx={{ mt: '1%' }}
                           />}
                         /> */}
-                        <AntSwitch
+                        {/* <AntSwitch
                           name="do_not_call"
                           checked={formData.do_not_call}
                           // onChange={handleChange}
@@ -490,7 +490,7 @@ function AddContacts() {
                             }))
                           }}
                           sx={{ mt: '1%' }}
-                        />
+                        /> */}
                       </div>
                     </div>
                   </Box>
@@ -699,13 +699,13 @@ function AddContacts() {
                         <div ref={quillRef} />
                       </div>
                     </div>
-                    
+
                   </Box>
                 </AccordionDetails>
               </Accordion>
             </div>
             {/* Socials */}
-            <div
+            {/* <div
               style={{
                 display: 'flex',
                 flexDirection: 'row',
@@ -838,7 +838,7 @@ function AddContacts() {
                   </Box>
                 </AccordionDetails>
               </Accordion>
-            </div>
+            </div> */}
           </div>
         </form>
       </Box>
