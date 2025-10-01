@@ -45,44 +45,6 @@ import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
 import '../../styles/style.css'
 
-// const useStyles = makeStyles({
-//   btnIcon: {
-//     height: '14px',
-//     color: '#5B5C63'
-//   },
-//   breadcrumbs: {
-//     color: 'white'
-//   },
-//   fields: {
-//     height: '5px'
-//   },
-//   chipStyle: {
-//     backgroundColor: 'red'
-//   },
-//   icon: {
-//     '&.MuiChip-deleteIcon': {
-//       color: 'darkgray'
-//     }
-//   }
-// })
-
-// const textFieldStyled = makeStyles(() => ({
-//   root: {
-//     borderLeft: '2px solid red',
-//     height: '35px'
-//   },
-//   fieldHeight: {
-//     height: '35px'
-//   }
-// }))
-
-// function getStyles (name, personName, theme) {
-//   return {
-//     fontWeight:
-//       theme.typography.fontWeightRegular
-//   }
-// }
-
 type FormErrors = {
   title?: string[]
   job_title?: string[]
@@ -137,7 +99,7 @@ interface FormData {
   postcode: string
   country: string
   tags: string[]
-  company_name: string
+  company: string
   probability: number
   industry: string
   linkedin_id: string
@@ -167,6 +129,8 @@ export function EditLead() {
   const [statusSelectOpen, setStatusSelectOpen] = useState(false)
   const [countrySelectOpen, setCountrySelectOpen] = useState(false)
   const [industrySelectOpen, setIndustrySelectOpen] = useState(false)
+  const [companies, setCompanies] = useState<any[]>([])
+  const [companiesLoading, setCompaniesLoading] = useState(true)
   const [errors, setErrors] = useState<FormErrors>({})
   const [formData, setFormData] = useState<FormData>({
     title: '',
@@ -192,7 +156,7 @@ export function EditLead() {
     postcode: '',
     country: '',
     tags: [],
-    company_name: '',
+    company: '',
     probability: 1,
     industry: 'ADVERTISING',
     linkedin_id: '',
@@ -220,57 +184,63 @@ export function EditLead() {
   }, [quill, hasInitialFocus])
 
   useEffect(() => {
-    console.log('Setting form data from state:', state?.value);
-    console.log('Phone value:', state?.value?.phone);
+    console.log('Setting form data from state:', state?.value)
+    console.log('Phone value:', state?.value?.phone)
 
     // Sanitize all string fields to remove JSX code
-    const sanitizedData = { ...state?.value };
+    const sanitizedData = { ...state?.value }
 
     // Function to sanitize string fields
     const sanitizeString = (str: string) => {
       if (typeof str === 'string') {
-        return str.replace(/<[^>]*>/g, '').replace(/FaStar.*?\/>|<br\s*\/?>/gi, '').trim();
+        return str
+          .replace(/<[^>]*>/g, '')
+          .replace(/FaStar.*?\/>|<br\s*\/?>/gi, '')
+          .trim()
       }
-      return str;
-    };
+      return str
+    }
 
     // Sanitize all string fields
-    Object.keys(sanitizedData).forEach(key => {
+    Object.keys(sanitizedData).forEach((key) => {
       if (typeof sanitizedData[key] === 'string') {
-        sanitizedData[key] = sanitizeString(sanitizedData[key]);
+        sanitizedData[key] = sanitizeString(sanitizedData[key])
       }
-    });
+    })
 
-    console.log('Sanitized data:', sanitizedData);
+    console.log('Sanitized data:', sanitizedData)
     setFormData({
       ...sanitizedData,
-      job_title: sanitizedData.job_title || ''
+      job_title: sanitizedData.job_title || '',
     })
   }, [state?.id])
 
   useEffect(() => {
     if (reset) {
       // Sanitize all string fields to remove JSX code
-      const sanitizedData = { ...state?.value };
+      const sanitizedData = { ...state?.value }
 
       // Function to sanitize string fields
       const sanitizeString = (str: string) => {
         if (typeof str === 'string') {
-          return str.replace(/<[^>]*>/g, '').replace(/FaStar.*?\/>|<br\s*\/?>/gi, '').trim();
+          return str
+            .replace(/<[^>]*>/g, '')
+            .replace(/FaStar.*?\/>|<br\s*\/?>/gi, '')
+            .trim()
         }
-        return str;
-      };
+        return str
+      }
 
       // Sanitize all string fields
-      Object.keys(sanitizedData).forEach(key => {
+      Object.keys(sanitizedData).forEach((key) => {
         if (typeof sanitizedData[key] === 'string') {
-          sanitizedData[key] = sanitizeString(sanitizedData[key]);
+          sanitizedData[key] = sanitizeString(sanitizedData[key])
         }
-      });
+      })
 
       setFormData({
         ...sanitizedData,
-        job_title: sanitizedData.job_title || ''
+        job_title: sanitizedData.job_title || '',
       })
       if (quill && initialContentRef.current !== null) {
         quill.clipboard.dangerouslyPasteHTML(initialContentRef.current)
@@ -289,37 +259,25 @@ export function EditLead() {
     }
   }, [quill, formData.description])
 
-
-  // useEffect(() => {
-  //     if (quill && initialContentRef.current === null) {
-  //       // Save the initial state (HTML content) of the Quill editor only if not already saved
-  //       initialContentRef.current = quillRef.current.firstChild.innerHTML;
-  //     }
-  //   }, [quill]);
-  // useEffect(() => {
-  //     if (quill) {
-  //         // Save the initial state (HTML content) of the Quill editor
-  //         initialContentRef.current = quillRef.current.firstChild.innerHTML;
-  //     }
-  // }, [quill]);
-
-  // useEffect(() => {
-  //     if (quill) {
-  //       quill.clipboard.dangerouslyPasteHTML(formData.description);
-  //     }
-  //   }, [quill]);
-
-  // const changeHandler = (event: any) => {
-  //   if (event.target.files[0]) {
-  //     // setLogo(event.target.files[0])
-  //     const reader = new FileReader()
-  //     reader.addEventListener('load', () => {
-  //       // setImgData(reader.result)
-  //       // setLogot(true)
-  //     })
-  //     val.lead_attachment = event.target.files[0]
-  //   }
-  // }
+  // Fetch companies on component mount
+  useEffect(() => {
+    setCompaniesLoading(true)
+    fetchData('leads/companies', 'GET', null, Header)
+      .then((res: any) => {
+        if (!res.error && res.data) {
+          setCompanies(Array.isArray(res.data) ? res.data : [])
+        } else {
+          setCompanies([])
+        }
+      })
+      .catch((error) => {
+        console.log('Error fetching companies:', error)
+        setCompanies([])
+      })
+      .finally(() => {
+        setCompaniesLoading(false)
+      })
+  }, [])
 
   const handleChange2 = (title: any, val: any) => {
     // const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -381,23 +339,24 @@ export function EditLead() {
   const submitForm = () => {
     // Basic validation
     if (!formData.title || formData.title.trim() === '') {
-      setError(true);
-      setErrors({ general: ['Lead Name is required'] });
-      return;
+      setError(true)
+      setErrors({ general: ['Lead Name is required'] })
+      return
     }
 
-    if (!formData.company_name || formData.company_name.trim() === '') {
+    if (!formData.company || formData.company.trim() === '') {
       setError(true);
       setErrors({ general: ['Company name is required'] });
       return;
     }
 
     if (!formData.first_name && !formData.last_name) {
-      setError(true);
-      setErrors({ general: ['Please provide at least first name or last name'] });
-      return;
+      setError(true)
+      setErrors({
+        general: ['Please provide at least first name or last name'],
+      })
+      return
     }
-
 
     const data: any = {
       title: formData.title,
@@ -408,7 +367,9 @@ export function EditLead() {
       phone: formData.phone,
       email: formData.email,
       lead_attachment: formData.file ? [formData.file] : [],
-      opportunity_amount: formData.opportunity_amount ? parseFloat(formData.opportunity_amount.toString()) : null,
+      opportunity_amount: formData.opportunity_amount
+        ? parseFloat(formData.opportunity_amount.toString())
+        : null,
       website: formData.website,
       description: formData.description,
       teams: formData.teams || [],
@@ -420,16 +381,18 @@ export function EditLead() {
       city: formData.city,
       state: formData.state,
       postcode: formData.postcode,
-      company: formData.company_name,
       tags: formData.tags || [],
-      probability: formData.probability ? Math.round(Math.min(formData.probability, 100)) : 0,
+      company: formData.company || null,
+      probability: formData.probability
+        ? Math.round(Math.min(formData.probability, 100))
+        : 0,
       industry: formData.industry,
       linkedin_id: formData.linkedin_id || '',
     }
 
     // Only include contacts if there are any
     if (formData.contacts && formData.contacts.length > 0) {
-      data.contacts = formData.contacts;
+      data.contacts = formData.contacts
     }
 
     // Only include country if it has a value
@@ -437,12 +400,18 @@ export function EditLead() {
       data.country = formData.country;
     }
 
-    console.log('EditLead - Submitting data:', data);
-    console.log('EditLead - Industry value:', formData.industry);
-    console.log('EditLead - Company name:', formData.company_name);
+    console.log('EditLead - Submitting data:', data)
+    console.log('EditLead - Industry value:', formData.industry)
+    console.log(
+      'EditLead - Company field:',
+      formData.company,
+      'Company name:',
+      companies.find((c) => c.id === formData.company)?.name
+    )
+    console.log('EditLead - Company UUID being sent:', data.company)
     fetchData(`${LeadUrl}/${state?.id}/`, 'PUT', JSON.stringify(data), Header)
       .then((res: any) => {
-        console.log('EditLead - API Response:', res);
+        console.log('EditLead - API Response:', res)
         if (!res.error) {
           setSuccessMessage('Lead updated successfully!')
           setError(false)
@@ -452,18 +421,21 @@ export function EditLead() {
           }, 1000)
         }
         if (res.error) {
-          console.log('EditLead - API Error:', res.errors);
+          console.log('EditLead - API Error:', res.errors)
           setError(true)
           setSuccessMessage('')
           setErrors(res?.errors)
         }
       })
       .catch((error) => {
-        console.log('EditLead - Fetch Error:', error);
-        console.log('EditLead - Error details:', JSON.stringify(error, null, 2));
+        console.log('EditLead - Fetch Error:', error)
+        console.log('EditLead - Error details:', JSON.stringify(error, null, 2))
         setError(true)
-        setSuccessMessage('')
-        setErrors(error?.errors || { general: ['An error occurred while saving the lead.'] })
+        setErrors(
+          error?.errors || {
+            general: ['An error occurred while saving the lead.'],
+          }
+        )
       })
   }
   const resetForm = () => {
@@ -491,7 +463,7 @@ export function EditLead() {
       postcode: '',
       country: '',
       tags: [],
-      company_name: '',
+      company: '',
       probability: 1,
       industry: 'ADVERTISING',
       linkedin_id: '',
@@ -533,17 +505,7 @@ export function EditLead() {
       reader.readAsDataURL(file)
     }
   }
-  // const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-  //     const file = event.target.files?.[0] || null;
-  //     if (file) {
-  //         const reader = new FileReader();
-  //         reader.onload = () => {
-  //             // setFormData({ ...formData, lead_attachment: reader.result as string });
-  //             setFormData({ ...formData, file: reader.result as string });
-  //         };
-  //         reader.readAsDataURL(file);
-  //     }
-  // };
+
   const backbtnHandle = () => {
     navigate('/app/leads/lead-details', {
       state: { leadId: state?.id, detail: true },
@@ -595,7 +557,16 @@ export function EditLead() {
                     autoComplete="off"
                   >
                     {error && errors?.general && (
-                      <div style={{ color: 'red', marginBottom: '10px', padding: '10px', backgroundColor: '#ffebee', border: '1px solid #f44336', borderRadius: '4px' }}>
+                      <div
+                        style={{
+                          color: 'red',
+                          marginBottom: '10px',
+                          padding: '10px',
+                          backgroundColor: '#ffebee',
+                          border: '1px solid #f44336',
+                          borderRadius: '4px',
+                        }}
+                      >
                         {errors.general[0]}
                       </div>
                     )}
@@ -613,9 +584,7 @@ export function EditLead() {
                           size="small"
                           required
                           helperText={
-                            errors?.title?.[0]
-                              ? errors?.title[0]
-                              : ''
+                            errors?.title?.[0] ? errors?.title[0] : ''
                           }
                           error={!!errors?.title?.[0]}
                         />
@@ -757,17 +726,26 @@ export function EditLead() {
                               : [
                                   ['ADVERTISING', 'ADVERTISING'],
                                   ['AGRICULTURE', 'AGRICULTURE'],
-                                  ['APPAREL & ACCESSORIES', 'APPAREL & ACCESSORIES'],
+                                  [
+                                    'APPAREL & ACCESSORIES',
+                                    'APPAREL & ACCESSORIES',
+                                  ],
                                   ['AUTOMOTIVE', 'AUTOMOTIVE'],
                                   ['BANKING', 'BANKING'],
                                   ['BIOTECHNOLOGY', 'BIOTECHNOLOGY'],
-                                  ['BUILDING MATERIALS & EQUIPMENT', 'BUILDING MATERIALS & EQUIPMENT'],
+                                  [
+                                    'BUILDING MATERIALS & EQUIPMENT',
+                                    'BUILDING MATERIALS & EQUIPMENT',
+                                  ],
                                   ['CHEMICAL', 'CHEMICAL'],
                                   ['COMPUTER', 'COMPUTER'],
                                   ['EDUCATION', 'EDUCATION'],
                                   ['ELECTRONICS', 'ELECTRONICS'],
                                   ['ENERGY', 'ENERGY'],
-                                  ['ENTERTAINMENT & LEISURE', 'ENTERTAINMENT & LEISURE'],
+                                  [
+                                    'ENTERTAINMENT & LEISURE',
+                                    'ENTERTAINMENT & LEISURE',
+                                  ],
                                   ['FINANCE', 'FINANCE'],
                                   ['FOOD & BEVERAGE', 'FOOD & BEVERAGE'],
                                   ['GROCERY', 'GROCERY'],
@@ -784,11 +762,11 @@ export function EditLead() {
                                   ['TELECOMMUNICATIONS', 'TELECOMMUNICATIONS'],
                                   ['TELEVISION', 'TELEVISION'],
                                   ['TRANSPORTATION', 'TRANSPORTATION'],
-                                  ['VENTURE CAPITAL', 'VENTURE CAPITAL']
+                                  ['VENTURE CAPITAL', 'VENTURE CAPITAL'],
                                 ].map((option: any) => (
                                   <MenuItem key={option[0]} value={option[0]}>
-                                      {option[1]}
-                                    </MenuItem>
+                                    {option[1]}
+                                  </MenuItem>
                                 ))}
                           </Select>
                           <FormHelperText>
@@ -799,18 +777,55 @@ export function EditLead() {
                     </div>
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Company Name</div>
-                        <RequiredTextField
-                          name="company_name"
-                          value={formData.company_name}
-                          onChange={handleChange}
-                          style={{ width: '70%' }}
-                          size="small"
-                          required
-                          error={!!errors?.company_name?.[0]}
-                          helperText={
-                            errors?.company_name?.[0] ? errors?.company_name[0] : ''
+                        <div className="fieldTitle">Company</div>
+                        <Autocomplete
+                          sx={{
+                            width: '70%',
+                            '& .MuiInputBase-root': {
+                              padding: '4px 8px',
+                            },
+                            '& .MuiAutocomplete-inputRoot': {
+                              paddingLeft: 1,
+                            },
+                          }}
+                          freeSolo
+                          options={companies}
+                          getOptionLabel={(option) =>
+                            typeof option === 'string' ? option : option.name
                           }
+                          value={formData.company}
+                          onChange={(event: any, newValue: any) => {
+                            if (newValue === null) {
+                              setFormData({
+                                ...formData,
+                                company: '',
+                              })
+                              return
+                            }
+                            setFormData({
+                              ...formData,
+                              company: newValue.name,
+                            })
+                          }}
+                          inputValue={formData.company}
+                          onInputChange={(e, newInputValue) => {
+                            setFormData({
+                              ...formData,
+                              company: newInputValue,
+                            })
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder="search or add new company"
+                              InputProps={{
+                                ...params.InputProps,
+                                endAdornment: (
+                                  <>{params.InputProps.endAdornment}</>
+                                ),
+                              }}
+                            />
+                          )}
                         />
                       </div>
                       <div className="fieldSubContainer">
@@ -895,8 +910,8 @@ export function EditLead() {
                             ].map((option) => (
                               <MenuItem key={option.value} value={option.value}>
                                 {option.label}
-                                </MenuItem>
-                              ))}
+                              </MenuItem>
+                            ))}
                           </Select>
                           <FormHelperText>
                             {errors?.source?.[0] ? errors?.source[0] : ''}
@@ -1152,9 +1167,7 @@ export function EditLead() {
                           style={{ width: '70%' }}
                           size="small"
                           helperText={
-                            errors?.job_title?.[0]
-                              ? errors?.job_title[0]
-                              : ''
+                            errors?.job_title?.[0] ? errors?.job_title[0] : ''
                           }
                           error={!!errors?.job_title?.[0]}
                         />
@@ -1175,12 +1188,18 @@ export function EditLead() {
                             inputProps={{
                               style: {
                                 fontSize: '14px',
-                                color: '#333'
-                              }
+                                color: '#333',
+                              },
                             }}
                             onFocus={() => {
-                              console.log('Phone field focused, value:', formData.phone);
-                              console.log('Phone field type:', typeof formData.phone);
+                              console.log(
+                                'Phone field focused, value:',
+                                formData.phone
+                              )
+                              console.log(
+                                'Phone field type:',
+                                typeof formData.phone
+                              )
                             }}
                           />
                         </Tooltip>
@@ -1188,17 +1207,19 @@ export function EditLead() {
                     </div>
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
-                      <div className="fieldTitle">Email Address</div>
-                      <TextField
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        style={{ width: '70%' }}
-                        size="small"
-                        helperText={errors?.email?.[0] ? errors?.email[0] : ''}
-                        error={!!errors?.email?.[0]}
-                      />
+                        <div className="fieldTitle">Email Address</div>
+                        <TextField
+                          name="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={handleChange}
+                          style={{ width: '70%' }}
+                          size="small"
+                          helperText={
+                            errors?.email?.[0] ? errors?.email[0] : ''
+                          }
+                          error={!!errors?.email?.[0]}
+                        />
                       </div>
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">LinkedIn ID</div>
@@ -1209,7 +1230,9 @@ export function EditLead() {
                           style={{ width: '70%' }}
                           size="small"
                           helperText={
-                            errors?.linkedin_id?.[0] ? errors?.linkedin_id[0] : ''
+                            errors?.linkedin_id?.[0]
+                              ? errors?.linkedin_id[0]
+                              : ''
                           }
                           error={!!errors?.linkedin_id?.[0]}
                         />
