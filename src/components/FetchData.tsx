@@ -57,13 +57,13 @@ export function fetchData(url: any, method: any, data: any, header: any) {
           ...header,
           Authorization: `Bearer ${newAccessToken}`
         }
-        
+
         const retryResponse = await fetch(`${SERVER}${url}`, {
           method,
           headers: newHeader,
           body: data
         })
-        
+
         if (retryResponse.ok) {
           const json = await retryResponse.json()
           return json
@@ -90,7 +90,7 @@ export function fetchData(url: any, method: any, data: any, header: any) {
 
     const json = await response.json()
     if (!response.ok) {
-      throw json // will be caught in .catch()
+      return { error: true, status: response.status, ...json };
     }
     return json
   })
