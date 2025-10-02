@@ -239,7 +239,11 @@ export function AddLeads() {
       return
     }
 
-    // Company is now optional - no validation needed
+    if (!formData.company || formData.company.trim() === '') {
+      setError(true)
+      setErrors({ general: ['Company is required'] })
+      return
+    }
 
     if (!formData.first_name && !formData.last_name) {
       setError(true)
@@ -286,11 +290,11 @@ export function AddLeads() {
       state: formData.state,
       postcode: formData.postcode,
       country: formData.country,
-      company: formData.company || null,
+      company: formData.company,
       organization: formData.company
         ? companies.find((c) => c.id === formData.company)?.name ||
           'Unknown Organization'
-        : null,
+        : 'Unknown Organization',
       probability: Math.round(Math.min(formData.probability, 100)),
       industry: formData.industry,
       linkedin_id: formData.linkedin_id,
