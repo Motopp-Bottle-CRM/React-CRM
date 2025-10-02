@@ -674,7 +674,7 @@ export default function LeadDetails() {
                     <Button
                       variant="contained"
                       size="small"
-                      onClick={() => saveAttachment(state?.leadId)}
+                      onClick={() => saveAttachment(leadId)}
                     >
                       {' '}
                       Save
@@ -746,7 +746,7 @@ export default function LeadDetails() {
                       <Button
                         variant="contained"
                         size="small"
-                        onClick={() => saveComment(state.leadId)}
+                        onClick={() => saveComment(leadId)}
                       >
                         {' '}
                         Save
