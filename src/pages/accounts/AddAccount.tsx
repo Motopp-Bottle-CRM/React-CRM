@@ -478,7 +478,7 @@ export function AddAccount() {
                             value={selectedTeams}
                             multiple
                             limitTags={5}
-                            options={state.teams || []}
+                            options={state?.teams || []}
                             // options={state.contacts ? state.contacts.map((option: any) => option) : ['']}
                             getOptionLabel={(option: any) => option}
                             onChange={(e: any, value: any) =>
@@ -543,7 +543,7 @@ export function AddAccount() {
                             multiple
                             value={selectedAssignTo}
                             limitTags={2}
-                            options={state.users || []}
+                            options={state?.users || []}
                             getOptionLabel={(option: any) =>
                               state.users ? option?.user__email : option
                             }
@@ -666,7 +666,7 @@ export function AddAccount() {
                             value={selectedTags}
                             multiple
                             limitTags={5}
-                            options={state.tags || []}
+                            options={state?.tags || []}
                             // options={state.contacts ? state.contacts.map((option: any) => option) : ['']}
                             getOptionLabel={(option: any) => option}
                             onChange={(e: any, value: any) =>

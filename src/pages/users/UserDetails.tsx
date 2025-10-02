@@ -124,6 +124,7 @@ export default function UserDetails() {
           backBtn={backBtn}
           crntPage={crntPage}
           editHandle={editHandle}
+          detail={!!state?.userId}
         />
         <Box
           sx={{

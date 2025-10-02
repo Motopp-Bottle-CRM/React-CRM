@@ -542,7 +542,7 @@ export default function Dashboard() {
                 border: "1px solid #c0c0c0",
                 display: "flex",
                 flexDirection: "column",
-                height: 150,
+                height: 238,
                 width: "250px",
                 overflow: "hidden",
               }}
@@ -561,27 +561,78 @@ export default function Dashboard() {
                 {item.icon} {item.title}
               </Typography>
 
-              <Box sx={{ overflow: "auto", flex: 1 }}>
-                <ol style={{ paddingLeft: "16px", margin: 0 }}>
+              <Box sx={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
+                <ol style={{ paddingLeft: "16px", margin: 0, flex: 1, overflowY: "auto" }}>
                   {item.data?.slice(-5).map((entry: any, idx: number) => (
-                    <li
-                      key={idx}
-                      style={{ marginBottom: "4px", listStyleType: "decimal" }}
-                    >
+                    <li key={idx} style={{ marginBottom: 4, listStyleType: "decimal" }}>
                       <Link
-                        to={`/leads/lead-details/${entry.id}`}
+                        to={`/app/contacts/contact-details/${entry.id}`}
                         style={{
                           textDecoration: "none",
                           color: "#1A3353",
-                          fontSize: "14px",
+                          fontSize: 14,
                           fontWeight: 500,
                         }}
                       >
-                        {entry.name || entry.title || `#${entry.id ?? idx}`}
+                        {entry.first_name && entry.last_name 
+                          ? `${entry.first_name} ${entry.last_name}`.trim()
+                          : entry.primary_email || entry.name || entry.title || `#${entry.id ?? idx}`}
                       </Link>
+
+                      {entry.organization && (
+                        <span
+                          style={{
+                            display: "inline-block",
+                            backgroundColor: "#22c55e",
+                            color: "#ffffff",
+                            borderRadius: "12px",
+                            padding: "2px 8px",
+                            fontSize: "0.5rem",
+                            fontWeight: "bold",
+                            textAlign: "center",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            maxWidth: 80,
+                            marginLeft: 4,
+                          }}
+                        >
+                          {entry.organization.substring(0, 8)}
+                        </span>
+                      )}
+
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          fontSize: "0.7rem",
+                          color: "#000000",
+                          fontWeight: 300,
+                          marginTop: 2,
+                        }}
+                      >
+                        <span>{new Date(entry.created_at).toLocaleDateString()}</span>
+                        <span style={{ color: "#1A3353" }}>{entry.primary_email}</span>
+                      </div>
                     </li>
                   ))}
                 </ol>
+
+                {/* Bottom-right "More Contacts" link */}
+                <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 0 }}>
+                  <Link
+                    to={`/app/contacts/`}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      textDecoration: "none",
+                    }}
+                  >
+                    <span style={{ fontSize: "0.8rem", color: "#1A3353" }}>more contacts</span>
+                    <FaArrowRight size={12} color="#1A3353" />
+                  </Link>
+                </Box>
               </Box>
             </Paper>
           ))}

@@ -278,25 +278,25 @@ function AddContacts() {
 
   // console.log(errors, 'err')
   return (
-    <Box sx={{ mt: '60px' }}>
-      <CustomAppBar
-        backbtnHandle={backbtnHandle}
-        module={module}
-        backBtn={backBtn}
-        crntPage={crntPage}
-        onCancel={onCancel}
-        onSubmit={handleSubmit}
-      />
-      <Box sx={{ mt: '120px' }}>
-        {/* Success Message Alert */}
-        {successMessage && (
-          <Box sx={{ mb: 2, px: 2 }}>
-            <Alert severity="success" onClose={() => setSuccessMessage('')}>
-              {successMessage}
-            </Alert>
-          </Box>
-        )}
-        <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit}>
+      <Box sx={{ mt: '60px' }}>
+        <CustomAppBar
+          backbtnHandle={backbtnHandle}
+          module={module}
+          backBtn={backBtn}
+          crntPage={crntPage}
+          onCancel={onCancel}
+          onSubmit={handleSubmit}
+        />
+        <Box sx={{ mt: '120px' }}>
+          {/* Success Message Alert */}
+          {successMessage && (
+            <Box sx={{ mb: 2, px: 2 }}>
+              <Alert severity="success" onClose={() => setSuccessMessage('')}>
+                {successMessage}
+              </Alert>
+            </Box>
+          )}
           {/* contact details */}
           <div style={{ padding: '10px' }}>
             <div className="leadContainer">
@@ -840,9 +840,9 @@ function AddContacts() {
               </Accordion>
             </div> */}
           </div>
-        </form>
+        </Box>
       </Box>
-    </Box>
+    </form>
   )
 }
 

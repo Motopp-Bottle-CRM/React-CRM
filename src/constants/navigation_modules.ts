@@ -5,6 +5,7 @@ export const allNavList = [
   'contacts',
   'opportunities',
   'accounts',
+  'companies',
   'users',
   'cases',
 ]

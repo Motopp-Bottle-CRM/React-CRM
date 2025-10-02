@@ -401,25 +401,25 @@ export function AddLeads() {
 
   // console.log(state, 'leadsform')
   return (
-    <Box sx={{ mt: '60px' }}>
-      <CustomAppBar
-        backbtnHandle={backbtnHandle}
-        module={module}
-        backBtn={backBtn}
-        crntPage={crntPage}
-        onCancel={onCancel}
-        onSubmit={handleSubmit}
-      />
-      <Box sx={{ mt: '120px' }}>
-        {/* Success Message Alert */}
-        {successMessage && (
-          <Box sx={{ mb: 2, px: 2 }}>
-            <Alert severity="success" onClose={() => setSuccessMessage('')}>
-              {successMessage}
-            </Alert>
-          </Box>
-        )}
-        <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit}>
+      <Box sx={{ mt: '60px' }}>
+        <CustomAppBar
+          backbtnHandle={backbtnHandle}
+          module={module}
+          backBtn={backBtn}
+          crntPage={crntPage}
+          onCancel={onCancel}
+          onSubmit={handleSubmit}
+        />
+        <Box sx={{ mt: '120px' }}>
+          {/* Success Message Alert */}
+          {successMessage && (
+            <Box sx={{ mb: 2, px: 2 }}>
+              <Alert severity="success" onClose={() => setSuccessMessage('')}>
+                {successMessage}
+              </Alert>
+            </Box>
+          )}
           <div style={{ padding: '10px' }}>
             <div className="leadContainer">
               <Accordion defaultExpanded style={{ width: '98%' }}>
@@ -691,7 +691,7 @@ export function AddLeads() {
                             },
                           }}
                           freeSolo
-                          options={companies}
+                          options={companies || []}
                           getOptionLabel={(option) =>
                             typeof option === 'string' ? option : option.name
                           }
@@ -1290,8 +1290,8 @@ export function AddLeads() {
               </Accordion>
             </div>
           </div>
-        </form>
+        </Box>
       </Box>
-    </Box>
+    </form>
   )
 }

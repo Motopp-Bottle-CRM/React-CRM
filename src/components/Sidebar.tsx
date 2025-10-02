@@ -68,6 +68,10 @@ import { ROLE_PERMISSIONS } from '../constants/role_permissions'
 import { allNavList } from '../constants/navigation_modules'
 import NotFounded from  '../pages/NotFounded'
 import ProtectedRoute from "../components/ProtectedRoute";
+import Company from '../pages/company/Company'
+import AddCompany from '../pages/company/AddCompany'
+import EditCompany from '../pages/company/EditCompany'
+import CompanyDetails from '../pages/company/CompanyDetails'
 
 export default function Sidebar(props: any) {
   const navigate = useNavigate()
@@ -96,6 +100,7 @@ const toggleScreen = () => {
     contacts: "contacts",
     opportunities: "opportunities",
     accounts: "accounts",
+    companies: "companies",
     users: "users",
     cases: "cases",
   };
@@ -423,6 +428,54 @@ useEffect(() => {
               />
 
               {/* Companies */}
+              <Route
+                path="/app/companies"
+                element={
+                  <ProtectedRoute role={role} module="companies">
+                    <Company />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/companies/add-company"
+                element={
+                  <ProtectedRoute role={role} module="companies">
+                    <AddCompany />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/companies/edit-company"
+                element={
+                  <ProtectedRoute role={role} module="companies">
+                    <EditCompany />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/companies/edit-company/:id"
+                element={
+                  <ProtectedRoute role={role} module="companies">
+                    <EditCompany />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/companies/company-details"
+                element={
+                  <ProtectedRoute role={role} module="companies">
+                    <CompanyDetails />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/companies/company-details/:id"
+                element={
+                  <ProtectedRoute role={role} module="companies">
+                    <CompanyDetails />
+                  </ProtectedRoute>
+                }
+              />
 
               {/* Contacts */}
               <Route

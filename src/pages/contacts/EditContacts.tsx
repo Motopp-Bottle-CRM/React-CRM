@@ -104,6 +104,191 @@ function EditContact() {
   })
   const [errors, setErrors] = useState<FormErrors>({})
   const [countrySelectOpen, setCountrySelectOpen] = useState(false)
+  const [countries, setCountries] = useState<any[]>([])
+
+  // Fallback countries list
+  const fallbackCountries = [
+    ['US', 'United States'],
+    ['CA', 'Canada'],
+    ['GB', 'United Kingdom'],
+    ['AU', 'Australia'],
+    ['DE', 'Germany'],
+    ['FR', 'France'],
+    ['IT', 'Italy'],
+    ['ES', 'Spain'],
+    ['NL', 'Netherlands'],
+    ['BE', 'Belgium'],
+    ['CH', 'Switzerland'],
+    ['AT', 'Austria'],
+    ['SE', 'Sweden'],
+    ['NO', 'Norway'],
+    ['DK', 'Denmark'],
+    ['FI', 'Finland'],
+    ['IE', 'Ireland'],
+    ['PT', 'Portugal'],
+    ['GR', 'Greece'],
+    ['PL', 'Poland'],
+    ['CZ', 'Czech Republic'],
+    ['HU', 'Hungary'],
+    ['SK', 'Slovakia'],
+    ['SI', 'Slovenia'],
+    ['HR', 'Croatia'],
+    ['RO', 'Romania'],
+    ['BG', 'Bulgaria'],
+    ['LT', 'Lithuania'],
+    ['LV', 'Latvia'],
+    ['EE', 'Estonia'],
+    ['CY', 'Cyprus'],
+    ['MT', 'Malta'],
+    ['LU', 'Luxembourg'],
+    ['IS', 'Iceland'],
+    ['LI', 'Liechtenstein'],
+    ['MC', 'Monaco'],
+    ['SM', 'San Marino'],
+    ['VA', 'Vatican City'],
+    ['AD', 'Andorra'],
+    ['IN', 'India'],
+    ['CN', 'China'],
+    ['JP', 'Japan'],
+    ['KR', 'South Korea'],
+    ['SG', 'Singapore'],
+    ['HK', 'Hong Kong'],
+    ['TW', 'Taiwan'],
+    ['TH', 'Thailand'],
+    ['MY', 'Malaysia'],
+    ['ID', 'Indonesia'],
+    ['PH', 'Philippines'],
+    ['VN', 'Vietnam'],
+    ['BR', 'Brazil'],
+    ['AR', 'Argentina'],
+    ['CL', 'Chile'],
+    ['CO', 'Colombia'],
+    ['MX', 'Mexico'],
+    ['PE', 'Peru'],
+    ['VE', 'Venezuela'],
+    ['ZA', 'South Africa'],
+    ['EG', 'Egypt'],
+    ['NG', 'Nigeria'],
+    ['KE', 'Kenya'],
+    ['MA', 'Morocco'],
+    ['TN', 'Tunisia'],
+    ['DZ', 'Algeria'],
+    ['GH', 'Ghana'],
+    ['ET', 'Ethiopia'],
+    ['UG', 'Uganda'],
+    ['TZ', 'Tanzania'],
+    ['ZW', 'Zimbabwe'],
+    ['BW', 'Botswana'],
+    ['NA', 'Namibia'],
+    ['ZM', 'Zambia'],
+    ['MW', 'Malawi'],
+    ['MZ', 'Mozambique'],
+    ['MG', 'Madagascar'],
+    ['MU', 'Mauritius'],
+    ['SC', 'Seychelles'],
+    ['RE', 'Réunion'],
+    ['YT', 'Mayotte'],
+    ['KM', 'Comoros'],
+    ['DJ', 'Djibouti'],
+    ['SO', 'Somalia'],
+    ['ER', 'Eritrea'],
+    ['SD', 'Sudan'],
+    ['SS', 'South Sudan'],
+    ['CF', 'Central African Republic'],
+    ['TD', 'Chad'],
+    ['NE', 'Niger'],
+    ['ML', 'Mali'],
+    ['BF', 'Burkina Faso'],
+    ['CI', 'Côte d\'Ivoire'],
+    ['LR', 'Liberia'],
+    ['SL', 'Sierra Leone'],
+    ['GN', 'Guinea'],
+    ['GW', 'Guinea-Bissau'],
+    ['GM', 'Gambia'],
+    ['SN', 'Senegal'],
+    ['MR', 'Mauritania'],
+    ['CV', 'Cape Verde'],
+    ['ST', 'São Tomé and Príncipe'],
+    ['GQ', 'Equatorial Guinea'],
+    ['GA', 'Gabon'],
+    ['CG', 'Republic of the Congo'],
+    ['CD', 'Democratic Republic of the Congo'],
+    ['AO', 'Angola'],
+    ['CM', 'Cameroon'],
+    ['BI', 'Burundi'],
+    ['RW', 'Rwanda'],
+    ['UY', 'Uruguay'],
+    ['PY', 'Paraguay'],
+    ['BO', 'Bolivia'],
+    ['EC', 'Ecuador'],
+    ['GY', 'Guyana'],
+    ['SR', 'Suriname'],
+    ['GF', 'French Guiana'],
+    ['FK', 'Falkland Islands'],
+    ['GS', 'South Georgia and the South Sandwich Islands'],
+    ['BZ', 'Belize'],
+    ['GT', 'Guatemala'],
+    ['HN', 'Honduras'],
+    ['SV', 'El Salvador'],
+    ['NI', 'Nicaragua'],
+    ['CR', 'Costa Rica'],
+    ['PA', 'Panama'],
+    ['CU', 'Cuba'],
+    ['JM', 'Jamaica'],
+    ['HT', 'Haiti'],
+    ['DO', 'Dominican Republic'],
+    ['PR', 'Puerto Rico'],
+    ['VI', 'U.S. Virgin Islands'],
+    ['BS', 'Bahamas'],
+    ['BB', 'Barbados'],
+    ['TT', 'Trinidad and Tobago'],
+    ['AG', 'Antigua and Barbuda'],
+    ['DM', 'Dominica'],
+    ['GD', 'Grenada'],
+    ['KN', 'Saint Kitts and Nevis'],
+    ['LC', 'Saint Lucia'],
+    ['VC', 'Saint Vincent and the Grenadines'],
+    ['AI', 'Anguilla'],
+    ['VG', 'British Virgin Islands'],
+    ['MS', 'Montserrat'],
+    ['TC', 'Turks and Caicos Islands'],
+    ['KY', 'Cayman Islands'],
+    ['BM', 'Bermuda'],
+    ['GL', 'Greenland'],
+    ['PM', 'Saint Pierre and Miquelon'],
+    ['SX', 'Sint Maarten'],
+    ['CW', 'Curaçao'],
+    ['AW', 'Aruba'],
+    ['BQ', 'Bonaire, Sint Eustatius and Saba'],
+    ['AN', 'Netherlands Antilles'],
+    ['GP', 'Guadeloupe'],
+    ['MQ', 'Martinique'],
+    ['BL', 'Saint Barthélemy'],
+    ['MF', 'Saint Martin'],
+    ['KN', 'Saint Kitts and Nevis'],
+    ['LC', 'Saint Lucia'],
+    ['VC', 'Saint Vincent and the Grenadines'],
+    ['AG', 'Antigua and Barbuda'],
+    ['DM', 'Dominica'],
+    ['GD', 'Grenada'],
+    ['BB', 'Barbados'],
+    ['TT', 'Trinidad and Tobago'],
+    ['BS', 'Bahamas'],
+    ['JM', 'Jamaica'],
+    ['HT', 'Haiti'],
+    ['DO', 'Dominican Republic'],
+    ['CU', 'Cuba'],
+    ['PA', 'Panama'],
+    ['CR', 'Costa Rica'],
+    ['NI', 'Nicaragua'],
+    ['SV', 'El Salvador'],
+    ['HN', 'Honduras'],
+    ['GT', 'Guatemala'],
+    ['BZ', 'Belize'],
+    ['MX', 'Mexico'],
+    ['US', 'United States'],
+    ['CA', 'Canada']
+  ]
 
   useEffect(() => {
     // Scroll to the top of the page when the component mounts
@@ -127,6 +312,14 @@ function EditContact() {
 
   useEffect(() => {
     setFormData(state?.value)
+    
+    // Set countries from state if available, otherwise use fallback
+    if (state?.countries?.length) {
+      setCountries(state.countries)
+    } else {
+      // Use fallback countries immediately
+      setCountries(fallbackCountries)
+    }
   }, [state?.id])
 
   useEffect(() => {
@@ -173,6 +366,7 @@ function EditContact() {
   }
 
   const handleSubmit = (e: any) => {
+    console.log('EditContacts: handleSubmit called')
     e.preventDefault()
     submitForm()
   }
@@ -186,17 +380,34 @@ function EditContact() {
   }
 
   const submitForm = () => {
+    console.log('EditContacts: submitForm called')
+    console.log('EditContacts: Current formData:', formData)
+    
+    // Basic validation
+    if (!formData.first_name || !formData.last_name || !formData.primary_email) {
+      console.log('EditContacts: Validation failed - missing required fields')
+      setError(true)
+      setSuccessMessage('')
+      setErrors({
+        first_name: !formData.first_name ? ['First name is required'] : [],
+        last_name: !formData.last_name ? ['Last name is required'] : [],
+        primary_email: !formData.primary_email ? ['Primary email is required'] : []
+      })
+      return
+    }
+    
     const Header = {
       Accept: 'application/json',
       'Content-Type': 'application/json',
       Authorization: localStorage.getItem('Token'),
       org: localStorage.getItem('org'),
     }
-    // console.log('Form data:', data);
+    console.log('EditContacts: Headers:', Header)
     const data = {
       salutation: formData.salutation,
       first_name: formData.first_name,
       last_name: formData.last_name,
+      date_of_birth: formData.date_of_birth || null,
       organization: formData.organization,
       title: formData.title,
       primary_email: formData.primary_email,
@@ -211,12 +422,16 @@ function EditContact() {
       street: formData.street,
       city: formData.city,
       state: formData.state,
+      postcode: formData.postcode,
       description: formData.description,
       linked_in_url: formData.linked_in_url,
       facebook_url: formData.facebook_url,
       twitter_username: formData.twitter_username,
     }
-    // console.log(data, 'edit')
+    console.log('EditContacts: Data being sent:', data)
+    console.log('EditContacts: Contact ID:', state?.id)
+    console.log('EditContacts: API URL:', `${ContactUrl}/${state?.id}/`)
+    
     fetchData(
       `${ContactUrl}/${state?.id}/`,
       'PUT',
@@ -224,32 +439,35 @@ function EditContact() {
       Header
     )
       .then((res: any) => {
-        console.log('Form data:', res)
+        console.log('EditContacts: API Response:', res)
         if (!res.error) {
+          console.log('EditContacts: Success - Contact updated')
           setSuccessMessage('Contact updated successfully!')
           setError(false)
-          // Show success message for 1 second before navigating
+          setErrors({})
+          // Show success message for 2 seconds before navigating
           setTimeout(() => {
             backbtnHandle()
-          }, 1000)
-        }
-        if (res.error) {
+          }, 2000)
+        } else {
+          console.log('EditContacts: API Error:', res.error)
           setError(true)
           setSuccessMessage('')
-          setErrors(res?.errors?.contact_errors)
+          setErrors(res?.errors?.contact_errors || {})
         }
       })
       .catch((err: any) => {
         console.error('Edit contact failed with errors:', err)
+        console.error('Edit contact error details:', JSON.stringify(err, null, 2))
         setError(true)
         setSuccessMessage('')
-        setErrors(err?.errors?.contact_errors || {})
+        setErrors(err?.errors?.contact_errors || err?.contact_errors || {})
       })
   }
 
   const backbtnHandle = () => {
     navigate('/app/contacts/contact-details', {
-      state: { contactId: { id: state?.id }, detail: true },
+      state: { contactId: state?.id, detail: true },
     })
   }
   const module = 'Contacts'
@@ -262,25 +480,41 @@ function EditContact() {
   }
   // console.log(formData, 'editform')
   return (
-    <Box sx={{ mt: '60px' }}>
-      <CustomAppBar
-        backbtnHandle={backbtnHandle}
-        module={module}
-        crntPage={crntPage}
-        backBtn={backBtn}
-        onCancel={onCancel}
-        onSubmit={handleSubmit}
-      />
-      <Box sx={{ mt: '120px' }}>
-        {/* Success Message Alert */}
-        {successMessage && (
-          <Box sx={{ mb: 2, px: 2 }}>
-            <Alert severity="success" onClose={() => setSuccessMessage('')}>
-              {successMessage}
-            </Alert>
-          </Box>
-        )}
-        <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit}>
+      <Box sx={{ mt: '60px' }}>
+        <CustomAppBar
+          backbtnHandle={backbtnHandle}
+          module={module}
+          crntPage={crntPage}
+          backBtn={backBtn}
+          onCancel={onCancel}
+          onSubmit={handleSubmit}
+        />
+        <Box sx={{ mt: '120px' }}>
+          {/* Success Message Alert */}
+          {successMessage && (
+            <Box sx={{ mb: 2, px: 2 }}>
+              <Alert severity="success" onClose={() => setSuccessMessage('')}>
+                {successMessage}
+              </Alert>
+            </Box>
+          )}
+          
+          {/* Error Message Alert */}
+          {error && Object.keys(errors).length > 0 && (
+            <Box sx={{ mb: 2, px: 2 }}>
+              <Alert severity="error" onClose={() => setError(false)}>
+                Please fix the following errors:
+                <ul style={{ margin: '8px 0 0 0', paddingLeft: '20px' }}>
+                  {Object.entries(errors).map(([field, fieldErrors]) => (
+                    fieldErrors.map((error: string, index: number) => (
+                      <li key={`${field}-${index}`}>{error}</li>
+                    ))
+                  ))}
+                </ul>
+              </Alert>
+            </Box>
+          )}
           {/* lead details */}
           <div style={{ padding: '10px' }}>
             <div className="leadContainer">
@@ -602,12 +836,15 @@ function EditContact() {
                             onChange={handleChange}
                             error={!!errors?.country?.[0]}
                           >
-                            {state?.countries?.length &&
-                              state?.countries.map((option: any) => (
+                            {countries.length > 0 ? (
+                              countries.map((option: any) => (
                                 <MenuItem key={option[0]} value={option[0]}>
                                   {option[1]}
                                 </MenuItem>
-                              ))}
+                              ))
+                            ) : (
+                              <MenuItem disabled>No countries available</MenuItem>
+                            )}
                           </Select>
                           <FormHelperText>
                             {errors?.country?.[0] ? errors?.country[0] : ''}
@@ -784,9 +1021,9 @@ function EditContact() {
               </Accordion>
             </div>
           </div>
-        </form>
+        </Box>
       </Box>
-    </Box>
+    </form>
   )
 }
 
