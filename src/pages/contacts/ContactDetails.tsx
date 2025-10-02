@@ -96,6 +96,7 @@ export default function ContactDetails() {
   const { id } = useParams()
   const [leadDetails, setLeadDetails] = useState<{
     contact_obj: Contact
+    countries?: any[]
   } | null>(null)
 
   const [comment, setComment] = useState('')
@@ -249,7 +250,8 @@ export default function ContactDetails() {
     navigate('/app/contacts/edit-contact', {
       state: {
         id: contactId,
-        value: leadDetails?.contact_obj
+        value: leadDetails?.contact_obj,
+        countries: leadDetails?.countries || []
       }
     })
   }
