@@ -150,6 +150,7 @@ export default function LeadDetails() {
   const [open, setOpen] = useState(false)
   const [selectedLeadId, setSelectedLeadId] = useState('')
   const [success, setSuccess] = useState(false)
+
   const { leadId: paramLeadId } = useParams<{ leadId: string }>();
   const leadId = state?.leadId ?? paramLeadId;
   const leadIdNumber = leadId ? Number(leadId) : null;
@@ -158,12 +159,19 @@ export default function LeadDetails() {
 
     getLeadDetails(leadId);
     getComment(leadId);
-
-    if (leadIdNumber !== null) {
-      getAttachment(leadIdNumber);
-    }
+    getAttachment(leadId);
+    // if (leadIdNumber !== null) {
+    //   getAttachment(leadIdNumber);
+    // }
   }, [leadId, leadIdNumber]);
 
+  //  useEffect(() => {
+  //   if (!leadId) return;
+
+  //   getLeadDetails(leadId);
+  //   getComment(leadId);
+  //   getAttachment(leadId); 
+  //  }, [leadId]);
 
 
   const getLeadDetails = async (id: any) => {
@@ -223,7 +231,7 @@ export default function LeadDetails() {
   const backbtnHandle = () => {
     navigate('/app/leads/')
   }
-  const saveAttachment = async (id: number) => {
+  const saveAttachment = async (id: string) => {
     if (attachmens.length === 0) return
 
     const formData = new FormData()
@@ -251,7 +259,8 @@ export default function LeadDetails() {
     }
   }
 
-  const getAttachment = async (id: number) => {
+  const getAttachment = async (id: string) => {
+ //  const getAttachment = async (id: number) => {
     const Header = {
       Authorization: localStorage.getItem('Token'),
       org: localStorage.getItem('org'),
@@ -365,7 +374,7 @@ export default function LeadDetails() {
       org: localStorage.getItem('org'),
     }
     const body = JSON.stringify({
-      status: 'Converted',
+      status: 'converted',
     })
     try {
       const response = await fetchData(
