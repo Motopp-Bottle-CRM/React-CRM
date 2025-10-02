@@ -46,38 +46,29 @@ export default function ContactDetails() {
     file_name: string
     file_path: string
   }
-  interface CreatedBy {
-    id: string
-    email: string
-    profile_pic: string | null
-  }
 
   interface Contact {
     id: string
     salutation: string
-  first_name: string
-  last_name: string
-  primary_email: string
-  secondary_email: string
+    first_name: string
+    last_name: string
+    primary_email: string
+    secondary_email: string
     mobile_number: string
-  secondary_number: string
+    secondary_number: string
     date_of_birth: string
     organization: string
-  title: string
+    title: string
     language: string
     do_not_call: boolean
     department: string
-  address_line: string
-    street: string
-  city: string
-    state: string
-  country: string
-  postcode: string
+    address: Address
     description: string
     linked_in_url: string
     facebook_url: string
     twitter_username: string
-    created_by: CreatedBy
+    created_by: string
+    created_by_email: string
     created_at: string
     is_active: boolean
   }
@@ -93,28 +84,25 @@ export default function ContactDetails() {
 
   const navigate = useNavigate()
   const { state } = useLocation()
-  const { id } = useParams()
-  const [leadDetails, setLeadDetails] = useState<{
-    contact_obj: Contact
-    countries?: any[]
-  } | null>(null)
+  const [contactDetails, setContactDetails] = useState<Contact>([] as any)
 
   const [comment, setComment] = useState('')
-  const [recievedComments, setRecievedComments] = useState<RecievedComments[]>([])
+  const [recievedComments, setRecievedComments] = useState<RecievedComments[]>(
+    []
+  )
   const [attachmens, setAttachments] = useState<File[]>([])
-  const [recievedAttachments, setRecievedAttachments] = useState<RecievedAttachments[]>([])
+  const [recievedAttachments, setRecievedAttachments] = useState<
+    RecievedAttachments[]
+  >([])
   const [loading, setLoading] = useState(true)
 
-  // Get contact ID from either state or URL params
-  const contactId = state?.contactId || id
-
   useEffect(() => {
-    if (contactId) {
-      getContactDetails()
-      getComment(contactId)
-      getAttachment(parseInt(contactId))
+    getContactDetails()
+    if (state?.contactId) {
+      getComment(state.contactId)
+      getAttachment(state.contactId)
     }
-  }, [contactId])
+  }, [state?.contactId])
 
   const getContactDetails = async () => {
     const Header = {
@@ -125,12 +113,13 @@ export default function ContactDetails() {
     }
     try {
       const response = await fetchData(
-        `${ContactUrl}/${contactId}/`,
+        `${ContactUrl}/${state?.contactId}/`,
         'GET',
         null as any,
         Header
       )
-      setLeadDetails(response)
+
+      setContactDetails(response?.contact_obj)
       setLoading(false)
     } catch (error) {
       console.log('error', error)
@@ -170,8 +159,7 @@ export default function ContactDetails() {
   const backbtnHandle = () => {
     navigate('/app/contacts/')
   }
-  const saveAttachment = async (id: number) => {
-
+  const saveAttachment = async (id: string) => {
     if (attachmens.length === 0) return
 
     const formData = new FormData()
@@ -199,21 +187,23 @@ export default function ContactDetails() {
     }
   }
 
-  const getAttachment = async(id:number)=>{
+  const getAttachment = async (id: string) => {
     const Header = {
       Authorization: localStorage.getItem('Token'),
       org: localStorage.getItem('org'),
     }
     try {
-      const response = await fetchData(`contacts/attachment/${id}/`, 'GET', null as any, Header )
+      const response = await fetchData(
+        `contacts/attachment/${id}/`,
+        'GET',
+        null as any,
+        Header
+      )
       setRecievedAttachments(response)
-      console.log("success")
-
+      console.log('success')
     } catch (error) {
-      console.log("faild to get all attachments", error)
-
+      console.log('faild to get all attachments', error)
     }
-
   }
   const saveComment = async (id: string) => {
     const Header = {
@@ -242,17 +232,12 @@ export default function ContactDetails() {
     }
   }
   const editHandle = () => {
-    if (!contactId) {
-      console.error('No contact ID available for editing')
-      return
-    }
-    
+    console.log('edit')
     navigate('/app/contacts/edit-contact', {
       state: {
-        id: contactId,
-        value: leadDetails?.contact_obj,
-        countries: leadDetails?.countries || []
-      }
+        id: state?.contactId,
+        value: contactDetails,
+      },
     })
   }
 
@@ -266,33 +251,32 @@ export default function ContactDetails() {
 
   return (
     <Box sx={{ mt: '60px' }}>
-        <CustomAppBar
-          backbtnHandle={backbtnHandle}
-          module={module}
-          backBtn={backBtn}
-          crntPage={crntPage}
-          editHandle={editHandle}
-          detail={!!contactId}
-        />
+      <CustomAppBar
+        backbtnHandle={backbtnHandle}
+        module={module}
+        backBtn={backBtn}
+        crntPage={crntPage}
+        onEdit={editHandle}
+      />
       <Box sx={{ mt: '120px' }}>
         <Box sx={{ display: 'flex', gap: 2, width: '100%' }}>
           <Box sx={{ width: '65%' }}>
-        <Box
-          sx={{
+            <Box
+              sx={{
                 width: '90%',
                 border: 1,
                 borderRadius: '12px',
                 borderColor: 'grey.300',
                 padding: 3,
                 boxShadow: 3,
-                mb: 2,
+                m: 2,
               }}
             >
               <Typography
                 variant="h5"
                 sx={{ color: 'gray.900', fontWeight: 700, mb: 2 }}
-                >
-                  Contact Information
+              >
+                Contact Information
               </Typography>
               <Box>
                 <Grid container>
@@ -302,24 +286,18 @@ export default function ContactDetails() {
                       Full Name
                     </Typography>
                     <Typography sx={{ color: 'gray.900' }}>
-                      {leadDetails?.contact_obj?.first_name} {leadDetails?.contact_obj?.last_name}
+                      {contactDetails?.first_name}
+                      {contactDetails?.last_name}
                     </Typography>
                   </Grid>
                   <Grid item md={4}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
-                      Primary Email
+                      Email
                     </Typography>
                     <Typography sx={{ color: 'gray.900' }}>
-                      {leadDetails?.contact_obj?.primary_email}
+                      {contactDetails?.primary_email}
                     </Typography>
-                  </Grid>
-                  <Grid item md={4}>
-                    <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
-                      {' '}
-                      Mobile Number
-                    </Typography>
-                    <Typography> {leadDetails?.contact_obj?.mobile_number}</Typography>
                   </Grid>
                 </Grid>
               </Box>
@@ -332,6 +310,7 @@ export default function ContactDetails() {
                 borderColor: 'grey.300',
                 padding: 3,
                 boxShadow: 3,
+                m: 2,
               }}
             >
               <Typography
@@ -345,117 +324,58 @@ export default function ContactDetails() {
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
-                      Salutation
+                      Mobile Number
                     </Typography>
-                    <Typography> {leadDetails?.contact_obj?.salutation}</Typography>
-                  </Grid>
-                  <Grid item md={4} sx={{ mb: 2 }}>
-                    <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
-                      {' '}
-                      Organization
-                    </Typography>
-                    <Typography> {leadDetails?.contact_obj?.organization}</Typography>
-                  </Grid>
-                  <Grid item md={4} sx={{ mb: 2 }}>
-                    <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
-                      {' '}
-                      Title
-                    </Typography>
-                    <Typography> {leadDetails?.contact_obj?.title}</Typography>
-                  </Grid>
-                  <Grid item md={4} sx={{ mb: 2 }}>
-                    <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
-                      {' '}
-                      Department
-                    </Typography>
-                    <Typography> {leadDetails?.contact_obj?.department}</Typography>
-                  </Grid>
-                  <Grid item md={4} sx={{ mb: 2 }}>
-                    <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
-                      Language
-                    </Typography>
-                    <Typography> {leadDetails?.contact_obj?.language}</Typography>
-                  </Grid>
-                  <Grid item md={4} sx={{ mb: 2 }}>
-                    <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
-                      {' '}
-                      Secondary Email
-                    </Typography>
-                    <Typography> {leadDetails?.contact_obj?.secondary_email}</Typography>
+                    <Typography> {contactDetails?.mobile_number}</Typography>
                   </Grid>
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
                       Secondary Number
                     </Typography>
-                    <Typography> {leadDetails?.contact_obj?.secondary_number}</Typography>
+                    <Typography> {contactDetails?.secondary_number}</Typography>
                   </Grid>
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
-                      Date of Birth
+                      Job title
                     </Typography>
-                    <Typography> {leadDetails?.contact_obj?.date_of_birth}</Typography>
+                    <Typography> {contactDetails?.title}</Typography>
                   </Grid>
+
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
-                      Do Not Call
+                      Created_By
                     </Typography>
-                    <Typography> {leadDetails?.contact_obj?.do_not_call ? 'Yes' : 'No'}</Typography>
+                    <Typography> {contactDetails?.created_by_email}</Typography>
                   </Grid>
+
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
-                      LinkedIn URL
-                    </Typography>
-                    <Typography> {leadDetails?.contact_obj?.linked_in_url}</Typography>
-                  </Grid>
-                  <Grid item md={4} sx={{ mb: 2 }}>
-                    <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
-                      {' '}
-                      Facebook URL
-                    </Typography>
-                    <Typography> {leadDetails?.contact_obj?.facebook_url}</Typography>
-                  </Grid>
-                  <Grid item md={4} sx={{ mb: 2 }}>
-                    <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
-                      {' '}
-                      Twitter Username
-                    </Typography>
-                    <Typography> {leadDetails?.contact_obj?.twitter_username}</Typography>
-                  </Grid>
-                  <Grid item md={4} sx={{ mb: 2 }}>
-                    <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
-                      {' '}
-                      Created By
+                      Created_at
                     </Typography>
                     <Typography>
                       {' '}
-                      {leadDetails?.contact_obj?.created_by?.email}
+                      {new Date(
+                        contactDetails?.created_at || ''
+                      ).toLocaleDateString()}
                     </Typography>
                   </Grid>
-                  <Grid item md={4} sx={{ mb: 2 }}>
-                    <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
-                      {' '}
-                      Created At
-                    </Typography>
-                    <Typography>
-                      {' '}
-                      {new Date(leadDetails?.contact_obj?.created_at || '').toLocaleDateString()}
-                    </Typography>
-                  </Grid>
+
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
                       Address
                     </Typography>
                     <Typography>
-                      {' '}
-                      {leadDetails?.contact_obj?.country}{' '}
-                      {leadDetails?.contact_obj?.state}{' '}
-                      {leadDetails?.contact_obj?.city}{' '}
-                      {leadDetails?.contact_obj?.street}
+                      {contactDetails?.address?.address_line}{' '}
+                      {contactDetails?.address?.street}{' '}
+                      {contactDetails?.address?.city}{' '}
+                      {contactDetails?.address?.state}{' '}
+                      {contactDetails?.address?.country}{' '}
+                      {contactDetails?.address?.postcode}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -465,9 +385,9 @@ export default function ContactDetails() {
           <Box sx={{ width: '35%' }}>
             <Box
               sx={{
-                        display: 'flex',
+                display: 'flex',
                 flexDirection: 'column',
-                        justifyContent: 'center',
+                justifyContent: 'center',
                 alignItems: 'center',
                 gap: 2,
               }}
@@ -483,10 +403,10 @@ export default function ContactDetails() {
               >
                 <Box
                   sx={{
-                      display: 'flex',
-                    justifyContent: 'space-bettween',
+                    display: 'flex',
+                    justifyContent: 'space-between',
                     alignItems: 'center',
-                    gap: 16,
+
                     padding: 2,
                     borderBottom: 1,
                   }}
@@ -514,7 +434,7 @@ export default function ContactDetails() {
                   </Button>
                 </Box>
                 <Box sx={{ padding: 2 }}>
-                  <Box sx={{ minHeight:100 }}>
+                  <Box sx={{ minHeight: 100 }}>
                     {attachmens.map((file, index) => {
                       const url = URL.createObjectURL(file)
                       return (
@@ -549,12 +469,24 @@ export default function ContactDetails() {
                     </Button>
                     <Button
                       variant="contained"
-                  size="small"
-                      onClick={() => saveAttachment(parseInt(state?.contactId || '0'))}
+                      size="small"
+                      onClick={() => saveAttachment(state?.contactId || '0')}
                     >
                       {' '}
                       Save
                     </Button>
+                  </Box>
+                  <Box sx={{ mt: 1 }}>
+                    {recievedAttachments.map((attachment, index) => (
+                      <ListItem key={attachment.id}>
+                        <a
+                          href={attachment.file_path}
+                          download={attachment.file_name}
+                        >
+                          {attachment.file_name}
+                        </a>
+                      </ListItem>
+                    ))}
                   </Box>
                 </Box>
               </Box>
@@ -581,15 +513,15 @@ export default function ContactDetails() {
                   <Typography>Notes</Typography>
                 </Box>
                 <Box sx={{ padding: 2 }}>
-                <TextField
+                  <TextField
                     multiline
                     rows={4}
                     fullWidth
                     placeholder="Add a note..."
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
-                  variant="outlined"
-                  size="small"
+                    variant="outlined"
+                    size="small"
                   />
                   <Box
                     sx={{
@@ -609,7 +541,7 @@ export default function ContactDetails() {
                     </Button>
                     <Button
                       variant="contained"
-                  size="small"
+                      size="small"
                       onClick={() => saveComment(state?.contactId || '')}
                     >
                       {' '}
@@ -617,11 +549,57 @@ export default function ContactDetails() {
                     </Button>
                   </Box>
                 </Box>
+                <Box>
+                  {recievedComments.map((comment, index) => (
+                    <ListItem
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 2,
+                        alignItems: 'flex-start',
+                      }}
+                    >
+                      <Box>
+                        <Box>
+                          <Avatar sx={{ backgroundColor: '#1976d2' }}></Avatar>
+                          <Typography>
+                            {comment?.commented_by?.email}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          {new Date(comment.commented_on).toLocaleString(
+                            'nl-NL',
+                            {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            }
+                          )}
+                        </Box>
+                      </Box>
+                      <Box
+                        sx={{
+                          padding: 2,
+                          border: 1,
+                          borderColor: '#c0b8b8ff',
+                          borderRadius: 4,
+                          width: '90%',
+                        }}
+                      >
+                        {comment.comment}
+                      </Box>
+
+                      {/* <Typography>{comment?.commented_by?.email}</Typography> */}
+                    </ListItem>
+                  ))}
+                </Box>
               </Box>
             </Box>
           </Box>
-          </Box>
         </Box>
+      </Box>
     </Box>
   )
 }
