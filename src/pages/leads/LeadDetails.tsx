@@ -370,7 +370,7 @@ export default function LeadDetails() {
       org: localStorage.getItem('org'),
     }
     const body = JSON.stringify({
-      status: 'Converted',
+      status: 'converted',
     })
     try {
       const response = await fetchData(

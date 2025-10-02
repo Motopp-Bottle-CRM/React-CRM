@@ -297,7 +297,8 @@ export default function Dashboard() {
               <Box sx={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
                 {/* Lead List */}
                 <ol style={{ paddingLeft: "16px", margin: 0, flex: 1, overflowY: "auto" }}>
-                  {item.data?.slice(-4).map((entry: any, idx: number) => (
+                 
+                  {item.data?.slice(0, 4).map((entry: any, idx: number) => (
                     <li key={idx} style={{ marginBottom: 4, listStyleType: "decimal" }}>
                       <Link
                         to={`/app/leads/lead-details/${entry.id}`}
@@ -449,7 +450,7 @@ export default function Dashboard() {
               color: "#000000",
             }}
           >
-            Contacts by source
+            LeadstoContacts by source
           </Typography>
 
           <Box sx={{ display: "flex", alignItems: "center", gap: "6px" }}>
@@ -577,8 +578,13 @@ export default function Dashboard() {
                           fontWeight: 500,
                         }}
                       >
-                        {entry.name || entry.title || `#${entry.id ?? idx}`}
+                       {entry.first_name} {entry.last_name}
                       </Link>
+                      <div style={{ fontSize: "12px", color: "#555", marginTop: 2 }}>
+                        <div><strong>Org.:</strong> {entry.organization || '-'}<strong> Job :</strong> {entry.title || '-'}</div>
+                        <span>{new Date(entry.created_at).toLocaleDateString()}</span>
+                        <span style={{ color: "#1A3353" }}>{entry.created_by.email}</span>
+                      </div>
                     </li>
                   ))}
                 </ol>
