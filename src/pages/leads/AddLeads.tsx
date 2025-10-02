@@ -141,7 +141,7 @@ export function AddLeads() {
     assigned_to: [],
     contacts: [],
     status: 'assigned',
-    source: 'call',
+    source: '',
     address_line: '',
     street: '',
     city: '',
@@ -176,7 +176,6 @@ export function AddLeads() {
         console.log('Error fetching companies:', error)
       })
   }, [])
-
 
   const handleChange2 = (title: any, val: any) => {
     // const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -215,7 +214,6 @@ export function AddLeads() {
     }
   }
 
-
   const resetQuillToInitialState = () => {
     // Reset the Quill editor to its initial state
     setFormData({ ...formData, description: '' })
@@ -236,6 +234,11 @@ export function AddLeads() {
     if (!formData.title || formData.title.trim() === '') {
       setError(true)
       setErrors({ general: ['Lead Name is required'] })
+      return
+    }
+    if (!formData.source || formData.source.trim() === '') {
+      setError(true)
+      setErrors({ general: ['choosing source is required'] })
       return
     }
 
@@ -298,7 +301,9 @@ export function AddLeads() {
       probability: Math.round(Math.min(formData.probability, 100)),
       industry: formData.industry,
       linkedin_id: formData.linkedin_id,
-      ...(formData.country && typeof formData.country === 'string' && formData.country.trim() !== '' && { country: formData.country })
+      ...(formData.country &&
+        typeof formData.country === 'string' &&
+        formData.country.trim() !== '' && { country: formData.country }),
     }
 
     fetchData(`${LeadUrl}/`, 'POST', JSON.stringify(data), Header)
@@ -307,6 +312,7 @@ export function AddLeads() {
         if (!res.error) {
           setSuccessMessage('Lead created successfully!')
           setError(false)
+          console.log('Lead created successfully:', res)
           // Show success message for 1 second before navigating
           setTimeout(() => {
             resetForm()
@@ -678,6 +684,7 @@ export function AddLeads() {
                             width: '70%',
                             '& .MuiInputBase-root': {
                               padding: '4px 8px',
+                              borderLeft: '3px solid red',
                             },
                             '& .MuiAutocomplete-inputRoot': {
                               paddingLeft: 1,
@@ -768,8 +775,15 @@ export function AddLeads() {
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Lead Source</div>
-                        <FormControl sx={{ width: '70%' }}>
+                        <FormControl
+                          sx={{
+                            width: '70%',
+                            borderLeft: '3px solid red',
+                            height: '40px',
+                          }}
+                        >
                           <Select
+                            placeholder="Select source"
                             name="source"
                             value={formData.source}
                             open={sourceSelectOpen}
@@ -796,13 +810,31 @@ export function AddLeads() {
                           >
                             {[
                               { value: '', label: 'Select source' },
-                              { value: 'referrals', label: 'Referrals & Recommendations' },
-                              { value: 'marketing', label: 'Digital Content & SEO' },
-                              { value: 'advertisement', label: 'Paid Ads (Google, LinkedIn, Meta)' },
-                              { value: 'networking', label: 'Networking & Professional Platforms' },
-                              { value: 'events', label: 'Events & Trade Shows' },
-                              { value: 'campaign', label: 'Email/Call Campaigns' },
-                              { value: 'other', label: 'Other' }
+                              {
+                                value: 'referrals',
+                                label: 'Referrals & Recommendations',
+                              },
+                              {
+                                value: 'marketing',
+                                label: 'Digital Content & SEO',
+                              },
+                              {
+                                value: 'advertisement',
+                                label: 'Paid Ads (Google, LinkedIn, Meta)',
+                              },
+                              {
+                                value: 'networking',
+                                label: 'Networking & Professional Platforms',
+                              },
+                              {
+                                value: 'events',
+                                label: 'Events & Trade Shows',
+                              },
+                              {
+                                value: 'campaign',
+                                label: 'Email/Call Campaigns',
+                              },
+                              { value: 'other', label: 'Other' },
                             ].map((option) => (
                               <MenuItem key={option.value} value={option.value}>
                                 {option.label}
