@@ -297,7 +297,7 @@ export default function Dashboard() {
               <Box sx={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
                 {/* Lead List */}
                 <ol style={{ paddingLeft: "16px", margin: 0, flex: 1, overflowY: "auto" }}>
-                  {item.data?.slice(-4).map((entry: any, idx: number) => (
+                  {item.data?.slice(0,4).map((entry: any, idx: number) => (
                     <li key={idx} style={{ marginBottom: 4, listStyleType: "decimal" }}>
                       <Link
                         to={`/app/leads/lead-details/${entry.id}`}
@@ -528,8 +528,8 @@ export default function Dashboard() {
             flexDirection: "column",
             gap: 5,
             marginLeft: 5,
-            flex: "0 0 200px",    // fixed width
-            // small gap from chart if needed
+            flex: "0 0 200px",  // fixed width
+            // Removed extra margin or spacing to bring it closer to chart
           }}
         >
           {AllRecent_contacts_data.map((item) => (
@@ -560,29 +560,67 @@ export default function Dashboard() {
               >
                 {item.icon} {item.title}
               </Typography>
+                <Box sx={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
+                  {/* Scrollable list */}
+                  <Box sx={{ flex: 1, overflow: "auto" }}>
+                    <ol style={{ paddingLeft: "16px", margin: 0 }}>
+                      {item.data?.slice(-5).map((entry: any, idx: number) => (
+                        <li key={idx} style={{ marginBottom: "4px", listStyleType: "decimal" }}>
+                          <Link
+                            to={`/app/contacts/contact-details/${entry.id}`}
+                            style={{
+                              textDecoration: "none",
+                              color: "#1A3353",
+                              fontSize: "14px",
+                              fontWeight: 500,
+                            }}
+                          >
+                            {entry.first_name && entry.last_name
+                              ? `${entry.first_name} ${entry.last_name}`.trim()
+                              : entry.primary_email || entry.name || entry.title || `#${entry.id ?? idx}`}
+                            {entry.organization && (
+                              <span
+                                style={{
+                                  display: "inline-block",
+                                  backgroundColor: "#22c55e",
+                                  color: "#ffffff",
+                                  borderRadius: "12px",
+                                  padding: "2px 8px",
+                                  fontSize: "0.5rem",
+                                  fontWeight: "bold",
+                                  textAlign: "center",
+                                  whiteSpace: "nowrap",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  maxWidth: 80,
+                                  marginLeft: 4,
+                                }}
+                              >
+                                {entry.organization.substring(0, 8)}
+                              </span>
+                            )}
+                          </Link>
+                        </li>
+                      ))}
+                    </ol>
+                  </Box>
 
-              <Box sx={{ overflow: "auto", flex: 1 }}>
-                <ol style={{ paddingLeft: "16px", margin: 0 }}>
-                  {item.data?.slice(-5).map((entry: any, idx: number) => (
-                    <li
-                      key={idx}
-                      style={{ marginBottom: "4px", listStyleType: "decimal" }}
+                  {/* "More contacts" link pinned to bottom */}
+                  <Box sx={{ display: "flex", justifyContent: "flex-end", mt: "auto", pt: 1 }}>
+                    <Link
+                      to={`/app/contacts/`}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        textDecoration: "none",
+                      }}
                     >
-                      <Link
-                        to={`/leads/lead-details/${entry.id}`}
-                        style={{
-                          textDecoration: "none",
-                          color: "#1A3353",
-                          fontSize: "14px",
-                          fontWeight: 500,
-                        }}
-                      >
-                        {entry.name || entry.title || `#${entry.id ?? idx}`}
-                      </Link>
-                    </li>
-                  ))}
-                </ol>
-              </Box>
+                      <span style={{ fontSize: "0.8rem", color: "#1A3353" }}>more contacts</span>
+                      <FaArrowRight size={12} color="#1A3353" />
+                    </Link>
+                  </Box>
+                </Box>
             </Paper>
           ))}
         </Box>

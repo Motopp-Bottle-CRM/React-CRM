@@ -103,15 +103,29 @@ export default function ContactDetails() {
   const [recievedAttachments, setRecievedAttachments] = useState<RecievedAttachments[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    getContactDetails()
-    if (state?.contactId) {
-      getComment(state.contactId)
-      getAttachment(parseInt(state.contactId))
-    }
-  }, [state?.contactId])
+  // useEffect(() => {
+  //   getContactDetails()
+  //   if (state?.contactId) {
+  //     getComment(state.contactId)
+  //     getAttachment(parseInt(state.contactId))
+  //   }
+  // }, [state?.contactId])
 
-  const getContactDetails = async () => {
+  const { contactId: paramLeadId } = useParams<{ contactId: string }>();
+  const contactId = state?.contactId ?? paramLeadId;
+  const contactIdNumber = contactId ? Number(contactId) : null;
+  useEffect(() => {
+    if (!contactId) return;
+
+    getContactDetails(contactId);
+    // getComment(contactId);
+    // getAttachment(contactId);
+    // if (leadIdNumber !== null) {
+    //   getAttachment(leadIdNumber);
+    // }
+  }, [contactId, contactIdNumber]);
+
+  const getContactDetails = async (id: string) => {
     const Header = {
       Accept: 'application/json',
       'Content-Type': 'application/json',
@@ -120,7 +134,7 @@ export default function ContactDetails() {
     }
     try {
       const response = await fetchData(
-        `${ContactUrl}/${state?.contactId}/`,
+        `${ContactUrl}/${id}/`,
         'GET',
         null as any,
         Header
