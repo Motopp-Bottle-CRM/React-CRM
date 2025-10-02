@@ -31,6 +31,7 @@ import {
 import { json } from 'stream/consumers'
 import { ConvertModel } from '../../components/ConvertModel'
 import zIndex from 'material-ui/styles/zIndex'
+import { get } from 'http';
 export default function LeadDetails() {
   interface RecievedComments {
     id: string
@@ -158,10 +159,8 @@ export default function LeadDetails() {
 
     getLeadDetails(leadId);
     getComment(leadId);
+    getAttachment(leadId);
 
-    if (leadIdNumber !== null) {
-      getAttachment(leadIdNumber);
-    }
   }, [leadId, leadIdNumber]);
 
 
