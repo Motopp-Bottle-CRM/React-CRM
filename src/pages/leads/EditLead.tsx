@@ -344,7 +344,11 @@ export function EditLead() {
       return
     }
 
-    // Company is now optional - no validation needed
+    if (!formData.company || formData.company.trim() === '') {
+      setError(true);
+      setErrors({ general: ['Company name is required'] });
+      return;
+    }
 
     if (!formData.first_name && !formData.last_name) {
       setError(true)
