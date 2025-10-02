@@ -262,25 +262,25 @@ function EditContact() {
   }
   // console.log(formData, 'editform')
   return (
-    <Box sx={{ mt: '60px' }}>
-      <CustomAppBar
-        backbtnHandle={backbtnHandle}
-        module={module}
-        crntPage={crntPage}
-        backBtn={backBtn}
-        onCancel={onCancel}
-        onSubmit={handleSubmit}
-      />
-      <Box sx={{ mt: '120px' }}>
-        {/* Success Message Alert */}
-        {successMessage && (
-          <Box sx={{ mb: 2, px: 2 }}>
-            <Alert severity="success" onClose={() => setSuccessMessage('')}>
-              {successMessage}
-            </Alert>
-          </Box>
-        )}
-        <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit}>
+      <Box sx={{ mt: '60px' }}>
+        <CustomAppBar
+          backbtnHandle={backbtnHandle}
+          module={module}
+          crntPage={crntPage}
+          backBtn={backBtn}
+          onCancel={onCancel}
+          onSubmit={handleSubmit}
+        />
+        <Box sx={{ mt: '120px' }}>
+          {/* Success Message Alert */}
+          {successMessage && (
+            <Box sx={{ mb: 2, px: 2 }}>
+              <Alert severity="success" onClose={() => setSuccessMessage('')}>
+                {successMessage}
+              </Alert>
+            </Box>
+          )}
           {/* lead details */}
           <div style={{ padding: '10px' }}>
             <div className="leadContainer">
@@ -784,9 +784,9 @@ function EditContact() {
               </Accordion>
             </div>
           </div>
-        </form>
+        </Box>
       </Box>
-    </Box>
+    </form>
   )
 }
 

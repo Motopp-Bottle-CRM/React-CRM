@@ -146,7 +146,7 @@ export function CustomAppBar(props: any) {
             </div>
             <div>
               <Button
-                // type='submit'
+                type="submit"
                 className="header-button"
                 onClick={onSubmit}
                 variant="contained"
