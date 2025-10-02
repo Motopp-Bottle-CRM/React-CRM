@@ -46,11 +46,6 @@ export default function ContactDetails() {
     file_name: string
     file_path: string
   }
-  interface CreatedBy {
-    id: string
-    email: string
-    profile_pic: string | null
-  }
 
   interface Contact {
     id: string
@@ -67,17 +62,13 @@ export default function ContactDetails() {
     language: string
     do_not_call: boolean
     department: string
-    address_line: string
-    street: string
-    city: string
-    state: string
-    country: string
-    postcode: string
+    address: Address
     description: string
     linked_in_url: string
     facebook_url: string
     twitter_username: string
-    created_by: CreatedBy
+    created_by: string
+    created_by_email: string
     created_at: string
     is_active: boolean
   }
@@ -93,20 +84,22 @@ export default function ContactDetails() {
 
   const navigate = useNavigate()
   const { state } = useLocation()
-  const [contactDetails, setContactDetails] = useState<{
-    contact_obj: Contact
-  } | null>(null)
+  const [contactDetails, setContactDetails] = useState<Contact>([] as any)
 
   const [comment, setComment] = useState('')
-  const [recievedComments, setRecievedComments] = useState<RecievedComments[]>([])
+  const [recievedComments, setRecievedComments] = useState<RecievedComments[]>(
+    []
+  )
   const [attachmens, setAttachments] = useState<File[]>([])
-  const [recievedAttachments, setRecievedAttachments] = useState<RecievedAttachments[]>([])
+  const [recievedAttachments, setRecievedAttachments] = useState<
+    RecievedAttachments[]
+  >([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     getContactDetails()
     if (state?.contactId) {
-       getComment(state.contactId)
+      getComment(state.contactId)
       // getAttachment(state.contactId)
     }
   }, [state?.contactId])
@@ -125,7 +118,8 @@ export default function ContactDetails() {
         null as any,
         Header
       )
-      setContactDetails(response)
+
+      setContactDetails(response?.contact_obj)
       setLoading(false)
     } catch (error) {
       console.log('error', error)
@@ -166,7 +160,6 @@ export default function ContactDetails() {
     navigate('/app/contacts/')
   }
   const saveAttachment = async (id: string) => {
-
     if (attachmens.length === 0) return
 
     const formData = new FormData()
@@ -194,21 +187,23 @@ export default function ContactDetails() {
     }
   }
 
-  const getAttachment = async(id:string)=>{
+  const getAttachment = async (id: string) => {
     const Header = {
       Authorization: localStorage.getItem('Token'),
       org: localStorage.getItem('org'),
     }
     try {
-      const response = await fetchData(`contacts/attachment/${id}/`, 'GET', null as any, Header )
+      const response = await fetchData(
+        `contacts/attachment/${id}/`,
+        'GET',
+        null as any,
+        Header
+      )
       setRecievedAttachments(response)
-      console.log("success")
-
+      console.log('success')
     } catch (error) {
-      console.log("faild to get all attachments", error)
-
+      console.log('faild to get all attachments', error)
     }
-
   }
   const saveComment = async (id: string) => {
     const Header = {
@@ -240,8 +235,8 @@ export default function ContactDetails() {
     navigate('/app/contacts/edit-contact', {
       state: {
         id: state?.contactId,
-        value: contactDetails?.contact_obj
-      }
+        value: contactDetails,
+      },
     })
   }
 
@@ -255,11 +250,11 @@ export default function ContactDetails() {
 
   return (
     <Box sx={{ mt: '60px' }}>
-        <CustomAppBar
-          backbtnHandle={backbtnHandle}
-          module={module}
-          backBtn={backBtn}
-          crntPage={crntPage}
+      <CustomAppBar
+        backbtnHandle={backbtnHandle}
+        module={module}
+        backBtn={backBtn}
+        crntPage={crntPage}
         onEdit={editHandle}
       />
       <Box sx={{ mt: '120px' }}>
@@ -273,7 +268,7 @@ export default function ContactDetails() {
                 borderColor: 'grey.300',
                 padding: 3,
                 boxShadow: 3,
-                mb: 2,
+                m: 2,
               }}
             >
               <Typography
@@ -290,7 +285,8 @@ export default function ContactDetails() {
                       Full Name
                     </Typography>
                     <Typography sx={{ color: 'gray.900' }}>
-                      {contactDetails?.contact_obj?.first_name} {contactDetails?.contact_obj?.last_name}
+                      {contactDetails?.first_name}
+                      {contactDetails?.last_name}
                     </Typography>
                   </Grid>
                   <Grid item md={4}>
@@ -299,15 +295,8 @@ export default function ContactDetails() {
                       Email
                     </Typography>
                     <Typography sx={{ color: 'gray.900' }}>
-                      {contactDetails?.contact_obj?.primary_email}
+                      {contactDetails?.primary_email}
                     </Typography>
-                  </Grid>
-                  <Grid item md={4}>
-                    <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
-                      {' '}
-                      Mobile Number
-                    </Typography>
-                    <Typography> {contactDetails?.contact_obj?.mobile_number}</Typography>
                   </Grid>
                 </Grid>
               </Box>
@@ -320,6 +309,7 @@ export default function ContactDetails() {
                 borderColor: 'grey.300',
                 padding: 3,
                 boxShadow: 3,
+                m: 2,
               }}
             >
               <Typography
@@ -333,83 +323,60 @@ export default function ContactDetails() {
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
-                      Organization
+                      Mobile Number
                     </Typography>
-                    <Typography> {contactDetails?.contact_obj?.organization}</Typography>
+                    <Typography> {contactDetails?.mobile_number}</Typography>
                   </Grid>
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
-                      Department
+                      Secondary Number
                     </Typography>
-                    <Typography> {contactDetails?.contact_obj?.department}</Typography>
+                    <Typography> {contactDetails?.secondary_number}</Typography>
                   </Grid>
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
                       Job title
                     </Typography>
-                    <Typography> {contactDetails?.contact_obj?.title}</Typography>
+                    <Typography> {contactDetails?.title}</Typography>
                   </Grid>
-                  
+
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
-                      Secondary Number
+                      Created_By
                     </Typography>
-                    <Typography> {contactDetails?.contact_obj?.secondary_number}</Typography>
+                    <Typography> {contactDetails?.created_by_email}</Typography>
                   </Grid>
-                 
+
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
-                      Do Not Call
-                    </Typography>
-                    <Typography> {contactDetails?.contact_obj?.do_not_call ? 'Yes' : 'No'}</Typography>
-                  </Grid>
-                  
-                  <Grid item md={4} sx={{ mb: 2 }}>
-                    <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
-                      {' '}
-                      LinkedIn URL
-                    </Typography>
-                    <Typography>
-                      {contactDetails?.contact_obj?.linked_in_url ? (
-                        <a
-                          href={contactDetails.contact_obj.linked_in_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{ color: '#1A3353', textDecoration: 'underline' }}
-                        >
-                          LinkedIn
-                        </a>
-                      ) : (
-                        ' '
-                      )}
-                    </Typography>
-                  </Grid>
-                  
-                  <Grid item md={4} sx={{ mb: 2 }}>
-                    <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
-                      {' '}
-                      Created By
+                      Created_at
                     </Typography>
                     <Typography>
                       {' '}
-                      {contactDetails?.contact_obj?.created_by?.email}
+                      {new Date(
+                        contactDetails?.created_at || ''
+                      ).toLocaleDateString()}
                     </Typography>
                   </Grid>
+
                   <Grid item md={4} sx={{ mb: 2 }}>
                     <Typography sx={{ color: '#2b6ac4ff', fontWeight: 500 }}>
                       {' '}
-                      Created At
+                      Address
                     </Typography>
                     <Typography>
-                      {' '}
-                      {new Date(contactDetails?.contact_obj?.created_at || '').toLocaleDateString()}
+                      {contactDetails?.address?.address_line}{' '}
+                      {contactDetails?.address?.street}{' '}
+                      {contactDetails?.address?.city}{' '}
+                      {contactDetails?.address?.state}{' '}
+                      {contactDetails?.address?.country}{' '}
+                      {contactDetails?.address?.postcode}
                     </Typography>
                   </Grid>
-                  
                 </Grid>
               </Box>
             </Box>
@@ -417,7 +384,7 @@ export default function ContactDetails() {
           <Box sx={{ width: '35%' }}>
             <Box
               sx={{
-                  display: 'flex',
+                display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -436,9 +403,9 @@ export default function ContactDetails() {
                 <Box
                   sx={{
                     display: 'flex',
-                    justifyContent: 'space-bettween',
+                    justifyContent: 'space-between',
                     alignItems: 'center',
-                    gap: 16,
+
                     padding: 2,
                     borderBottom: 1,
                   }}
@@ -466,7 +433,7 @@ export default function ContactDetails() {
                   </Button>
                 </Box>
                 <Box sx={{ padding: 2 }}>
-                  <Box sx={{ minHeight:100 }}>
+                  <Box sx={{ minHeight: 100 }}>
                     {attachmens.map((file, index) => {
                       const url = URL.createObjectURL(file)
                       return (
@@ -533,15 +500,15 @@ export default function ContactDetails() {
                   <Typography>Notes</Typography>
                 </Box>
                 <Box sx={{ padding: 2 }}>
-                <TextField
+                  <TextField
                     multiline
                     rows={4}
                     fullWidth
                     placeholder="Add a note..."
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
-                  variant="outlined"
-                  size="small"
+                    variant="outlined"
+                    size="small"
                   />
                   <Box
                     sx={{
