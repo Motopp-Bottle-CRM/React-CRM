@@ -11,7 +11,7 @@ export function CustomAppBar(props: any) {
   const navigate = useNavigate()
   const {
     backbtnHandle,
-    editHandle,
+    onEdit,
     module,
     crntPage,
     backBtn,
@@ -96,7 +96,7 @@ export function CustomAppBar(props: any) {
                 variant="contained"
                 className="header-button"
                 size="small"
-                onClick={editHandle}
+                onClick={onEdit}
                 startIcon={<FaEdit style={{ fill: 'white', width: '16px' }} />}
                 style={{
                   textTransform: 'capitalize',
