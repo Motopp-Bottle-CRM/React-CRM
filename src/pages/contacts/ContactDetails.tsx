@@ -93,6 +93,7 @@ export default function ContactDetails() {
 
   const navigate = useNavigate()
   const { state } = useLocation()
+  const { id } = useParams()
   const [leadDetails, setLeadDetails] = useState<{
     contact_obj: Contact
   } | null>(null)
@@ -103,13 +104,16 @@ export default function ContactDetails() {
   const [recievedAttachments, setRecievedAttachments] = useState<RecievedAttachments[]>([])
   const [loading, setLoading] = useState(true)
 
+  // Get contact ID from either state or URL params
+  const contactId = state?.contactId || id
+
   useEffect(() => {
-    getContactDetails()
-    if (state?.contactId) {
-      getComment(state.contactId)
-      getAttachment(parseInt(state.contactId))
+    if (contactId) {
+      getContactDetails()
+      getComment(contactId)
+      getAttachment(parseInt(contactId))
     }
-  }, [state?.contactId])
+  }, [contactId])
 
   const getContactDetails = async () => {
     const Header = {
@@ -120,7 +124,7 @@ export default function ContactDetails() {
     }
     try {
       const response = await fetchData(
-        `${ContactUrl}/${state?.contactId}/`,
+        `${ContactUrl}/${contactId}/`,
         'GET',
         null as any,
         Header
@@ -237,9 +241,14 @@ export default function ContactDetails() {
     }
   }
   const editHandle = () => {
+    if (!contactId) {
+      console.error('No contact ID available for editing')
+      return
+    }
+    
     navigate('/app/contacts/edit-contact', {
       state: {
-        id: state?.contactId,
+        id: contactId,
         value: leadDetails?.contact_obj
       }
     })
@@ -260,7 +269,8 @@ export default function ContactDetails() {
           module={module}
           backBtn={backBtn}
           crntPage={crntPage}
-        onEdit={editHandle}
+          editHandle={editHandle}
+          detail={!!contactId}
         />
       <Box sx={{ mt: '120px' }}>
         <Box sx={{ display: 'flex', gap: 2, width: '100%' }}>

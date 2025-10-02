@@ -334,7 +334,7 @@ export function EditCase() {
                             // options={state.contacts || []}
                             // getOptionLabel={(option: any) => state.contacts ? option?.first_name : option}
                             options={
-                              state?.contacts?.length
+                              state?.contacts && state?.contacts.length > 0
                                 ? state?.contacts.filter(
                                     (option: any) =>
                                       !selectedContacts.some(
@@ -345,7 +345,7 @@ export function EditCase() {
                                 : []
                             }
                             getOptionLabel={(option: any) =>
-                              state?.contacts?.length
+                              state?.contacts && state?.contacts.length > 0
                                 ? option?.first_name
                                 : option
                             }
@@ -462,7 +462,7 @@ export function EditCase() {
                             value={selectedTeams}
                             multiple
                             limitTags={5}
-                            options={state?.teams?.length || []}
+                            options={state?.teams || []}
                             getOptionLabel={(option: any) => option}
                             onChange={(e: any, value: any) =>
                               handleChange2('teams', value)
@@ -567,7 +567,7 @@ export function EditCase() {
                             multiple
                             value={selectedAssignTo}
                             limitTags={2}
-                            options={state?.users?.length || []}
+                            options={state?.users || []}
                             getOptionLabel={(option: any) =>
                               state?.users?.length
                                 ? option?.user__email

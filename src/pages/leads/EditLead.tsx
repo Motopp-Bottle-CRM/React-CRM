@@ -789,7 +789,7 @@ export function EditLead() {
                             },
                           }}
                           freeSolo
-                          options={companies}
+                          options={companies || []}
                           getOptionLabel={(option) =>
                             typeof option === 'string' ? option : option.name
                           }

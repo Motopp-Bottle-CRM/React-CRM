@@ -134,6 +134,7 @@ export default function LeadDetails() {
   }
   const navigate = useNavigate()
   const { state } = useLocation()
+  const { id } = useParams()
   const [leadDetails, setLeadDetails] = useState<LeadDetailsReponse | null>(
     null
   )
@@ -394,6 +395,7 @@ export default function LeadDetails() {
         backBtn={backBtn}
         crntPage={crntPage}
         editHandle={editHandle}
+        detail={!!(state?.leadId || id)}
       />
       <Box sx={{ mt: 15, position: 'relative' }}>
         <Box sx={{ display: 'flex' }}>

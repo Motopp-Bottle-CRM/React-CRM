@@ -18,6 +18,7 @@ export function CustomAppBar(props: any) {
     onCancel,
     onSubmit,
     isSubmitting = false,
+    detail = false,
   } = props
 
   const Module = module.toLowerCase()
@@ -72,7 +73,7 @@ export function CustomAppBar(props: any) {
             </Link>
           </Breadcrumbs>
         </div>
-        {location.state?.detail ? (
+        {(location.state?.detail || detail) ? (
           <div className="saveClose">
             <div style={{ marginRight: '10px' }}>
               <Button

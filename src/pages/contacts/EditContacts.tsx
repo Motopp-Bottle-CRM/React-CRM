@@ -173,6 +173,7 @@ function EditContact() {
   }
 
   const handleSubmit = (e: any) => {
+    console.log('EditContacts: handleSubmit called')
     e.preventDefault()
     submitForm()
   }
@@ -186,17 +187,34 @@ function EditContact() {
   }
 
   const submitForm = () => {
+    console.log('EditContacts: submitForm called')
+    console.log('EditContacts: Current formData:', formData)
+    
+    // Basic validation
+    if (!formData.first_name || !formData.last_name || !formData.primary_email) {
+      console.log('EditContacts: Validation failed - missing required fields')
+      setError(true)
+      setSuccessMessage('')
+      setErrors({
+        first_name: !formData.first_name ? ['First name is required'] : [],
+        last_name: !formData.last_name ? ['Last name is required'] : [],
+        primary_email: !formData.primary_email ? ['Primary email is required'] : []
+      })
+      return
+    }
+    
     const Header = {
       Accept: 'application/json',
       'Content-Type': 'application/json',
       Authorization: localStorage.getItem('Token'),
       org: localStorage.getItem('org'),
     }
-    // console.log('Form data:', data);
+    console.log('EditContacts: Headers:', Header)
     const data = {
       salutation: formData.salutation,
       first_name: formData.first_name,
       last_name: formData.last_name,
+      date_of_birth: formData.date_of_birth || null,
       organization: formData.organization,
       title: formData.title,
       primary_email: formData.primary_email,
@@ -211,12 +229,16 @@ function EditContact() {
       street: formData.street,
       city: formData.city,
       state: formData.state,
+      postcode: formData.postcode,
       description: formData.description,
       linked_in_url: formData.linked_in_url,
       facebook_url: formData.facebook_url,
       twitter_username: formData.twitter_username,
     }
-    // console.log(data, 'edit')
+    console.log('EditContacts: Data being sent:', data)
+    console.log('EditContacts: Contact ID:', state?.id)
+    console.log('EditContacts: API URL:', `${ContactUrl}/${state?.id}/`)
+    
     fetchData(
       `${ContactUrl}/${state?.id}/`,
       'PUT',
@@ -224,32 +246,35 @@ function EditContact() {
       Header
     )
       .then((res: any) => {
-        console.log('Form data:', res)
+        console.log('EditContacts: API Response:', res)
         if (!res.error) {
+          console.log('EditContacts: Success - Contact updated')
           setSuccessMessage('Contact updated successfully!')
           setError(false)
-          // Show success message for 1 second before navigating
+          setErrors({})
+          // Show success message for 2 seconds before navigating
           setTimeout(() => {
             backbtnHandle()
-          }, 1000)
-        }
-        if (res.error) {
+          }, 2000)
+        } else {
+          console.log('EditContacts: API Error:', res.error)
           setError(true)
           setSuccessMessage('')
-          setErrors(res?.errors?.contact_errors)
+          setErrors(res?.errors?.contact_errors || {})
         }
       })
       .catch((err: any) => {
         console.error('Edit contact failed with errors:', err)
+        console.error('Edit contact error details:', JSON.stringify(err, null, 2))
         setError(true)
         setSuccessMessage('')
-        setErrors(err?.errors?.contact_errors || {})
+        setErrors(err?.errors?.contact_errors || err?.contact_errors || {})
       })
   }
 
   const backbtnHandle = () => {
     navigate('/app/contacts/contact-details', {
-      state: { contactId: { id: state?.id }, detail: true },
+      state: { contactId: state?.id, detail: true },
     })
   }
   const module = 'Contacts'
@@ -278,6 +303,22 @@ function EditContact() {
             <Box sx={{ mb: 2, px: 2 }}>
               <Alert severity="success" onClose={() => setSuccessMessage('')}>
                 {successMessage}
+              </Alert>
+            </Box>
+          )}
+          
+          {/* Error Message Alert */}
+          {error && Object.keys(errors).length > 0 && (
+            <Box sx={{ mb: 2, px: 2 }}>
+              <Alert severity="error" onClose={() => setError(false)}>
+                Please fix the following errors:
+                <ul style={{ margin: '8px 0 0 0', paddingLeft: '20px' }}>
+                  {Object.entries(errors).map(([field, fieldErrors]) => (
+                    fieldErrors.map((error: string, index: number) => (
+                      <li key={`${field}-${index}`}>{error}</li>
+                    ))
+                  ))}
+                </ul>
               </Alert>
             </Box>
           )}
