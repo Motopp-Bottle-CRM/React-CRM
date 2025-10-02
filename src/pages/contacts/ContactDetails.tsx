@@ -100,7 +100,7 @@ export default function ContactDetails() {
     getContactDetails()
     if (state?.contactId) {
       getComment(state.contactId)
-      // getAttachment(state.contactId)
+      getAttachment(state.contactId)
     }
   }, [state?.contactId])
 
@@ -237,7 +237,6 @@ export default function ContactDetails() {
       state: {
         id: state?.contactId,
         value: contactDetails,
-
       },
     })
   }
@@ -477,6 +476,18 @@ export default function ContactDetails() {
                       Save
                     </Button>
                   </Box>
+                  <Box sx={{ mt: 1 }}>
+                    {recievedAttachments.map((attachment, index) => (
+                      <ListItem key={attachment.id}>
+                        <a
+                          href={attachment.file_path}
+                          download={attachment.file_name}
+                        >
+                          {attachment.file_name}
+                        </a>
+                      </ListItem>
+                    ))}
+                  </Box>
                 </Box>
               </Box>
 
@@ -537,6 +548,52 @@ export default function ContactDetails() {
                       Save
                     </Button>
                   </Box>
+                </Box>
+                <Box>
+                  {recievedComments.map((comment, index) => (
+                    <ListItem
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 2,
+                        alignItems: 'flex-start',
+                      }}
+                    >
+                      <Box>
+                        <Box>
+                          <Avatar sx={{ backgroundColor: '#1976d2' }}></Avatar>
+                          <Typography>
+                            {comment?.commented_by?.email}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          {new Date(comment.commented_on).toLocaleString(
+                            'nl-NL',
+                            {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            }
+                          )}
+                        </Box>
+                      </Box>
+                      <Box
+                        sx={{
+                          padding: 2,
+                          border: 1,
+                          borderColor: '#c0b8b8ff',
+                          borderRadius: 4,
+                          width: '90%',
+                        }}
+                      >
+                        {comment.comment}
+                      </Box>
+
+                      {/* <Typography>{comment?.commented_by?.email}</Typography> */}
+                    </ListItem>
+                  ))}
                 </Box>
               </Box>
             </Box>

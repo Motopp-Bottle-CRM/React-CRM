@@ -393,7 +393,7 @@ export default function LeadDetails() {
         module={module}
         backBtn={backBtn}
         crntPage={crntPage}
-        editHandle={editHandle}
+        onEdit={editHandle}
         detail={!!(state?.leadId || id)}
       />
       <Box sx={{ mt: 15, position: 'relative' }}>
