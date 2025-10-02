@@ -312,7 +312,7 @@ function EditContact() {
 
   useEffect(() => {
     setFormData(state?.value)
-    
+
     // Set countries from state if available, otherwise use fallback
     if (state?.countries?.length) {
       setCountries(state.countries)
@@ -382,7 +382,7 @@ function EditContact() {
   const submitForm = () => {
     console.log('EditContacts: submitForm called')
     console.log('EditContacts: Current formData:', formData)
-    
+
     // Basic validation
     if (!formData.first_name || !formData.last_name || !formData.primary_email) {
       console.log('EditContacts: Validation failed - missing required fields')
@@ -395,7 +395,7 @@ function EditContact() {
       })
       return
     }
-    
+
     const Header = {
       Accept: 'application/json',
       'Content-Type': 'application/json',
@@ -431,7 +431,7 @@ function EditContact() {
     console.log('EditContacts: Data being sent:', data)
     console.log('EditContacts: Contact ID:', state?.id)
     console.log('EditContacts: API URL:', `${ContactUrl}/${state?.id}/`)
-    
+
     fetchData(
       `${ContactUrl}/${state?.id}/`,
       'PUT',
@@ -499,7 +499,7 @@ function EditContact() {
               </Alert>
             </Box>
           )}
-          
+
           {/* Error Message Alert */}
           {error && Object.keys(errors).length > 0 && (
             <Box sx={{ mb: 2, px: 2 }}>
@@ -566,7 +566,7 @@ function EditContact() {
                       </div>
                     </div>
                     <div className="fieldContainer2">
-                      <div className="fieldSubContainer">
+                      {/* <div className="fieldSubContainer">
                         <div className="fieldTitle">Organization</div>
                         <RequiredTextField
                           name="organization"
@@ -582,8 +582,8 @@ function EditContact() {
                               : ''
                           }
                         />
-                      </div>
-                      <div className="fieldSubContainer">
+                      </div> */}
+                      {/* <div className="fieldSubContainer">
                         <div className="fieldTitle">Department</div>
                         <TextField
                           name="department"
@@ -597,7 +597,7 @@ function EditContact() {
                             errors?.department?.[0] ? errors?.department[0] : ''
                           }
                         />
-                      </div>
+                      </div> */}
                     </div>
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
@@ -688,13 +688,13 @@ function EditContact() {
                         />
                       </div>
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Do Not Call</div>
+                        {/* <div className="fieldTitle">Do Not Call</div>
                         <AntSwitch
                           name="do_not_call"
                           checked={formData.do_not_call}
                           onChange={handleChange}
                           sx={{ mt: '1%' }}
-                        />
+                        /> */}
                       </div>
                     </div>
                   </Box>
@@ -880,7 +880,7 @@ function EditContact() {
                         <div ref={quillRef} />
                       </div>
                     </div>
-                    
+
                   </Box>
                 </AccordionDetails>
               </Accordion>
