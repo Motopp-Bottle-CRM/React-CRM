@@ -123,7 +123,7 @@ export default function UserDetails() {
           module={module}
           backBtn={backBtn}
           crntPage={crntPage}
-          editHandle={editHandle}
+          onEdit={editHandle}
           detail={!!state?.userId}
         />
         <Box
