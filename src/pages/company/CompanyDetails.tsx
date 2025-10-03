@@ -65,7 +65,7 @@ export default function CompanyDetails() {
           module={module}
           backBtn={backBtn}
           crntPage={crntPage}
-          editHandle={editHandle}
+          onEdit={editHandle}
         />
         <Box
           sx={{
