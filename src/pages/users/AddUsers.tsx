@@ -24,7 +24,7 @@ import {
 // import isEmail from 'validator/lib/isEmail'
 
 import '../../styles/style.css'
-import { UsersUrl } from '../../services/ApiUrls'
+import { UsersUrl, SERVER } from '../../services/ApiUrls'
 import { fetchData, Header } from '../../components/FetchData'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import {
@@ -166,6 +166,20 @@ export function AddUsers() {
   }
   const handleSubmit = (e: any) => {
     e.preventDefault()
+    
+    // Clear previous errors
+    setError(false)
+    setMsg('')
+    setProfileErrors({})
+    setUserErrors({})
+    
+    // Validate phone vs alternate phone
+    if (formData.phone && formData.alternate_phone && formData.phone === formData.alternate_phone) {
+      setUserErrors({ ...userErrors, alternate_phone: ['Alternate phone cannot be the same as phone'] })
+      setError(true)
+      setMsg('Alternate phone cannot be the same as phone')
+      return
+    }
     submitForm()
   }
   const [errors, setErrors] = useState<FormErrors>({})
@@ -200,12 +214,32 @@ export function AddUsers() {
   }
 
   const submitForm = () => {
+    // Check if user is logged in
+    const token = localStorage.getItem('Token')
+    const org = localStorage.getItem('org')
+    
+    if (!token) {
+      setError(true)
+      setMsg('Please log in to create users.')
+      return
+    }
+    
+    if (!org) {
+      setError(true)
+      setMsg('Organization not found. Please log in again.')
+      return
+    }
+    
     const Header = {
       Accept: 'application/json',
       'Content-Type': 'application/json',
-      Authorization: localStorage.getItem('Token'),
-      org: localStorage.getItem('org'),
+      Authorization: token,
+      org: org,
     }
+    
+    console.log('Token:', token)
+    console.log('Org:', org)
+    console.log('Headers:', Header)
     // console.log('Form data:', data);
 
     const data = {
@@ -214,47 +248,99 @@ export function AddUsers() {
       phone: formData.phone.startsWith('+')
         ? formData.phone
         : getPhonePrefixForCountry(formData.country) + ' ' + formData.phone,
-      alternate_phone: formData.alternate_phone.startsWith('+')
-        ? formData.alternate_phone
-        : getPhonePrefixForCountry(formData.country) +
-          ' ' +
-          formData.alternate_phone,
-      address_line: formData.address_line,
-      street: formData.street,
-      city: formData.city,
-      state: formData.state,
-      postcode: formData.postcode,
-      country: getCountryNameFromCode(formData.country),
-      profile_pic: formData.profile_pic,
+      // Only include alternate_phone if it has a value
+      ...(formData.alternate_phone && {
+        alternate_phone: formData.alternate_phone.startsWith('+')
+          ? formData.alternate_phone
+          : getPhonePrefixForCountry(formData.country) +
+            ' ' +
+            formData.alternate_phone,
+      }),
+      // Only include address fields if they have values
+      ...(formData.address_line && { address_line: formData.address_line }),
+      ...(formData.street && { street: formData.street }),
+      ...(formData.city && { city: formData.city }),
+      ...(formData.state && { state: formData.state }),
+      ...(formData.postcode && { postcode: formData.postcode }),
+      // Only include country if it has a value
+      ...(formData.country && { country: formData.country }),
+      // Only include profile_pic if it has a value
+      ...(formData.profile_pic && { profile_pic: formData.profile_pic }),
       has_sales_access: formData.has_sales_access,
       has_marketing_access: formData.has_marketing_access,
       is_organization_admin: formData.is_organization_admin,
     }
 
-    fetchData(`${UsersUrl}/`, 'POST', JSON.stringify(data), Header)
+    console.log('Making API call to:', `${UsersUrl}/`)
+    console.log('Data being sent:', data)
+    console.log('Form data state:', formData)
+    
+    // Test basic API connectivity first
+    fetch(`${SERVER}${UsersUrl}/`, {
+      method: 'GET',
+      headers: Header
+    })
+    .then(response => {
+      console.log('Test API response status:', response.status)
+      if (response.status === 401) {
+        setError(true)
+        setMsg('Authentication failed. Please log in again.')
+        return
+      }
+      // Continue with the actual POST request
+      return fetchData(`${UsersUrl}/`, 'POST', JSON.stringify(data), Header)
+    })
       .then((res: any) => {
-        console.log('Form data:', res)
+        console.log('API response received:', res)
         if (!res.error) {
-          console.log('User created successfully, navigating to users page...')
           resetForm()
           // Show success message briefly, then navigate
           setMsg('User created successfully!')
+          setError(false)
           setTimeout(() => {
             navigate('/app/users?tab=inactive', { replace: true })
           }, 1000)
-        }
-        if (res.error) {
-          // profile_errors
-          // user_errors
+        } else {
+          console.log('Error response received:', res)
+          console.log('Full error details:', JSON.stringify(res, null, 2))
           setError(true)
-          setProfileErrors(res?.errors?.profile_errors)
-          setUserErrors(res?.errors?.user_errors)
+          // Handle nested error structure from backend
+          const profileErrors = res?.errors?.profile_errors || {}
+          const userErrors = res?.errors?.user_errors || {}
+          const addressErrors = res?.errors?.address_errors || {}
+          
+          console.log('Profile errors:', profileErrors)
+          console.log('User errors:', userErrors)
+          console.log('Address errors:', addressErrors)
+          
+          setProfileErrors(profileErrors)
+          setUserErrors(userErrors)
+          
+          // Show the first error message found
+          const firstError = 
+            userErrors?.email?.[0] || 
+            profileErrors?.phone?.[0] || 
+            profileErrors?.alternate_phone?.[0] ||
+            'Please correct the highlighted errors.'
+          
+          console.log('Setting error message:', firstError)
+          setMsg(firstError)
         }
       })
       .catch((error) => {
         console.error('Error creating user:', error)
         setError(true)
-        setMsg('An error occurred while creating the user.')
+        
+        // More specific error messages
+        if (error.message === 'Failed to fetch') {
+          setMsg('Unable to connect to server. Please check if the backend server is running.')
+        } else if (error.status === 500) {
+          setMsg('Server error occurred. Please try again later.')
+        } else if (error.status === 404) {
+          setMsg('API endpoint not found. Please check the server configuration.')
+        } else {
+          setMsg(`Error: ${error.message || 'An error occurred while creating the user.'}`)
+        }
       })
   }
   const resetForm = () => {

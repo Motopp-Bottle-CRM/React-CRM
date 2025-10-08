@@ -42,43 +42,49 @@ export default function Login() {
       Accept: 'application/json',
     }
 
-  fetchData(
-    `${LoginUrl}/`,
-    'POST',
-    JSON.stringify({ email, password }),
-    header
-  )
-    .then((res: any) => {
-      console.log('Response from server:', res)   // <--- Add this
-      localStorage.setItem('Token', `Bearer ${res.access}`)
-      if (res.refresh) {
-        localStorage.setItem('refreshToken', res.refresh)
-      }
-      if (res.org_id) {
-        localStorage.setItem('org', res.org_id)
-        console.log("Saving org to localStorage:", res.org_id)
-      }
-      localStorage.setItem('email', email)
-      localStorage.setItem('role', res.role)
-      console.log("Saving email to localStorage:", email)
-      setToken(true)
-      navigate('/app') // Redirect to app after successful login
-    })
-    .catch((err: any) => {
-      console.error('Login error :', err)
-      console.log("Login error details:", err)
-      if (err.email) {
-        setError(err.email) // user not found
-      } else if (err.non_field_errors) {
-        setError(err.non_field_errors[0]) // other general errors
-      } else if (err.password) {
-        setError(err.password[0]) // password validation errors
-      } else {
-        setError('An unexpected error occurred.')
-      }
-    })
-}
-
+    fetchData(
+      `${LoginUrl}/`,
+      'POST',
+      JSON.stringify({ email, password }),
+      header
+    )
+      .then((res: any) => {
+        console.log('Response from server:', res) // <--- Add this
+        localStorage.setItem('Token', `Bearer ${res.access}`)
+        if (res.refresh) {
+          localStorage.setItem('refreshToken', res.refresh)
+        }
+        if (res.org_id) {
+          localStorage.setItem('org', res.org_id)
+          console.log('Saving org to localStorage:', res.org_id)
+        }
+        localStorage.setItem('email', email)
+        localStorage.setItem('role', res.role)
+        console.log('Saving email to localStorage:', email)
+        setToken(true)
+        navigate('/app') // Redirect to app after successful login
+      })
+      .catch((err: any) => {
+        console.error('Login error :', err)
+        console.log('Login error details:', err)
+        if (err.email) {
+          setError(err.email) // user not found
+        } else if (err.non_field_errors) {
+          setError(err.non_field_errors[0]) // other general errors
+        } else if (err.password) {
+          setError(err.password[0]) // password validation errors
+        } else {
+          setError('An unexpected error occurred.')
+        }
+      })
+      .finally(() => {
+        setEmail('')
+        setPassword('')
+        setTimeout(() => {
+          setError('Try again with correct credentials')
+        }, 2000)
+      })
+  }
 
   useEffect(() => {
     if (localStorage.getItem('Token')) {
@@ -103,7 +109,7 @@ export default function Login() {
             }
             if (res.org_id) {
               localStorage.setItem('org', res.org_id)
-              console.log("Saving org to localStorage:", res.org_id)
+              console.log('Saving org to localStorage:', res.org_id)
             }
             localStorage.setItem('email', res.username)
             localStorage.setItem('role', res.role)
@@ -256,7 +262,12 @@ export default function Login() {
                 display="flex"
                 justifyContent="center"
                 alignItems="center"
-                sx={{ height: '350px', width: '800px', overflow: 'hidden' }}
+                sx={{
+                  height: '350px',
+                  width: '800px',
+                  overflow: 'hidden',
+                  minHeight: '370px',
+                }}
               >
                 <Box
                   sx={{

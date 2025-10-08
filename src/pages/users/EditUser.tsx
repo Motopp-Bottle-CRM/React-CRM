@@ -19,6 +19,7 @@ import {
   Select,
   FormControl,
   FormHelperText,
+  Alert,
 } from '@mui/material'
 import { UserUrl } from '../../services/ApiUrls'
 import { fetchData, Header } from '../../components/FetchData'
@@ -125,6 +126,7 @@ export function EditUser() {
   const [isActivating, setIsActivating] = useState(false)
   const [isDeactivating, setIsDeactivating] = useState(false)
   const [msg, setMsg] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
   const [userStatus, setUserStatus] = useState<'Active' | 'Inactive' | 'Unknown'>('Unknown')
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null)
@@ -346,14 +348,12 @@ useEffect(() => {
   }
   const handleSubmit = (e: any) => {
     e.preventDefault()
-    if (formData.phone) {
-      if (formData.phone === formData.alternate_phone) {
+    if (formData.phone && formData.alternate_phone && formData.phone === formData.alternate_phone) {
         setProfileErrors({
           ...profileErrors,
           alternate_phone: ['Alternate phone cannot be the same as phone'],
         })
         return
-      }
     }
 
     submitForm()
@@ -383,21 +383,38 @@ useEffect(() => {
       city: formData.city,
       state: formData.state,
       postcode: formData.postcode,
-      country: getCountryNameFromCode(formData.country),
+      // Send country code to backend; backend provides display via serializer
+      country: formData.country,
     }
 
     fetchData(`${UserUrl}/${state?.id}/`, 'PUT', JSON.stringify(data), Header)
       .then((res: any) => {
-        resetForm()
-        navigate('/app/users')
+        setSuccessMessage('User info updated successfully!')
+        setError(false)
+        // Show success message for 1 second before navigating
+        setTimeout(() => {
+          resetForm()
+          navigate('/app/users')
+        }, 1000)
       })
       .catch(async (err: any) => {
         setError(true)
-        const profileErr = err?.profile_errors?.[0] || {}
-        const userErr = err?.user_errors?.[0] || {}
-
-        setProfileErrors(profileErr)
-        setUserErrors(userErr)
+        setSuccessMessage('')
+        
+        // Handle nested error structure from backend
+        const profileErrors = err?.profile_errors || {}
+        const userErrors = err?.user_errors || {}
+        
+        setProfileErrors(profileErrors)
+        setUserErrors(userErrors)
+        
+        // Show the first error message found
+        const firstError = 
+          userErrors?.email?.[0] || 
+          profileErrors?.phone?.[0] || 
+          profileErrors?.alternate_phone?.[0] ||
+          'Please correct the highlighted errors.'
+        setMsg(firstError)
       })
   }
   const resetForm = () => {
@@ -545,7 +562,15 @@ useEffect(() => {
         onSubmit={handleSubmit}
       />
       <Box sx={{ mt: '120px' }}>
-        {/* Success/Error Messages */}
+        {/* Success Message Alert */}
+        {successMessage && (
+          <Box sx={{ mb: 2, px: 2 }}>
+            <Alert severity="success" onClose={() => setSuccessMessage('')}>
+              {successMessage}
+            </Alert>
+          </Box>
+        )}
+        {/* Error Messages */}
         {msg && (
           <Box sx={{ mb: 2, px: 2 }}>
             <div style={{

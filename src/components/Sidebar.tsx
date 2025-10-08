@@ -34,10 +34,6 @@ import { fetchData } from './FetchData'
 import { ProfileUrl } from '../services/ApiUrls'
 import { Header1 } from './FetchData'
 import OrganizationModal from '../pages/organization/OrganizationModal'
-import Company from '../pages/company/Company'
-import AddCompany from '../pages/company/AddCompany'
-import CompanyDetails from '../pages/company/CompanyDetails'
-import EditCompany from '../pages/company/EditCompany'
 import Leads from '../pages/leads/Leads'
 import AddContacts from '../pages/contacts/AddContacts'
 import { EditLead } from '../pages/leads/EditLead'
@@ -72,6 +68,10 @@ import { ROLE_PERMISSIONS } from '../constants/role_permissions'
 import { allNavList } from '../constants/navigation_modules'
 import NotFounded from  '../pages/NotFounded'
 import ProtectedRoute from "../components/ProtectedRoute";
+import Company from '../pages/company/Company'
+import AddCompany from '../pages/company/AddCompany'
+import EditCompany from '../pages/company/EditCompany'
+import CompanyDetails from '../pages/company/CompanyDetails'
 
 export default function Sidebar(props: any) {
   const navigate = useNavigate()
@@ -81,10 +81,10 @@ export default function Sidebar(props: any) {
   const [headerWidth, setHeaderWidth] = useState(drawerWidth)
   const [userDetail, setUserDetail] = useState('')
   const [organizationModal, setOrganizationModal] = useState(false)
-  
+
   const email = localStorage.getItem('email') || 'No email'
   const role = localStorage.getItem('role') || 'SALES'
-  
+
   const organizationModalClose = () => {
     setOrganizationModal(false)
   }
@@ -116,7 +116,7 @@ const toggleScreen = () => {
 
 useEffect(() => {
   toggleScreen();
-}, [navigate, location.pathname, role]); 
+}, [navigate, location.pathname, role]);
 
 
 
@@ -150,7 +150,6 @@ useEffect(() => {
     contacts: <FaAddressBook />,
     opportunities: <FaHandshake />,
     accounts: <FaBuilding />,
-    companies: <FaIndustry />,
     users: <FaUserFriends />,
     cases: <FaBriefcase />,
   }
@@ -333,7 +332,7 @@ useEffect(() => {
             </Popover>
           </Box>
         </AppBar>
-        
+
         {/*  Creating  of the  left-side menu */}
         <Drawer
           variant="permanent"
@@ -419,6 +418,14 @@ useEffect(() => {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/app/leads/lead-details/:leadId"
+                element={
+                  <ProtectedRoute role={role} module="leads">
+                    <LeadDetails />
+                  </ProtectedRoute>
+                }
+              />
 
               {/* Companies */}
               <Route
@@ -446,7 +453,23 @@ useEffect(() => {
                 }
               />
               <Route
+                path="/app/companies/edit-company/:id"
+                element={
+                  <ProtectedRoute role={role} module="companies">
+                    <EditCompany />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/app/companies/company-details"
+                element={
+                  <ProtectedRoute role={role} module="companies">
+                    <CompanyDetails />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/companies/company-details/:id"
                 element={
                   <ProtectedRoute role={role} module="companies">
                     <CompanyDetails />
@@ -480,7 +503,23 @@ useEffect(() => {
                 }
               />
               <Route
+                path="/app/contacts/contact-details/:id"
+                element={
+                  <ProtectedRoute role={role} module="contacts">
+                    <ContactDetails />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/app/contacts/edit-contact"
+                element={
+                  <ProtectedRoute role={role} module="contacts">
+                    <EditContact />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/contacts/edit-contact/:id"
                 element={
                   <ProtectedRoute role={role} module="contacts">
                     <EditContact />
@@ -630,9 +669,9 @@ useEffect(() => {
               {/* Not Found */}
               <Route path="/not-found" element={<NotFounded />} />
               <Route path="*" element={<NotFounded />} />
-            </Routes> 
-          
-          
+            </Routes>
+
+
           </Box>
         </MyContext.Provider>
         <OrganizationModal

@@ -11,16 +11,18 @@ export function CustomAppBar(props: any) {
   const navigate = useNavigate()
   const {
     backbtnHandle,
-    editHandle,
+    onEdit,
     module,
     crntPage,
     backBtn,
     onCancel,
     onSubmit,
     isSubmitting = false,
+    detail = false,
   } = props
 
   const Module = module.toLowerCase()
+
 
   return (
     <AppBar
@@ -71,7 +73,7 @@ export function CustomAppBar(props: any) {
             </Link>
           </Breadcrumbs>
         </div>
-        {location.state?.detail ? (
+        {(location.state?.detail || detail) ? (
           <div className="saveClose">
             <div style={{ marginRight: '10px' }}>
               <Button
@@ -94,7 +96,7 @@ export function CustomAppBar(props: any) {
                 variant="contained"
                 className="header-button"
                 size="small"
-                onClick={editHandle}
+                onClick={onEdit}
                 startIcon={<FaEdit style={{ fill: 'white', width: '16px' }} />}
                 style={{
                   textTransform: 'capitalize',
@@ -145,7 +147,7 @@ export function CustomAppBar(props: any) {
             </div>
             <div>
               <Button
-                // type='submit'
+                type="submit"
                 className="header-button"
                 onClick={onSubmit}
                 variant="contained"

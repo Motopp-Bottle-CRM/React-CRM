@@ -14,6 +14,7 @@ import {
   Select,
   FormHelperText,
   Button,
+  Alert,
 } from '@mui/material'
 import { useQuill } from 'react-quilljs'
 import 'quill/dist/quill.snow.css'
@@ -71,6 +72,7 @@ function AddContacts() {
   // }, [location.pathname]);
 
   const [error, setError] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
   const [formData, setFormData] = useState({
     salutation: '',
     first_name: '',
@@ -208,16 +210,31 @@ function AddContacts() {
       .then((res: any) => {
         // console.log('Form data:', res);
         if (!res.error) {
-          // setResponceError(data.error)
-          navigate('/app/contacts')
-          resetForm()
+          setSuccessMessage('Contact created successfully!')
+          setError(false)
+          // Show success message for 1 second before navigating
+          setTimeout(() => {
+            resetForm()
+            navigate('/app/contacts')
+          }, 1000)
         }
         if (res.error) {
           setError(true)
+          setSuccessMessage('')
           setErrors(res?.errors?.contact_errors)
         }
       })
-      .catch(() => {})
+      .catch((err: any) => {
+        // Merge contact and address errors (backend returns address_errors as a tuple)
+        console.error('Create contact failed with errors:', err)
+        setError(true)
+        setSuccessMessage('')
+        const contactErrors = err?.errors?.contact_errors || {}
+        const addressErrors = Array.isArray(err?.errors?.address_errors)
+          ? err?.errors?.address_errors?.[0] || {}
+          : err?.errors?.address_errors || {}
+        setErrors({ ...(contactErrors as any), ...(addressErrors as any) })
+      })
   }
 
   const resetForm = () => {
@@ -261,17 +278,25 @@ function AddContacts() {
 
   // console.log(errors, 'err')
   return (
-    <Box sx={{ mt: '60px' }}>
-      <CustomAppBar
-        backbtnHandle={backbtnHandle}
-        module={module}
-        backBtn={backBtn}
-        crntPage={crntPage}
-        onCancel={onCancel}
-        onSubmit={handleSubmit}
-      />
-      <Box sx={{ mt: '120px' }}>
-        <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit}>
+      <Box sx={{ mt: '60px' }}>
+        <CustomAppBar
+          backbtnHandle={backbtnHandle}
+          module={module}
+          backBtn={backBtn}
+          crntPage={crntPage}
+          onCancel={onCancel}
+          onSubmit={handleSubmit}
+        />
+        <Box sx={{ mt: '120px' }}>
+          {/* Success Message Alert */}
+          {successMessage && (
+            <Box sx={{ mb: 2, px: 2 }}>
+              <Alert severity="success" onClose={() => setSuccessMessage('')}>
+                {successMessage}
+              </Alert>
+            </Box>
+          )}
           {/* contact details */}
           <div style={{ padding: '10px' }}>
             <div className="leadContainer">
@@ -290,22 +315,7 @@ function AddContacts() {
                     component="form"
                     autoComplete="off"
                   >
-                    <div className="fieldContainer">
-                      <div className="fieldSubContainer">
-                        <div className="fieldTitle">Salutation</div>
-                        <TextField
-                          name="salutation"
-                          className="custom-textfield"
-                          value={formData.salutation}
-                          onChange={handleChange}
-                          style={{ width: '70%' }}
-                          size="small"
-                          error={!!errors?.salutation?.[0]}
-                          helperText={
-                            errors?.salutation?.[0] ? errors?.salutation[0] : ''
-                          }
-                        />
-                      </div>
+                    <div className="fieldContainer2">
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">First Name</div>
                         <RequiredTextField
@@ -321,8 +331,6 @@ function AddContacts() {
                           }
                         />
                       </div>
-                    </div>
-                    <div className="fieldContainer2">
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Last Name</div>
                         <RequiredTextField
@@ -338,7 +346,9 @@ function AddContacts() {
                           }
                         />
                       </div>
-                      <div className="fieldSubContainer">
+                    </div>
+                    <div className="fieldContainer2">
+                      {/* <div className="fieldSubContainer">
                         <div className="fieldTitle">Organization</div>
                         <RequiredTextField
                           name="organization"
@@ -354,11 +364,26 @@ function AddContacts() {
                               : ''
                           }
                         />
-                      </div>
+                      </div> */}
+                      {/* <div className="fieldSubContainer">
+                        <div className="fieldTitle">Department</div>
+                        <TextField
+                          name="department"
+                          id="outlined-error-helper-text"
+                          value={formData.department}
+                          onChange={handleChange}
+                          style={{ width: '70%' }}
+                          size="small"
+                          error={!!errors?.department?.[0]}
+                          helperText={
+                            errors?.department?.[0] ? errors?.department[0] : ''
+                          }
+                        />
+                      </div> */}
                     </div>
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Primary Email</div>
+                        <div className="fieldTitle">Email</div>
                         <RequiredTextField
                           name="primary_email"
                           value={formData.primary_email}
@@ -375,41 +400,7 @@ function AddContacts() {
                         />
                       </div>
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Secondary Email</div>
-                        <TextField
-                          name="secondary_email"
-                          value={formData.secondary_email}
-                          onChange={handleChange}
-                          style={{ width: '70%' }}
-                          size="small"
-                          error={!!errors?.secondary_email?.[0]}
-                          helperText={
-                            errors?.secondary_email?.[0]
-                              ? errors?.secondary_email[0]
-                              : ''
-                          }
-                        />
-                      </div>
-                    </div>
-                    <div className="fieldContainer2">
-                      <div className="fieldSubContainer">
-                        <div className="fieldTitle">Department</div>
-                        <RequiredTextField
-                          name="department"
-                          id="outlined-error-helper-text"
-                          value={formData.department}
-                          onChange={handleChange}
-                          required
-                          style={{ width: '70%' }}
-                          size="small"
-                          error={!!errors?.department?.[0]}
-                          helperText={
-                            errors?.department?.[0] ? errors?.department[0] : ''
-                          }
-                        />
-                      </div>
-                      <div className="fieldSubContainer">
-                        <div className="fieldTitle">Title</div>
+                        <div className="fieldTitle">Job Title</div>
                         <TextField
                           name="title"
                           value={formData.title}
@@ -447,8 +438,7 @@ function AddContacts() {
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Secondary Number</div>
                         <Tooltip title="Number must starts with +91">
-                          <RequiredTextField
-                            required
+                          <TextField
                             name="secondary_number"
                             value={formData.secondary_number}
                             onChange={handleChange}
@@ -467,8 +457,7 @@ function AddContacts() {
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Language</div>
-                        <RequiredTextField
-                          required
+                        <TextField
                           name="language"
                           value={formData.language}
                           onChange={handleChange}
@@ -481,7 +470,7 @@ function AddContacts() {
                         />
                       </div>
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Do Not Call</div>
+                        {/* <div className="fieldTitle">Do Not Call</div> */}
                         {/* <FormControlLabel
                           control={<AntSwitch
                             name='do_not_call'
@@ -490,7 +479,7 @@ function AddContacts() {
                             sx={{ mt: '1%' }}
                           />}
                         /> */}
-                        <AntSwitch
+                        {/* <AntSwitch
                           name="do_not_call"
                           checked={formData.do_not_call}
                           // onChange={handleChange}
@@ -501,7 +490,7 @@ function AddContacts() {
                             }))
                           }}
                           sx={{ mt: '1%' }}
-                        />
+                        /> */}
                       </div>
                     </div>
                   </Box>
@@ -531,9 +520,8 @@ function AddContacts() {
                   >
                     <div className="fieldContainer">
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Billing Address</div>
-                        <RequiredTextField
-                          required
+                        <div className="fieldTitle">Address</div>
+                        <TextField
                           name="address_line"
                           value={formData.address_line}
                           onChange={handleChange}
@@ -711,66 +699,13 @@ function AddContacts() {
                         <div ref={quillRef} />
                       </div>
                     </div>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        mt: 1.5,
-                      }}
-                    >
-                      <Button
-                        className="header-button"
-                        onClick={resetQuillToInitialState}
-                        size="small"
-                        variant="contained"
-                        startIcon={
-                          <FaTimesCircle
-                            style={{
-                              fill: 'white',
-                              width: '16px',
-                              marginLeft: '2px',
-                            }}
-                          />
-                        }
-                        sx={{
-                          backgroundColor: '#2b5075',
-                          ':hover': { backgroundColor: '#1e3750' },
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        className="header-button"
-                        onClick={() =>
-                          setFormData({
-                            ...formData,
-                            description: quillRef.current.firstChild.innerHTML,
-                          })
-                        }
-                        variant="contained"
-                        size="small"
-                        startIcon={
-                          <FaCheckCircle
-                            style={{
-                              fill: 'white',
-                              width: '16px',
-                              marginLeft: '2px',
-                            }}
-                          />
-                        }
-                        sx={{ ml: 1 }}
-                      >
-                        Save
-                      </Button>
-                    </Box>
+
                   </Box>
                 </AccordionDetails>
               </Accordion>
             </div>
             {/* Socials */}
-            <div
+            {/* <div
               style={{
                 display: 'flex',
                 flexDirection: 'row',
@@ -903,11 +838,11 @@ function AddContacts() {
                   </Box>
                 </AccordionDetails>
               </Accordion>
-            </div>
+            </div> */}
           </div>
-        </form>
+        </Box>
       </Box>
-    </Box>
+    </form>
   )
 }
 
